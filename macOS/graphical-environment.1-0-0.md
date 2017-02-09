@@ -14,6 +14,8 @@ Google Chrome: ```yaourt google-chrome```
 Discord: ```yaourt discord```
 Blender: ```pacman -Sy blender```
 Pamac: ```yaourt pamac-aur```
+Numix Square Icons: ```yaourt numix-square-icon-theme```
+Adapta: ```yaourt adapta-gtk-theme```
 
 #### SDDM Themes
 For this example I'm just going to use sao-grasslands. Download the zip from
