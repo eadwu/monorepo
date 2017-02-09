@@ -1,5 +1,5 @@
 # Post Installation
-Setup your wifi with [netctl](../macOS.netctl.1-0-0) and run ```ping -c 3 google.com``` to verify that you have a connection.
+Setup your wifi with [netctl](https://github.com/Kutoru/arch-x-os/blob/master/macOS/netctl.1-0-0.md) and run ```ping -c 3 google.com``` to verify that you have a connection.
 
 ## Sources
 LearnLinux.tv, see [here](https://www.youtube.com/watch?v=GCUmGtCYPWM)
@@ -44,19 +44,19 @@ If you want the 32-bit drivers as well then run ```pacman -Sy lib32-intel-dri li
 If you're planning to run XFCE you should also run the following. Run ```yaourt -S xfce4-indicator-plugin``` then ```systemctl disable netctl.service``` to disable netctl and then to enable NetworkManager run ```systemctl enable NetworkManager.service```. For USB Mounting support run ```pacman -Sy thunar-volman gvfs```.
 
 #### NTP (Network Time Protocol)
-Follow the instructions [here](../macOS.ntp.1-0-0/README.md).
+Follow the instructions [here](https://github.com/Kutoru/arch-x-os/blob/master/macOS/ntp.1-0-0.md).
 
 #### Bluetooth
-Follow the instructions [here](../macOS.bluetooth.1-0-0/README.md).
+Follow the instructions [here](https://github.com/Kutoru/arch-x-os/blob/master/macOS/bluetooth.1-0-0.md).
 
 #### Trackpad Configuration
-Follow the instructions [here](../macOS.trackpad.1-0-0/README.md)
+Follow the instructions [here](https://github.com/Kutoru/arch-x-os/blob/master/macOS/trackpad.1-0-0.md)
 
-#### Git, Node.js, Coffeescript, and Atom
-Follow the instructions [here](../macOS.extra.1-0-0/README.md).
+#### Git, Node.js, Coffeescript, Atom, and Redshift
+Follow the instructions [here](https://github.com/Kutoru/arch-x-os/blob/master/macOS/extra.1-0-0.md).
 
 #### Desktop Manager/Environment
-Follow the instructions [here](../macOS.graphical-environment.1-0-0/README.md)
+Follow the instructions [here](https://github.com/Kutoru/arch-x-os/blob/master/macOS/graphical-environment.1-0-0.md)
 
 #### Conky
-Follow the instructions [here](../macOS.conky.1-0-0/README.md)
+Follow the instructions [here](https://github.com/Kutoru/arch-x-os/blob/master/macOS/conky.1-0-0.md)
