@@ -214,4 +214,4 @@ Open up terminal and run ```sudo bless --device /dev/disk0s4 --setBoot``` and it
 To reenable System Integrity Protection go back to recovery mode and its Terminal and run ```csrutil enable```.
 
 ## Post Install
-To see what I do after doing the base installation of Arch Linux see [here](./macOS.post_install.1-0-0/README.md).
+Most of the steps from here basically assume you're going to install XFCE, see [here](https://github.com/Kutoru/arch-x-os/blob/master/macOS/post_install.1-0-0.md) to continue.
