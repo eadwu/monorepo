@@ -4,7 +4,7 @@ Instructions for dual booting Arch Linux.
 #### Standard Installation
 **Last Built:** N/A
 
-Written off the top of my head after installing Arch Linux. Might be missing some things. See [here](https://github.com/Kutoru/arch-x-os/blob/1.x/macOS/standard.1-0-0.md) for instructions.
+Written off the top of my head after installing Arch Linux. Might be missing some things. See [here](https://github.com/Kutoru/arch-x-os/blob/1.x/macOS/standard.1-0-1.md) for instructions.
 
 #### Encrypted Installation
 **Last Built:** N/A
