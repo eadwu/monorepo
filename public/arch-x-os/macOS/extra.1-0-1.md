@@ -8,6 +8,6 @@ Run ```sudo pacman -Sy nodejs npm``` to install Node.js and npm.
 
 Run ```sudo pacman -Sy coffee-script``` to install Coffeescript.
 
-Run ```pacman -Sy atom``` to install (Atom)[atom.io].
+Run ```pacman -Sy atom``` to install [Atom](atom.io).
 
 Run ```pacman -Sy redshift python-gobject python-xdg librsvg``` to install Redshift.

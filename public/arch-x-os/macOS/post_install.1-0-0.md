@@ -53,7 +53,7 @@ Follow the instructions [here](https://github.com/Kutoru/arch-x-os/blob/master/m
 Follow the instructions [here](https://github.com/Kutoru/arch-x-os/blob/master/macOS/trackpad.1-0-0.md)
 
 #### Git, Node.js, Coffeescript, Atom, and Redshift
-Follow the instructions [here](https://github.com/Kutoru/arch-x-os/blob/master/macOS/extra.1-0-0.md).
+Follow the instructions [here](https://github.com/Kutoru/arch-x-os/blob/master/macOS/extra.1-0-1.md).
 
 #### Desktop Manager/Environment
 Follow the instructions [here](https://github.com/Kutoru/arch-x-os/blob/master/macOS/graphical-environment.1-0-0.md)
