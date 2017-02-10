@@ -102,26 +102,25 @@ Verify TRIM support by using ```lsblk -D``` and checking the DISC-GRAN and DISC-
 
 **Operating in nano: Ctrl+O then enter to save file and Ctrl+X to exit nano**
 
-Edit /mnt/etc/fstab by ```nano /mnt/etc/fstab```. Add discard to the root and boot partitions.
+Edit /mnt/etc/fstab by `nano /mnt/etc/fstab`. Add discard to the root and boot partitions.
 
-```
-/dev/sda7 /         ext4 defaults,noatime,discard,data=writeback 0 1
-/dev/sda5 /boot  ext4 defaults,relatime,stripe=4                         0 2
-```
+    /dev/sda7 /         ext4 defaults,noatime,discard,data=writeback 0 1
+    /dev/sda5 /boot     ext4 defaults,relatime,stripe=4                         0 2
+
 #### System Configuration
-Get into root by ```arch-chroot /mnt /bin/bash``` and then set the root password by ```passwd```.
+Get into root by `arch-chroot /mnt /bin/bash` and then set the root password by `passwd`.
 
-**Wireless packages for post installation, if you're going to follow the post installation for this you should run ```pacman -S wpa_supplicant wireless_tools``` otherwise continue.**
+**Wireless packages for post installation, if you're going to follow the post installation for this you should run `pacman -S wpa_supplicant wireless_tools` otherwise continue.**
 
-OPTIONAL: Install linux-headers by ```pacman -S linux-headers```
+OPTIONAL: Install linux-headers by `pacman -S linux-headers`
 
-Set the hostname by ```echo HOST_NAME > /etc/hostname```.
+Set the hostname by `echo HOST_NAME > /etc/hostname`.
 
-Set your timezone by ```ln -s /usr/share/zoneinfo/AREA/CITY /etc/localtime```. If you get an error, do ```ln -sf /usr/share/zoneinfo/AREA/CITY /etc/localtime```.
+Set your timezone by `ln -s /usr/share/zoneinfo/AREA/CITY /etc/localtime`. If you get an error, do `ln -sf /usr/share/zoneinfo/AREA/CITY /etc/localtime`.
 
-Then do ```hwclock --systohc --utc```.
+Then do `hwclock --systohc --utc`.
 
-Create your user by ```useradd -m -g users -G wheel -s /bin/bash USER_NAME``` and set its password by ```passwd USER_NAME```.
+Create your user by `useradd -m -g users -G wheel -s /bin/bash USER_NAME` and set its password by `passwd USER_NAME`.
 
 Install sudo by ```pacman -S sudo```. Grant sudo for terminal use by ```echo "%wheel ALL=(ALL) ALL" > /etc/sudoers.d/10-grant-wheel-group```.
 
@@ -129,22 +128,22 @@ Set up your locale by ```nano /etc/locale.gen``` and uncomment the one(s) that f
 #### Mkinitcpio
 Add "keyboard" after "autodetect" if it doesn't exist by ```nano /etc/mkinitcpio.conf``` and then running it with ```mkinitcpio -p linux```
 #### GRUB/EFI
-** Explanations for this part can be found [here](https://github.com/pandeiro/arch-on-air#11-set-up-grubefi).**
+**Explanations for this part can be found [here](https://github.com/pandeiro/arch-on-air#11-set-up-grubefi).**
 
 Install GRUB-EFI by ```pacman -S grub-efi-x86_64```.
 
 Configure it by ```nano /etc/default/grub``` and edit GRUB_CMDLINE_LINUX_DEFAULT to be ```GRUB_CMDLINE_LINUX_DEFAULT="quiet rootflags=data=writeback libata.force=1:noncq"```.
 
 Add this snippet to file also.
-```
-# fix broken grub.cfg gen
-GRUB_DISABLE_SUBMENU=y```
+
+    # fix broken grub.cfg gen
+    GRUB_DISABLE_SUBMENU=y
 
 Run the following command to build "boot.efi".
-```
-grub-mkconfig -o boot/grub/grub.cfg
-grub-mkstandalone -o boot.efi -d usr/lib/grub/x86_64-efi -O x86_64-efi --compress=xz boot/grub/grub.cfg
-```
+
+    grub-mkconfig -o boot/grub/grub.cfg
+    grub-mkstandalone -o boot.efi -d usr/lib/grub/x86_64-efi -O x86_64-efi --compress=xz boot/grub/grub.cfg
+
 #### Copying boot.efi
 This is where you need your second USB. Plug it into a port and then run ```fdisk -l``` to find the partition. Here it would be /dev/sdd. Find the partition that is the USB's filesystem. It would most likely be in a FAT or FAT32 format. Here it will be /dev/sdd1.
 
