@@ -96,13 +96,17 @@ Run `sudo pacman -Sy nodejs npm` to install Node.js and npm.
 
 Run `sudo pacman -Sy coffee-script` to install Coffeescript.
 
+Run `sudo pacman -Sy php` to install PHP.
+
 Run `pacman -Sy atom` to install [Atom](atom.io).
 
 Run `pacman -Sy redshift python-gobject python-xdg librsvg` to install Redshift.
 
+Run `pacman -Sy blender` to install Blender.
+
 Run `pacman -Sy chromium` to install Chromium.
 
-Run `pacman -Sy blender` to install Blender.
+My Chromium Fonts: `pacman -Sy ttf-croscore ttf-liberation ttf-inconsolata`
 
 #### Graphical Enviornment
 To install SDDM run `pacman -Sy sddm` and then enable it by running `systemctl enable sddm.service`.
