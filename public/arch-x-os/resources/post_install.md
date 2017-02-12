@@ -106,7 +106,7 @@ Run `pacman -Sy blender` to install Blender.
 
 Run `pacman -Sy chromium` to install Chromium.
 
-My Chromium Fonts: `pacman -Sy ttf-croscore ttf-liberation ttf-inconsolata`
+Non Latin Chromium Font: `pacman -Sy noto-fonts-cjk`
 
 #### Graphical Enviornment
 To install SDDM run `pacman -Sy sddm` and then enable it by running `systemctl enable sddm.service`.
