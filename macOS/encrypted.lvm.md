@@ -1,31 +1,23 @@
-# **Dual booting macOS and Arch Linux**
-Base installation of Arch Linux on macOS.
+# **Encrypted LVM Arch Linux and macSO dual boot**
 ## Sources
-The information used here is mainly from pandeiro's arch-on-air repository (see [here](https://github.com/pandeiro/arch-on-air)) with a few lines being from Mark H. Nichols (see [here](http://zanshin.net/2015/02/05/arch-linux-on-a-macbook-pro-part-3-base-installation/)) and LearnLinux.tv (see [here](https://www.youtube.com/watch?v=lizdpoZj_vU)).
-## **Requirements**
-Wifi access
+Pandeiro's [Arch on Air](https://github.com/pandeiro/arch-on-air)
 
-2 USB Drives
-## **Prerequisites**
-Partition the hard drive using DiskUtility.
+LearnLinux.tv's [Installing Arch Linux on Encrypted LVM](https://www.youtube.com/watch?v=gB1N00wj3bw)
+## Requirements
+See [requirements](https://github.com/Kutoru/arch-x-os/blob/master/macOS/standard.md#requirements)
+## Prerequisites
+See [prerequisites](https://github.com/Kutoru/arch-x-os/blob/master/macOS/standard.md#requirements)
+## Procedure
+#### Partitioning
+The installation process for a LVM Encrypted Arch Linux is pretty similar to the standard installation.
 
-Download the [Arch Linux ISO](https://www.archlinux.org/download/) and burn it into a USB/CD.
+Use `fdisk -l` and find out which of the partitions is your drive. For this, it'll be __/dev/sda__.
 
-Boot into the USB/CD.
+Adjust accordingly based on what yours is.
 
-## **Procedure**
-#### **Partitioning**
-Here we will be creating 3 partitions for Arch Linux. Adjust accordingly to your preferences.
+Run `cgdisk /dev/sda`. Controlling the menu here is easy, just use the arrow keys. **Please note: [enter] means just to press enter.**
 
-Use `fdisk -l` to display the hard drive partitions. Find out which one is your hard drive. Here it will be /dev/sda
-
-Run `cgdisk /dev/sda`
-
-Use the arrow keys to control the menu.
-
-Delete the partition you created beforehand. And make your partition target the Free Space which should be at the bottom of the partitions.
-
-**[enter] basically means to just press enter**
+Delete the partition you made beforehand and the amount of free space should be somewhere around the amount you partitioned for it.
 
 Boot Loader Partition
 
@@ -36,61 +28,60 @@ Boot Loader Partition
     af00
     [enter]
 
-Boot partition
-
-**There is suppose to be free space. Read more about Apple's partitioning policy [here](https://developer.apple.com/library/content/technotes/tn2166/_index.html#//apple_ref/doc/uid/DTS10003927-CH1-SUBSECTION5).**
+Boot Partition
 
     New
     [enter]
     +128Mib
-    +128Mib
+    +256Mib
     [enter]
     [enter]
 
-Swap partition
-
-***The size of this partition is opinion based. Some say it isn't needed but I usually just make a 2GB partition when I have 4GB RAM built-in with no problems so far.***
-
-**If you don't want to create a swap partition but a swap file follow the instructions [here](https://github.com/pandeiro/arch-on-air/blob/master/README.org#4-format-and-mount-partitions)**
-
-    New
-    [enter]
-    [enter]
-    +2Gib
-    8200
-    [enter]
-
-Root partition
+Root Partition
 
     New
     [enter]
     [enter]
     [enter]
+    8e00
     [enter]
-    [enter]
 
-#### Formatting partitions
+The current partition setup for this currently:
 
-If you followed the above directions and assuming you only have macOS then
+    /dev/sda4 - Boot Loader
+    /dev/sda5 - Boot Partition
+    /dev/sda6 - Root Partition
 
-/dev/sda4 should be the Boot Loader partition
+Adjust the following commands based on your setup.
 
-/dev/sda5 should be the Boot partition
+To set it up for LVM run `cryptsetup luksFormat /dev/sda6`, type __YES__ and then create a password for it.
 
-/dev/sda6 should be the Swap partition
+To create the swap/roots partitions we will need access to the drive so run `cryptsetup open --type luks /dev/sda6 lvm` and enter your password.
 
-/dev/sda7 should be the Root partition
+__SSD Configuration : Run `pvcreate --dataalignment 1m /dev/mapper/lvm` otherwise run `pvcreate /dev/mapper/lvm`__
+
+Run `vgcreate volgroup0 /dev/mapper/lvm`.
+
+To create the swap partition run `lvcreate -L 2GB volgroup0 -n lv_swap`. Edit the size of this partition accordingly to your needs. It is also possible to skip this partition.
+
+To create the root partition run `lvcreate -l 100%FREE volgroup0 -n lv_root`.
+
+Then run `modprobe dm_mod`, `vgscan`, and `vgchange -ay`.
+
+#### Formatting and Mounting Partitions
 
     mkfs.ext4 /dev/sda5
-    mkfs.ext4 /dev/sda7
-    mkswap /dev/sda6
-    swapon /dev/sda6
+    mkfs.ext4 /dev/volgroup0/lv_root
+    mkswap /dev/volgroup0/lv_swap
+    swapon /dev/volgroup0/lv_swap
 
-    mount /dev/sda7 /mnt
+    mount /dev/volgroup0/lv_root /mnt
     mkdir /mnt/boot && mount /dev/sda5 /mnt/boot
 
 #### Installation
-We will be setting up wireless here. You can use `wifi-menu` or [netctl](https://github.com/Kutoru/arch-x-os/blob/1.x/macOS/netctl.1-0-0.md). Verify you have internet access with `ping -c 3 google.com`
+Due to minimal difference between the steps, this is basically a copy and paste of the standard installation.
+
+We will be setting up wireless here. You can use `wifi-menu` or [netctl](https://github.com/Kutoru/arch-x-os/blob/master/resources/netctl.md). Verify you have internet access with `ping -c 3 google.com`
 
     pacstrap /mnt base base-devel   
 #### FStab
@@ -104,10 +95,15 @@ Verify TRIM support by using `lsblk -D` and checking the DISC-GRAN and DISC-MAX 
 
 Edit /mnt/etc/fstab by `nano /mnt/etc/fstab`. Add discard to the root and boot partitions.
 
-    /dev/sda7 /         ext4 defaults,noatime,discard,data=writeback      0 1
-    /dev/sda5 /boot     ext4 defaults,relatime,stripe=4                   0 2
+    # /dev/mapper/volgroup0-lv_root
+    UUID=PARTITION_UUID	/         	ext4      	defaults,noatime,discard,data=writeback		0 1
+
+    # /dev/sda5
+    UUID=PARTITION_UUID	/boot     	ext4      	defaults,relatime,stripe=4			0 2
 
 #### System Configuration
+The same as the standard installation essentially.
+
 Get into root by `arch-chroot /mnt /bin/bash` and then set the root password by `passwd`.
 
 **Wireless packages for post installation, if you're going to follow the post installation for this you should run `pacman -S wpa_supplicant wireless_tools` otherwise continue.**
@@ -126,20 +122,27 @@ Install sudo by `pacman -S sudo`. Grant sudo for terminal use by `echo "%wheel A
 
 Set up your locale by `nano /etc/locale.gen` and uncomment the one(s) that fit your criteria. For me this was **en_US.UTF-8**. Run `locale-gen` and `echo LANG=en_US.UTF-8 > /etc/locale.conf` and `export LANG=en_US.UTF-8`
 #### Mkinitcpio
-Add "keyboard" after "autodetect" if it doesn't exist by `nano /etc/mkinitcpio.conf` and then running it with `mkinitcpio -p linux`
+Run `nano /etc/mkinitcpio.conf` and make sure __HOOKS__ is like this
+
+    HOOKS="base udev autodetect keyboard modconf block encrypt lvm2 filesystems fsck"
+
+and then run `mkinitcpio -p linux`.
+
 #### GRUB/EFI
 **Explanations for this part can be found [here](https://github.com/pandeiro/arch-on-air#11-set-up-grubefi).**
 
 Install GRUB-EFI by `pacman -S grub-efi-x86_64`.
 
-Configure it by `nano /etc/default/grub` and edit GRUB_CMDLINE_LINUX_DEFAULT to be `GRUB_CMDLINE_LINUX_DEFAULT="quiet rootflags=data=writeback libata.force=1:noncq"`.
+Configure it by `nano /etc/default/grub` and edit GRUB_CMDLINE_LINUX_DEFAULT to be
+
+    GRUB_CMDLINE_LINUX_DEFAULT="cryptdevice=/dev/sda6:volgroup0 quiet rootflags=data=writeback libata.force=1:noncq"
 
 Add this snippet to file also.
 
     # fix broken grub.cfg gen
     GRUB_DISABLE_SUBMENU=y
 
-Run the following command to build "boot.efi".
+Run the following command to build "boot.efi". __You may experience warnings here. I just ignored them and it still works fine.__
 
     grub-mkconfig -o boot/grub/grub.cfg
     grub-mkstandalone -o boot.efi -d usr/lib/grub/x86_64-efi -O x86_64-efi --compress=xz boot/grub/grub.cfg
@@ -213,4 +216,4 @@ Open up terminal and run `sudo bless --device /dev/disk0s4 --setBoot` and it sho
 To reenable System Integrity Protection go back to recovery mode and its Terminal and run `csrutil enable`.
 
 ## Post Install
-Most of the steps from here basically assume you're going to install XFCE, see [here](https://github.com/Kutoru/arch-x-os/blob/master/macOS/post_install.1-0-0.md) to continue.
+This is more like a reference for what I do after I finish this part. But if you want to see it look [here](https://github.com/Kutoru/arch-x-os/blob/master/resources/post_install.md).
