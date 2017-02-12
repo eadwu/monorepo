@@ -116,7 +116,7 @@ Reboot by running `reboot`. Log in and open terminal.
 #### Enabling NetworkManager
 Run `yaourt -S xfce4-indicator-plugin` then `systemctl disable netctl.service` to disable netctl and then to enable NetworkManager run `systemctl enable NetworkManager.service`.
 
-#### Other Applications
+#### Misc/Other Applications
 Google Chrome: `yaourt google-chrome`
 
 Discord: `yaourt discord`
@@ -126,3 +126,7 @@ Pamac: `yaourt pamac-aur`
 Numix Square Icons: `yaourt numix-square-icon-theme`
 
 Adapta: `yaourt adapta-gtk-theme`
+
+Archey3: `pacman -Sy archey3`
+
+Edit `~/.bashrc` and add `archey3 to it`
