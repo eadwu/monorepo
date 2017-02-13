@@ -106,7 +106,13 @@ Run `pacman -Sy blender` to install Blender.
 
 Run `pacman -Sy chromium` to install Chromium.
 
-Non Latin Chromium Font: `pacman -Sy noto-fonts-cjk`
+Non Latin Chromium Font: `pacman -Sy noto-fonts-cjk ttf-liberation`
+
+Archey3: `pacman -Sy archey3`
+
+Edit `~/.bashrc` and add `archey3` to it
+
+Run `pacman -Sy vlc` to install VLC Media Player.
 
 #### Graphical Enviornment
 To install SDDM run `pacman -Sy sddm` and then enable it by running `systemctl enable sddm.service`.
@@ -121,6 +127,10 @@ Reboot by running `reboot`. Log in and open terminal.
 Run `yaourt -S xfce4-indicator-plugin` then `systemctl disable netctl.service` to disable netctl and then to enable NetworkManager run `systemctl enable NetworkManager.service`.
 
 #### Misc/Other Applications
+DKMS: `pacman -Sy dkms`
+
+Broadcom-wl-dkms: `yaourt broadcom-wl-dkms`
+
 Google Chrome: `yaourt google-chrome`
 
 Discord: `yaourt discord`
@@ -130,7 +140,3 @@ Pamac: `yaourt pamac-aur`
 Numix Square Icons: `yaourt numix-square-icon-theme`
 
 Adapta: `yaourt adapta-gtk-theme`
-
-Archey3: `pacman -Sy archey3`
-
-Edit `~/.bashrc` and add `archey3 to it`
