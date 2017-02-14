@@ -23,7 +23,6 @@ Boot Loader Partition
 
     New
     [enter]
-    [enter]
     +128Mib
     af00
     [enter]
@@ -31,7 +30,6 @@ Boot Loader Partition
 Boot Partition
 
     New
-    [enter]
     +128Mib
     +256Mib
     [enter]
@@ -40,7 +38,6 @@ Boot Partition
 Root Partition
 
     New
-    [enter]
     [enter]
     [enter]
     8e00
