@@ -34,7 +34,6 @@ Boot Loader Partition
 
     New
     [enter]
-    [enter]
     +128Mib
     af00
     [enter]
@@ -44,7 +43,6 @@ Boot partition
 **There is suppose to be free space. Read more about Apple's partitioning policy [here](https://developer.apple.com/library/content/technotes/tn2166/_index.html#//apple_ref/doc/uid/DTS10003927-CH1-SUBSECTION5).**
 
     New
-    [enter]
     +128Mib
     +256Mib
     [enter]
@@ -58,7 +56,6 @@ Swap partition
 
     New
     [enter]
-    [enter]
     +2Gib
     8200
     [enter]
@@ -66,7 +63,6 @@ Swap partition
 Root partition
 
     New
-    [enter]
     [enter]
     [enter]
     [enter]
