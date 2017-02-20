@@ -78,6 +78,7 @@ Generate `30-touchpad.conf` by running `nano /etc/X11/xorg.conf.d/30-touchpad.co
       Driver "libinput"
       MatchIsTouchpad "on"
       Option "ClickMethod" "buttonareas"
+      Option "DisableWhileTyping" "off"
       Option "MiddleEmulation" "on"
     EndSection
 
@@ -93,8 +94,6 @@ Run `sudo pacman -Sy git` to install Git.
 If you plan to use SSH then run `sudo pacman -Sy openssh`.
 
 Run `sudo pacman -Sy nodejs npm` to install Node.js and npm.
-
-Run `sudo pacman -Sy coffee-script` to install Coffeescript.
 
 Run `sudo pacman -Sy php` to install PHP.
 
@@ -127,9 +126,13 @@ Reboot by running `reboot`. Log in and open terminal.
 Run `yaourt -S xfce4-indicator-plugin` then `systemctl disable netctl.service` to disable netctl and then to enable NetworkManager run `systemctl enable NetworkManager.service`.
 
 #### Misc/Other Applications
+Atom Beta: `yaourt atom-editor-beta-bin`
+
 DKMS: `pacman -Sy dkms`
 
 Broadcom-wl-dkms: `yaourt broadcom-wl-dkms`
+
+Flow: `yaourt flow javascript`
 
 Google Chrome: `yaourt google-chrome`
 
@@ -140,3 +143,20 @@ Pamac: `yaourt pamac-aur`
 Numix Square Icons: `yaourt numix-square-icon-theme`
 
 Adapta: `yaourt adapta-gtk-theme`
+
+#### Atom Configuration
+Go into the atom packages folder `cd ~/.atom/packages`.
+
+Building from source:
+
+1) Uninstall the package currently installed
+
+2) Clone repo by `git clone HTTP_REPO_GIT`
+
+3) Cd to the folder `cd FOLDER_NAME`
+
+4) Install dependencies `npm i`
+
+Build `Browser Plus` from source.
+
+For Linter v2 refer [here](https://github.com/steelbrain/linter-ui-default#installation)
