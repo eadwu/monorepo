@@ -113,9 +113,19 @@ Edit `~/.bashrc` and add `archey3` to it
 
 Run `pacman -Sy vlc` to install VLC Media Player.
 
+Compton: `pacman -Sy compton` and then disable normal compositor (in XFCE Settings > Window Tweaks > Compositor Disable it)
+
 #### Graphical Enviornment
+##### Display Manager
+###### SDDM
+
 To install SDDM run `pacman -Sy sddm` and then enable it by running `systemctl enable sddm.service`.
 
+###### LightDM
+
+Run `pacman -Sy lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings`. Then enable it by running `systemctl enable lightdm.service`
+##### Desktop Environment
+###### XFCE
 To install XFCE run `pacman -Sy xfce4 xfce4-goodies`.
 
 To install an Archive Manager (in this case Ark) run `pacman -Sy ark p7zip zip unzip unrar`
@@ -159,4 +169,4 @@ Building from source:
 
 Build `Browser Plus` from source.
 
-For Linter v2 refer [here](https://github.com/steelbrain/linter-ui-default#installation)
+For Linter v2 refer [here](https://github.com/steelbrain/linter-ui-default#installation).
