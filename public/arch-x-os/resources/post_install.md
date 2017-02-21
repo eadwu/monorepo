@@ -13,7 +13,7 @@ wiki.archlinux.org [PulseAudio/Troubleshooting](https://wiki.archlinux.org/index
 wiki.archlinux.org [Bluetooth_headset](https://wiki.archlinux.org/index.php/Bluetooth_headset)
 
 #### Audio
-Run `pacman -Sy alsa-utils` and then `alsamixer`. Unmute by pressing M and bring the scales up until the dB gain is 0.00. "The MM label below a channel indicates that the channel is muted, and 00 indicates that it is open." -- [wiki.archlinux.org](https://wiki.archlinux.org/index.php/PulseAudio/Troubleshooting)
+Run `pacman -Sy pulseaudio alsa-utils` and then `alsamixer`. Unmute by pressing M and bring the scales up until the dB gain is 0.00. "The MM label below a channel indicates that the channel is muted, and 00 indicates that it is open." -- [wiki.archlinux.org](https://wiki.archlinux.org/index.php/PulseAudio/Troubleshooting)
 
 #### Editing /etc/pacman.conf
 Run `nano /etc/pacman.conf`
@@ -62,7 +62,7 @@ Then run `systemctl daemon-reload` and then `systemctl enable bluetooth`.
 **Headset connected but no sound**
 Find your headset from running `pacmd ls` and then get the index value of your headset and run `pacmd set-card-profile INDEX_HERE a2dp_sink`.
 
-**Headset Autoconnection**
+**Headset Output Autoswitch**
 Edit /etc/pulse/default.pa by running `nano /etc/pulse/default.pa` and add the following snippet to it.
 
     ### automatically switch to newly-connected devices
@@ -82,55 +82,25 @@ Generate `30-touchpad.conf` by running `nano /etc/X11/xorg.conf.d/30-touchpad.co
       Option "MiddleEmulation" "on"
     EndSection
 
-#### Conky
-To install conky run `pacman -Sy conky conky-manager`.
+#### Packages
+Pacman Stuff: `pacman -Sy conky git openssh nodejs npm php redshift python-gobject python-xdg librsvg blender chromium screenfetch compton vlc ark p7zip zip unzip unrar dkms noto-fonts-cjk ttf-liberation`
+
+Disable XFCE's default compositor and enable compton.
+
+Edit `~/.bashrc` and add `screenfetch` to it.
 
 #### USB Mounting support
 Run `pacman -Sy thunar-volman gvfs`.
 
-#### Language/Applications
-Run `sudo pacman -Sy git` to install Git.
-
-If you plan to use SSH then run `sudo pacman -Sy openssh`.
-
-Run `sudo pacman -Sy nodejs npm` to install Node.js and npm.
-
-Run `sudo pacman -Sy php` to install PHP.
-
-Run `pacman -Sy atom` to install [Atom](atom.io).
-
-Run `pacman -Sy redshift python-gobject python-xdg librsvg` to install Redshift.
-
-Run `pacman -Sy blender` to install Blender.
-
-Run `pacman -Sy chromium` to install Chromium.
-
-Non Latin Chromium Font: `pacman -Sy noto-fonts-cjk ttf-liberation`
-
-Archey3: `pacman -Sy archey3`
-
-Edit `~/.bashrc` and add `archey3` to it
-
-Run `pacman -Sy vlc` to install VLC Media Player.
-
-Compton: `pacman -Sy compton` and then disable normal compositor (in XFCE Settings > Window Tweaks > Compositor Disable it)
-
 #### Graphical Enviornment
-##### Display Manager
-###### SDDM
-
-To install SDDM run `pacman -Sy sddm` and then enable it by running `systemctl enable sddm.service`.
-
 ###### LightDM
-
 Run `pacman -Sy lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings`. Then enable it by running `systemctl enable lightdm.service`
-##### Desktop Environment
 ###### XFCE
 To install XFCE run `pacman -Sy xfce4 xfce4-goodies`.
+###### i3
+To install i3 run `yaourt i3-gaps` and `pacman -Sy`.
 
-To install an Archive Manager (in this case Ark) run `pacman -Sy ark p7zip zip unzip unrar`
-
-Reboot by running `reboot`. Log in and open terminal.
+Goto into user by `su USER_NAME` and then run yaourt.
 
 #### Enabling NetworkManager
 Run `yaourt -S xfce4-indicator-plugin` then `systemctl disable netctl.service` to disable netctl and then to enable NetworkManager run `systemctl enable NetworkManager.service`.
@@ -138,21 +108,19 @@ Run `yaourt -S xfce4-indicator-plugin` then `systemctl disable netctl.service` t
 #### Misc/Other Applications
 Atom Beta: `yaourt atom-editor-beta-bin`
 
-DKMS: `pacman -Sy dkms`
-
 Broadcom-wl-dkms: `yaourt broadcom-wl-dkms`
 
-Flow: `yaourt flow javascript`
-
-Google Chrome: `yaourt google-chrome`
+Flow: `yaourt flow javascript` (flow-bin)
 
 Discord: `yaourt discord`
 
 Pamac: `yaourt pamac-aur`
 
-Numix Square Icons: `yaourt numix-square-icon-theme`
+Paper Icons: `yaourt paper-icon-theme-git`
 
-Adapta: `yaourt adapta-gtk-theme`
+Adapta: `yaourt adapta-gtk-theme` (for notifications)
+
+Arc Dark: `yaourt gtk-theme-arc-git` (normal theme)
 
 #### Atom Configuration
 Go into the atom packages folder `cd ~/.atom/packages`.
