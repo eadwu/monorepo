@@ -83,7 +83,7 @@ Generate `30-touchpad.conf` by running `nano /etc/X11/xorg.conf.d/30-touchpad.co
     EndSection
 
 #### Packages
-Pacman Stuff: `pacman -Sy conky git openssh nodejs npm php redshift python-gobject python-xdg librsvg blender chromium screenfetch compton vlc ark p7zip zip unzip unrar dkms noto-fonts-cjk ttf-liberation`
+Pacman Stuff: `pacman -Sy conky git openssh nodejs npm php redshift python-gobject python-xdg librsvg blender chromium screenfetch compton vlc ark p7zip zip unzip unrar dkms nitrogen rofi noto-fonts-cjk ttf-liberation`
 
 Disable XFCE's default compositor and enable compton.
 
@@ -98,14 +98,16 @@ Run `pacman -Sy lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings`. Then 
 ###### XFCE
 To install XFCE run `pacman -Sy xfce4 xfce4-goodies`.
 ###### i3
-To install i3 run `yaourt i3-gaps` and `pacman -Sy`.
+Run yaourt in your user `su $USER`
 
-Goto into user by `su USER_NAME` and then run yaourt.
+To install i3 run `yaourt i3-gaps`.
 
 #### Enabling NetworkManager
 Run `yaourt -S xfce4-indicator-plugin` then `systemctl disable netctl.service` to disable netctl and then to enable NetworkManager run `systemctl enable NetworkManager.service`.
 
 #### Misc/Other Applications
+oblogout-blurlock: `yaourt oblogout-blurlock` (i3lock blurlock function)
+
 Atom Beta: `yaourt atom-editor-beta-bin`
 
 Broadcom-wl-dkms: `yaourt broadcom-wl-dkms`
