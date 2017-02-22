@@ -5,7 +5,7 @@ conky.config = {
 	cpu_avg_samples = 2,
 	default_color = 'FFFFFF',
 	double_buffer = true,
-	font = 'Cantarell:size=10',
+	font = 'Input Bold:size=10',
 	gap_x = 25,
 	gap_y = 45,
 	minimum_width = 200,
@@ -23,11 +23,11 @@ conky.text = [[
 	${color2}dmenu - ${color}mod+d
 	${color2}morc_menu - ${color}mod+m
 	${color2}rofi - ${color}mod+z
-	${color2}switch to workspace 1-10 - ${color}mod+1-2
-	${color2}send to workspace 1-10 - ${color}mod+Ctrl+1-2
+	${color2}switch to workspace 1-3 - ${color}mod+1-3
+	${color2}send to workspace 1-3 - ${color}mod+Ctrl+1-3
 	${color2}navigate workspaces - ${color}mod+arrowkeys
 	${color2}toggle floating - ${color}mod+Shift+Space
-	${color2}exit - ${color}mod+del
+	${color2}exit - ${color}mod+backspace
 
 	default mod=Alt
 ]]

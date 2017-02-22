@@ -1,0 +1,6 @@
+#!/bin/bash
+
+conky -c /home/arcus/.config/conky/.shortcuts.conkyrc &&
+conky -c /home/arcus/.config/conky/.theme.conkyrc &&
+
+exit 0
