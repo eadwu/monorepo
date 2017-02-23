@@ -98,16 +98,19 @@ bindsym $mod+a focus parent
 set $workspace_1 "1 "
 set $workspace_2 "2 "
 set $workspace_3 "3 "
+set $workspace_4 "4 "
 
 # switch to workspace
 bindsym $mod+1 workspace $workspace_1
 bindsym $mod+2 workspace $workspace_2
 bindsym $mod+3 workspace $workspace_3
+bindsym $mod+4 workspace $workspace_4
 
 # move focused container to workspace
 bindsym $mod+Shift+1 move container to workspace $workspace_1
 bindsym $mod+Shift+2 move container to workspace $workspace_2
 bindsym $mod+Shift+3 move container to workspace $workspace_3
+bindsym $mod+Shift+4 move container to workspace $workspace_4
 
 # reload the configuration file
 bindsym $mod+Shift+c reload
@@ -145,8 +148,9 @@ bindsym $mod+r mode "resize"
 # workspace specific applications
 assign [class="Chromium"] $workspace_1
 assign [class="Atom"] $workspace_2
-assign [class="Xfce4-terminal"] $workspace_2
+#assign [class="Xfce4-terminal"] $workspace_2
 assign [class="discord"] $workspace_3
+assign [class="Molecule"] $workspace_4
 
 # define colors
 set $bg-color 	         #333333
@@ -189,10 +193,7 @@ mode "$mode_system" {
 # Autostart certain applications
 exec --no-startup-id chromium
 exec --no-startup-id discord
-exec --no-startup-id "i3-msg 'workspace 2 ; append_layout /home/arcus/.config/i3/.i3.workspace-2.json'"
 exec --no-startup-id atom-beta
-exec --no-startup-id xfce4-terminal
-exec --no-startup-id xfce4-terminal
 
 exec --no-startup-id pa-applet
 exec --no-startup-id /home/arcus/.config/conky/init-conky

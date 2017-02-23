@@ -74,7 +74,7 @@ wireless _first_ {
 #}
 
 battery 0 {
-  format = " %status %remaining (%consumption %emptytime) "
+  format = " %status %percentage (%remaining %consumption) "
   status_chr = " "
   status_bat = " "
   status_unk = " ? UNK"
@@ -82,6 +82,7 @@ battery 0 {
   low_threshold = 10
   threshold_type = "percentage"
   last_full_capacity = true
+  integer_battery_capacity = true
   hide_seconds = true
 }
 
