@@ -1,9 +1,9 @@
 conky.config = {
 	alignment = 'bottom_left',
 	background = true,
-	color2 = '795548',
+	default_color = '90A4AE',
 	cpu_avg_samples = 2,
-	default_color = '616161',
+	color2 = 'FFAB91',
 	double_buffer = true,
 	font = 'Input:bold:size=10',
 	gap_x = 25,
@@ -22,11 +22,11 @@ ${color2}Quit Focused Window - ${color}mod+Shift+q
 ${color2}DMenu - ${color}mod+d
 ${color2}Morc Menu - ${color}mod+m
 ${color2}Rofi - ${color}mod+z
-${color2}Workspace 1-4 - ${color}mod+1-4
-${color2}Move To Workspace 1-4 - ${color}mod+Ctrl+1-4
+${color2}Workspace 1-6 - ${color}mod+1-6
+${color2}Move To Workspace 1-6 - ${color}mod+Ctrl+1-6
 ${color2}Navigate Windows - ${color}mod+arrowkeys
 ${color2}Toggle Floating - ${color}mod+Shift+Space
 ${color2}Exit - ${color}mod+backspace
 
-${color2}Mod - Alt
+${color2}Mod - ${color}Alt
 ]]

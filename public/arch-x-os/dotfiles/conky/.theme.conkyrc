@@ -1,9 +1,9 @@
 conky.config = {
 	alignment = 'top_right',
 	background = true,
-	color2 = '795548',
+	color2 = '90A4AE',
 	cpu_avg_samples = 2,
-	default_color = '616161',
+	default_color = 'FFAB91',
 	double_buffer = true,
 	font = 'Input:bold:size=9',
 	gap_x = 25,
@@ -23,23 +23,23 @@ conky.text = [[
 	$color${voffset -30}$color${font Input:size=18}${time %b}$font\
 	${voffset -3} $color${font Input:size=20}${time %Y}$font$color2$hr
 	#
-	${voffset 20}${goto 40}${color}CPU${font Input:bold:size=9}$alignr$cpu%
+	${voffset 20}${goto 40}${color}${font Input:bold:size=8}CPU$alignr$cpu%
 	${voffset 5}${goto 40}${font Input:size=8}$color2${top name 1}$alignr$color${top cpu 1}%
 	${goto 40}${font Input:size=8}$color2${top name 2}$alignr$color${top cpu 2}%
 	${goto 40}${font Input:size=8}$color2${top name 3}$alignr$color${top cpu 3}%
 	${goto 40}${font Input:size=8}$color2${top name 4}$alignr$color${top cpu 4}%
 	${goto 40}${font Input:size=8}$color2${top name 5}$alignr$color${top cpu 5}%
 	#
-	${voffset 10}${goto 40}${color}RAM${font Input:bold:size=9}$alignr$mem
+	${voffset 10}${goto 40}${color}${font Input:bold:size=8}RAM$alignr$mem
 	${goto 40}${voffset 5}${font Input:size=8}$color2${top_mem name 1}$alignr$color${top_mem mem_res 1}
 	${goto 40}${font Input:size=8}$color2${top_mem name 2}$alignr$color${top_mem mem_res 2}
 	${goto 40}${font Input:size=8}$color2${top_mem name 3}$alignr$color${top_mem mem_res 3}
 	${goto 40}${font Input:size=8}$color2${top_mem name 4}$alignr$color${top_mem mem_res 4}
 	${goto 40}${font Input:size=8}$color2${top_mem name 5}$alignr$color${top_mem mem_res 5}
 	#
-	${voffset 10}${goto 40}${color}Swap${font Input:bold:size=9}$alignr${swap} / ${swapfree}
-	${voffset 15}${font Input:size=8}$alignr${execi 10000 awk -F= '/TION/ {print $2}' /etc/lsb-release |sed 's/"//g'} \
-	${execi 10000 awk -F= '/EASE=/ {printf $2" "} /NAME/ {print $2}' /etc/lsb-release}
+	${voffset 10}${goto 40}${color}${font Input:bold:size=8}Swap$alignr${swap} / ${swapfree}
+	# ${voffset 15}${color}${font Input:bold:size=8}$alignr${execi 10000 awk -F= '/TION/ {print $2}' /etc/lsb-release |sed 's/"//g'} \
+	# ${execi 10000 awk -F= '/EASE=/ {printf $2" "} /NAME/ {print $2}' /etc/lsb-release}
 	${voffset 10}${color2}${alignr}${execi 1200 whoami}@${nodename}
 	${alignr}${color2}${font Input:size=8}uptime: ${color}${uptime_short}
 	${voffset 5}${color2}${font Input:size=8}${alignr}kernel: ${color}${kernel}
