@@ -20,8 +20,6 @@ Alternate terminal __Terminix__: `yaourt terminix`
 Some thing for Terminix: `pacman -Sy powerline`
 
 CLI Music: `pacman -Sy cmus` and visualizer `yaourt cli-visualizer` see [here](https://github.com/dpayne/cli-visualizer)
-
-D-Menu alternative 2 __morc_menu__: Build manually from [here](https://github.com/Boruch-Baum/morc_menu#setup).
 ### Installation
 The __.Xresources__ file goes to your home directory `/home/$USER` or `~`.
 
