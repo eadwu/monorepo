@@ -9,9 +9,9 @@ alias ls='ls --color=auto'
 PS1='[\u@\h \W]\$ '
 
 # Terminix
-if [[ $TERMINIX_ID ]]; then
-  . /etc/profile.d/vte.sh
-fi
+#if [[ $TERMINIX_ID ]]; then
+#  . /etc/profile.d/vte.sh
+#fi
 
 # Powerline
 if [ -f `which powerline-daemon` ]; then
