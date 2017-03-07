@@ -1,9 +1,9 @@
 conky.config = {
 	alignment = 'bottom_left',
 	background = true,
-	default_color = '90A4AE',
+	color2 = '90CAF9',
 	cpu_avg_samples = 2,
-	color2 = 'FFAB91',
+	default_color = 'FFAB91',
 	double_buffer = true,
 	font = 'Input:bold:size=10',
 	gap_x = 25,

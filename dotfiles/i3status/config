@@ -20,8 +20,10 @@ order += "disk /"
 order += "cpu_temperature 0"
 order += "cpu_temperature 1"
 #order += "load"
+#order += "bluetooth"
 order += "wireless _first_"
 #order += "ethernet _first_"
+#order += "battery_level"
 order += "battery 0"
 order += "tztime local"
 order += "tztime tokyo"
@@ -61,9 +63,17 @@ cpu_temperature 1 {
 #  max_threshold = 0.3
 #}
 
+#bluetooth {
+#  format_prefix = ""
+#  format_no_conn_prefix = ""
+#
+#  format = " {name}"
+#  format_no_conn = ""
+#}
+
 wireless _first_ {
 # format_up = "W: (%quality at %essid) %ip"
-  format_up = "  %essid%quality "
+  format_up = " %essid%quality "
   format_down = " ? UNK "
 }
 
@@ -73,9 +83,19 @@ wireless _first_ {
 #  format_down = " no lan "
 #}
 
+#battery_level {
+#  battery_id = 0
+#  hide_seconds = true
+#  charging_character = ''
+#  blocks = ""
+#  measurement_mode = 'acpi'
+#
+#  format = "{icon} {percent}% ({time_remaining}) "
+#}
+
 battery 0 {
   format = " %status %percentage (%remaining %consumption) "
-  status_chr = " "
+  status_chr = " "
   status_bat = " "
   status_unk = " ? UNK"
   status_full = " "
@@ -100,7 +120,7 @@ tztime tokyo {
 }
 
 tztime new_york {
-  format = "   %e-%b-%Y "
+  format = "  %e-%b-%Y "
   timezone = "America/New_York"
 }
 
