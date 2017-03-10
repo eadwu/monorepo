@@ -83,7 +83,7 @@ Generate `30-touchpad.conf` by running `nano /etc/X11/xorg.conf.d/30-touchpad.co
     EndSection
 
 #### Packages
-Pacman Stuff: `pacman -Sy conky git openssh nodejs npm php redshift python-gobject python-xdg librsvg blender chromium screenfetch compton vlc ark p7zip zip unzip unrar dkms nitrogen rofi lsb-release ranger feh terminix powerline cmus noto-fonts-cjk ttf-liberation`
+Pacman Stuff: `pacman -Sy conky git openssh nodejs npm php redshift python-gobject python-xdg librsvg blender chromium screenfetch compton vlc ark p7zip zip unzip unrar dkms nitrogen rofi lsb-release ranger feh powerline cmus processing xclip glslang i3status jupyter ipython ipython2-notebook jupyter-notebook zeromq noto-fonts-cjk ttf-liberation`
 
 Disable XFCE's default compositor and enable compton.
 
@@ -108,6 +108,8 @@ Run `yaourt -S xfce4-indicator-plugin` then `systemctl disable netctl.service` t
 #### Misc/Other Applications
 oblogout-blurlock: `yaourt oblogout-blurlock` (i3lock blurlock function)
 
+Terminix: `yaourt terminix`
+
 Atom Beta: `yaourt atom-editor-beta-bin`
 
 Broadcom-wl-dkms: `yaourt broadcom-wl-dkms`
@@ -123,6 +125,11 @@ Paper Icons: `yaourt paper-icon-theme-git`
 Adapta: `yaourt adapta-gtk-theme` (for notifications)
 
 Arc Dark: `yaourt gtk-theme-arc-git` (normal theme)
+
+#### NPM Packages
+Jupyter kernels:
+
+jp_babel: `sudo npm install -g jp-babel`
 
 #### Atom Configuration
 Go into the atom packages folder `cd ~/.atom/packages`.
