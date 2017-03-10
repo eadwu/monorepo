@@ -1,6 +1,8 @@
 ### Dependencies
 Install awesome from [here](http://fontawesome.io/) into `~/.local/share/fonts`.
 
+i3 Statusbar __i3status__: `pacman -Sy i3status`
+
 To change wallpapers in i3 you need __nitrogen__: `pacman -Sy nitrogen`.
 
 i3 Compositor __compton__: `pacman -Sy compton`.
