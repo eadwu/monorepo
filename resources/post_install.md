@@ -83,11 +83,15 @@ Generate `30-touchpad.conf` by running `nano /etc/X11/xorg.conf.d/30-touchpad.co
     EndSection
 
 #### Packages
-Pacman Stuff: `pacman -Sy conky git openssh nodejs npm php redshift python-gobject python-xdg librsvg blender chromium screenfetch compton vlc ark p7zip zip unzip unrar dkms nitrogen rofi lsb-release ranger feh powerline cmus processing xclip glslang i3status jupyter ipython ipython2-notebook jupyter-notebook zeromq noto-fonts-cjk ttf-liberation`
+Pacman Stuff: `pacman -Sy conky git openssh nodejs npm php redshift python-gobject python-xdg librsvg blender chromium screenfetch compton vlc ark p7zip zip unzip unrar dkms nitrogen rofi lsb-release ranger feh powerline cmus processing xclip glslang i3status jupyter ipython ipython2-notebook jupyter-notebook zeromq luarocks docker jenkins noto-fonts-cjk ttf-liberation`
 
 Disable XFCE's default compositor and enable compton.
 
 Edit `~/.bashrc` and add `screenfetch` to it.
+
+Enable docker by running `systemctl enable docker`.
+
+Enable jenkins by running `systemctl enable jenkins`
 
 #### USB Mounting support
 Run `pacman -Sy thunar-volman gvfs`.
@@ -126,10 +130,11 @@ Adapta: `yaourt adapta-gtk-theme` (for notifications)
 
 Arc Dark: `yaourt gtk-theme-arc-git` (normal theme)
 
-#### NPM Packages
-Jupyter kernels:
+ngrok: `yaourt ngrok` (for exposing localhost)
 
-jp_babel: `sudo npm install -g jp-babel`
+Moonscript: `sudo luarocks install moonscript`
+
+Jupyter babel kernel __jp_babel__: `sudo npm install -g jp-babel`
 
 #### Atom Configuration
 Go into the atom packages folder `cd ~/.atom/packages`.
