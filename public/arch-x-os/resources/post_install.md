@@ -112,7 +112,7 @@ Run `yaourt -S xfce4-indicator-plugin` then `systemctl disable netctl.service` t
 #### Misc/Other Applications
 oblogout-blurlock: `yaourt oblogout-blurlock` (i3lock blurlock function)
 
-Terminix: `yaourt terminix`
+Tilix: `yaourt tilix`
 
 Atom Beta: `yaourt atom-editor-beta-bin`
 

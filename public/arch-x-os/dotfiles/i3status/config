@@ -17,8 +17,9 @@ general {
 order += "cpu_usage"
 order += "disk /"
 # order += "disk /home"
-order += "cpu_temperature 0"
+#order += "cpu_temperature 0"
 order += "cpu_temperature 1"
+order += "cpu_temperature 2"
 #order += "load"
 #order += "bluetooth"
 order += "wireless _first_"
@@ -45,17 +46,26 @@ disk "/" {
 #  format = " /home %avail "
 #}
 
+# Average Core Temperature (`Package id: 0` from sensors)
+#cpu_temperature 0 {
+#  format = "  : %degrees °C "
+#  max_threshold = 60
+#  format_above_threshold = "  : %degrees °C "
+#  path = "/sys/class/hwmon/hwmon1/temp1_input"
+#}
 # Core 1
-cpu_temperature 0 {
-  format = "  : %degrees °C "
-  max_threshold = 60
-  format_above_threshold = "  : %degrees °C "
-}
-# Core 2
 cpu_temperature 1 {
   format = "  : %degrees °C "
   max_threshold = 60
   format_above_threshold = "  : %degrees °C "
+  path = "/sys/class/hwmon/hwmon1/temp2_input"
+}
+# Core 2
+cpu_temperature 2 {
+  format = "  : %degrees °C "
+  max_threshold = 60
+  format_above_threshold = "  : %degrees °C "
+  path = "/sys/class/hwmon/hwmon1/temp3_input"
 }
 
 #load {
