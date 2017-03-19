@@ -10,7 +10,7 @@ PS1='[\u@\h \W]\$ '
 
 # Terminix
 #if [[ $TERMINIX_ID ]]; then
-#  . /etc/profile.d/vte.sh
+#  source /etc/profile.d/vte.sh
 #fi
 
 # Powerline
@@ -21,4 +21,4 @@ if [ -f `which powerline-daemon` ]; then
   . /usr/lib/python3.6/site-packages/powerline/bindings/bash/powerline.sh
 fi
 
-screenfetch
+#screenfetch
