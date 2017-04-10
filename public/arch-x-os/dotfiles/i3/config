@@ -44,7 +44,7 @@ bindsym $mod+Shift+q kill
 # There also is the (new) i3-dmenu-desktop which only displays applications
 # shipping a .desktop file. It is a wrapper around dmenu, so you need that
 # installed.
-bindsym $mod+d exec --no-startup-id i3-dmenu-desktop
+#bindsym $mod+d exec --no-startup-id i3-dmenu-desktop
 #bindsym $mod+m exec morc_menu
 bindsym $mod+z exec rofi -show run -lines 3 -bw 1 -font "Input Bold 14" -opacity "50"
 
@@ -158,6 +158,7 @@ bindsym $mod+r mode "resize"
 # workspace specific applications
 assign [class="Chromium"] $workspace_1
 assign [class="Atom"] $workspace_2
+assign [class="Blender"] $workspace_2
 assign [class="discord"] $workspace_3
 assign [class="Molecule"] $workspace_6
 
@@ -173,7 +174,6 @@ client.focused    #1793d1   #1793d1       #ffffff
 client.unfocused  #333333   #333333       #ffffff
 
 # start certain windows in float mode
-for_window [class="Lxappearance"] floating enable border normal
 for_window [class="Nitrogen"] floating enable sticky enable border normal
 
 # i3-gaps config
