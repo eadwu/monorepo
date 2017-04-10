@@ -8,10 +8,10 @@
 alias ls='ls --color=auto'
 PS1='[\u@\h \W]\$ '
 
-# Terminix
-#if [[ $TERMINIX_ID ]]; then
-#  source /etc/profile.d/vte.sh
-#fi
+# Tilix
+if [ $TILIX_ID ] || [ $VTE_VERSION ]; then
+  source /etc/profile.d/vte.sh
+fi
 
 # Powerline
 if [ -f `which powerline-daemon` ]; then
