@@ -83,7 +83,7 @@ Generate `30-touchpad.conf` by running `nano /etc/X11/xorg.conf.d/30-touchpad.co
     EndSection
 
 #### Packages
-Pacman Stuff: `pacman -Sy conky git openssh nodejs npm php redshift python-gobject python-xdg librsvg blender chromium screenfetch compton vlc ark p7zip zip unzip unrar dkms nitrogen rofi lsb-release ranger feh powerline cmus processing xclip glslang i3status jupyter ipython ipython2-notebook jupyter-notebook zeromq luarocks docker jenkins noto-fonts-cjk ttf-liberation`
+Pacman Stuff: `pacman -Sy conky git openssh nodejs npm php redshift python-gobject python-xdg librsvg blender chromium screenfetch compton ark p7zip zip unzip unrar nitrogen rofi lsb-release ranger feh powerline processing xclip glslang i3status luarocks docker jenkins noto-fonts-cjk ttf-liberation`
 
 Disable XFCE's default compositor and enable compton.
 
@@ -100,7 +100,7 @@ Run `pacman -Sy thunar-volman gvfs`.
 ###### LightDM
 Run `pacman -Sy lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings`. Then enable it by running `systemctl enable lightdm.service`
 ###### XFCE
-To install XFCE run `pacman -Sy xfce4 xfce4-goodies`.
+To install XFCE run `pacman -Sy xfce4 xfce4-notifyd xfce4-screenshooter xfce4-taskmanager`.
 ###### i3
 Run yaourt in your user `su $USER`
 
@@ -112,15 +112,15 @@ Run `yaourt -S xfce4-indicator-plugin` then `systemctl disable netctl.service` t
 #### Misc/Other Applications
 oblogout-blurlock: `yaourt oblogout-blurlock` (i3lock blurlock function)
 
-Tilix: `yaourt tilix`
+pa-applet: `yaourt pa-applet`
+
+Tilix: `yaourt tilix` (tilix-bin)
 
 Atom Beta: `yaourt atom-editor-beta-bin`
 
-Broadcom-wl-dkms: `yaourt broadcom-wl-dkms`
-
 Flow: `yaourt flow javascript` (flow-bin)
 
-Discord: `yaourt discord`
+Discord: `yaourt discord` (discord)
 
 Pamac: `yaourt pamac-aur`
 
@@ -130,11 +130,9 @@ Adapta: `yaourt adapta-gtk-theme` (for notifications)
 
 Arc Dark: `yaourt gtk-theme-arc-git` (normal theme)
 
-ngrok: `yaourt ngrok` (for exposing localhost)
+ngrok: `yaourt ngrok` (for exposing localhost) [or download manually from [ngrok](https://ngrok.com/download) and move to /usr/bin and `sudo chmod +x path/to/ngrok`]
 
 Moonscript: `sudo luarocks install moonscript`
-
-Jupyter babel kernel __jp_babel__: `sudo npm install -g jp-babel`
 
 #### Atom Configuration
 Go into the atom packages folder `cd ~/.atom/packages`.
