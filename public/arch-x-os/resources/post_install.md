@@ -114,6 +114,8 @@ oblogout-blurlock: `yaourt oblogout-blurlock` (i3lock blurlock function)
 
 pa-applet: `yaourt pa-applet`
 
+monitorix: `yaourt monitorix`
+
 Tilix: `yaourt tilix` (tilix-bin)
 
 Atom Beta: `yaourt atom-editor-beta-bin`
