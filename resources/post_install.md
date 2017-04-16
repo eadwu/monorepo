@@ -83,7 +83,7 @@ Generate `30-touchpad.conf` by running `nano /etc/X11/xorg.conf.d/30-touchpad.co
     EndSection
 
 #### Packages
-Pacman Stuff: `pacman -Sy conky git openssh nodejs npm php redshift python-gobject python-xdg librsvg blender chromium screenfetch compton ark p7zip zip unzip unrar nitrogen rofi lsb-release ranger feh powerline processing xclip glslang i3status luarocks docker jenkins noto-fonts-cjk ttf-liberation`
+Pacman Stuff: `pacman -Sy conky git openssh nodejs npm php redshift python-gobject python-xdg librsvg blender chromium screenfetch compton ark p7zip zip unzip unrar nitrogen rofi lsb-release ranger feh powerline processing xclip glslang i3status luarocks lm_sensors docker jenkins noto-fonts-cjk ttf-liberation`
 
 Disable XFCE's default compositor and enable compton.
 
