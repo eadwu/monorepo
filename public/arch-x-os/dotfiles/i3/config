@@ -175,6 +175,7 @@ client.unfocused  #333333   #333333       #ffffff
 
 # start certain windows in float mode
 for_window [class="Nitrogen"] floating enable sticky enable border normal
+# for_window [class="Molecule"] floating enable sticky enable border normal
 
 # i3-gaps config
 for_window [class="^.*"] border pixel 1
