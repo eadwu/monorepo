@@ -83,7 +83,7 @@ Generate `30-touchpad.conf` by running `nano /etc/X11/xorg.conf.d/30-touchpad.co
     EndSection
 
 #### Packages
-Pacman Stuff: `pacman -Sy conky git openssh nodejs npm php redshift python-gobject python-xdg librsvg blender chromium screenfetch compton ark p7zip zip unzip unrar nitrogen rofi lsb-release ranger feh powerline processing xclip glslang i3status luarocks lm_sensors docker jenkins noto-fonts-cjk ttf-liberation`
+Pacman Stuff: `pacman -Sy conky git openssh nodejs npm php redshift python-gobject python-xdg librsvg blender chromium screenfetch compton ark p7zip zip unzip unrar nitrogen rofi lsb-release ranger feh powerline processing xclip glslang i3status luarocks lm_sensors powertop tlp docker jenkins noto-fonts-cjk ttf-liberation`
 
 Disable XFCE's default compositor and enable compton.
 
@@ -136,7 +136,49 @@ ngrok: `yaourt ngrok` (for exposing localhost) [or download manually from [ngrok
 
 Moonscript: `sudo luarocks install moonscript`
 
+### Battery Configuration
+Run `sudo nano /etc/systemd/system/powertop.service` and put the following inside it
+
+    [Unit]
+    Description=Powertop tunings
+
+    [Service]
+    Type=oneshot
+    ExecStart=/usr/bin/powertop --auto-tune
+
+    [Install]
+    WantedBy=multi-user.target
+
+Enable the services with `sudo systemctl enable powertop`, `sudo systemctl enable tlp`, and `sudo systemctl enable tlp-sleep`. Edit `/usr/lib/systemd/system/tlp.service` to remove `NetworkManager.service` from the `Wants=` line.
+
+Run `sudo powertop --calibrate`
+
+### Git Configuration
+Generate SSH Key by
+
+    ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
+    eval "$(ssh-agent -s)"
+    ssh-add ~/.ssh/id_rsa
+    xclip -sel clip < ~/.ssh/id_rsa.pub
+
+Generate GPG Key by
+
+    gpg --gen-key
+    gpg --list-secret-keys --keyid-format LONG
+    gpg --armor --export GPG_IDENTIFIER
+
+Git Config
+
+    git config --global user.name NAME_HERE
+    git config --global user.email EMAIL_HERE
+    git config --global core.editor "atom-beta --wait"
+    git config --global user.signingkey GPG_IDENTIFIER
+    git config --global commit.gpgsign true
+
 #### Atom Configuration
+
+Install atom packages by `apm-beta install linter linter-ui-default busy-signal intentions` or just `apm-beta install linter` + dependencies and `apm-beta install atom-clock atom-ternjs atom-typescript autocomplete-glsl color-picker docblockr file-icons filesize flow-ide git-plus highlight-selected keyboard-sounds language-babel language-glsl language-lua language-moonscript language-pug linter-js-standard linter-jsonlint linter-xmllint minimap minimap-find-and-replace minimap-git-diff minimap-highlight-selected minimap-pigments pigments processing processing-language sync-settings termination toggle-packages tool-bar tool-bar-atom linter-glsl linter-less linter-moonscript`
+
 Go into the atom packages folder `cd ~/.atom/packages`.
 
 Building from source:
@@ -150,5 +192,3 @@ Building from source:
 4) Install dependencies `npm i`
 
 Build `Browser Plus` from source.
-
-For Linter v2 refer [here](https://github.com/steelbrain/linter-ui-default#installation).
