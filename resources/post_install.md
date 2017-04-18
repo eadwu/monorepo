@@ -177,7 +177,7 @@ Git Config
 
 #### Atom Configuration
 
-Install atom packages by `apm-beta install linter linter-ui-default busy-signal intentions` or just `apm-beta install linter` + dependencies and `apm-beta install atom-clock atom-ternjs atom-typescript autocomplete-glsl color-picker docblockr file-icons filesize flow-ide git-plus highlight-selected keyboard-sounds language-babel language-glsl language-lua language-moonscript language-pug linter-js-standard linter-jsonlint linter-xmllint minimap minimap-find-and-replace minimap-git-diff minimap-highlight-selected minimap-pigments pigments processing processing-language sync-settings termination toggle-packages tool-bar tool-bar-atom linter-glsl linter-less linter-moonscript`
+Install atom packages by `apm-beta install linter linter-ui-default busy-signal intentions` or just `apm-beta install linter` + dependencies and `apm-beta install atom-clock atom-ternjs atom-typescript autocomplete-glsl color-picker docblockr file-icons filesize flow-ide git-plus highlight-selected keyboard-sounds language-babel language-glsl language-lua language-moonscript language-pug linter-js-standard-engine linter-jsonlint linter-xmllint minimap minimap-find-and-replace minimap-git-diff minimap-highlight-selected minimap-pigments pigments processing processing-language sync-settings termination toggle-packages tool-bar tool-bar-atom linter-glsl linter-less linter-moonscript`
 
 Go into the atom packages folder `cd ~/.atom/packages`.
 
