@@ -8,6 +8,10 @@ LearnLinux.tv's [Getting Started with Arch Linux (Second Edition) Part 6: Settin
 
 Tech Linux's [Ep4: How to setup network manager, usb, and more](https://www.youtube.com/watch?v=DtohxreWjVg)
 
+wiki.archlinux.org [CUPS](https://wiki.archlinux.org/index.php/CUPS)
+
+wiki.archlinux.org [Avahi](https://wiki.archlinux.org/index.php/Avahi)
+
 wiki.archlinux.org [PulseAudio/Troubleshooting](https://wiki.archlinux.org/index.php/PulseAudio/Troubleshooting)
 
 wiki.archlinux.org [Bluetooth_headset](https://wiki.archlinux.org/index.php/Bluetooth_headset)
@@ -83,15 +87,25 @@ Generate `30-touchpad.conf` by running `nano /etc/X11/xorg.conf.d/30-touchpad.co
     EndSection
 
 #### Packages
-Pacman Stuff: `pacman -Sy conky git openssh nodejs npm php redshift python-gobject python-xdg librsvg blender chromium screenfetch compton ark p7zip zip unzip unrar nitrogen rofi lsb-release ranger feh powerline processing xclip glslang i3status luarocks lm_sensors powertop tlp docker jenkins noto-fonts-cjk ttf-liberation`
+Pacman Stuff: `pacman -Sy conky git openssh nodejs npm php redshift python-gobject python-xdg librsvg blender chromium screenfetch compton ark p7zip zip unzip unrar nitrogen rofi lsb-release ranger feh powerline processing xclip glslang i3status luarocks lm_sensors powertop tlp cups cups-pdf avahi hplip docker jenkins noto-fonts-cjk ttf-liberation`
 
 Disable XFCE's default compositor and enable compton.
 
 Edit `~/.bashrc` and add `screenfetch` to it.
 
+Enable cups by running `systemctl enable org.cups.cupsd.service`
+
+Enable avahi by running `systemctl enable avahi-daemon.service`
+
 Enable docker by running `systemctl enable docker`.
 
 Enable jenkins by running `systemctl enable jenkins`
+
+Edit `/etc/nsswitch.conf` to change the `hosts` line to be
+
+    hosts: ... mdns_minimal [NOTFOUND=return] resolve [!UNAVAIL=return] dns ...
+
+For the driver I prefer `hpijs` over `hpcups`
 
 #### USB Mounting support
 Run `pacman -Sy thunar-volman gvfs`.
