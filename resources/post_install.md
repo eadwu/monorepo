@@ -194,22 +194,22 @@ Git Config
 #### Atom Dependencies
 
 ##### Theme
-`apm-beta northem-dark-atom-ui northem-dark-atom-syntax`
+`apm-beta install northem-dark-atom-ui northem-dark-atom-syntax`
 
 ##### Language Support
-`apm-beta atom-typescript language-babel language-glsl language-lua language-moonscript language-pug processing-language`
+`apm-beta install atom-typescript language-babel language-glsl language-lua language-moonscript language-pug processing-language`
 
 ##### Linter
-`apm-beta busy-signal intentions linter linter-ui-default`
+`apm-beta install busy-signal intentions linter linter-ui-default`
 
 ##### Linters
-`apm-beta linter-glsl linter-js-standard-engine linter-jsonlint linter-less linter-moonscript linter-xmllint`
+`apm-beta install linter-glsl linter-js-standard-engine linter-jsonlint linter-less linter-moonscript linter-xmllint`
 
 ##### Other
-`apm-beta atom-clock atom-ternjs autocomplete-glsl docblockr file-icons filesize flow-ide git-plus highlight-selected keyboard-sounds minimap minimap-git-diff minimap-highlight-selected processing sync-settings termination tool-bar tool-bar-atom`
+`apm-beta install atom-clock atom-ternjs autocomplete-glsl docblockr file-icons filesize flow-ide git-plus highlight-selected keyboard-sounds minimap minimap-git-diff minimap-highlight-selected processing sync-settings toggle-packages termination tool-bar tool-bar-atom`
 
 ##### Dead Weight Packages
-`apm-beta pigments color-picker minimap-pigments`
+`apm-beta install pigments color-picker minimap-pigments`
 
 ##### Manual Installation
 Go into the atom packages folder `cd ~/.atom/packages`.

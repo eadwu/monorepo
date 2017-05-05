@@ -85,9 +85,9 @@ cpu_temperature 2 {
 #}
 
 wireless _first_ {
-# format_up = "W: (%quality at %essid) %ip"
+#  format_up = "W: (%quality at %essid) %ip"
   format_up = " %essid%quality "
-# format_up = "%quality "
+#  format_up = "%quality "
   format_down = " ? UNK "
 }
 
