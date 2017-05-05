@@ -89,6 +89,8 @@ Generate `30-touchpad.conf` by running `nano /etc/X11/xorg.conf.d/30-touchpad.co
 #### Packages
 Pacman Stuff: `pacman -Sy conky git openssh nodejs npm php redshift python-gobject python-xdg librsvg blender chromium screenfetch compton ark p7zip zip unzip unrar nitrogen rofi lsb-release ranger feh powerline processing xclip glslang i3status luarocks lm_sensors powertop tlp cups cups-pdf avahi hplip docker jenkins noto-fonts-cjk ttf-liberation`
 
+Screen recorder: `pacman -Sy simplescreenrecorder`
+
 Disable XFCE's default compositor and enable compton.
 
 Edit `~/.bashrc` and add `screenfetch` to it.
@@ -189,12 +191,27 @@ Git Config
     git config --global user.signingkey GPG_IDENTIFIER
     git config --global commit.gpgsign true
 
-#### Atom Configuration
+#### Atom Dependencies
 
-Install atom packages by `apm-beta install linter linter-ui-default busy-signal intentions` or just `apm-beta install linter` + dependencies and `apm-beta install atom-clock atom-ternjs atom-typescript autocomplete-glsl color-picker docblockr file-icons filesize flow-ide git-plus highlight-selected keyboard-sounds language-babel language-glsl language-lua language-moonscript language-pug linter-js-standard-engine linter-jsonlint linter-xmllint minimap minimap-find-and-replace minimap-git-diff minimap-highlight-selected processing processing-language sync-settings termination toggle-packages tool-bar tool-bar-atom linter-glsl linter-less linter-moonscript`
+##### Theme
+`apm-beta northem-dark-atom-ui northem-dark-atom-syntax`
 
-Erroring packages: `apm-beta install minimap-pigments pigments`
+##### Language Support
+`apm-beta atom-typescript language-babel language-glsl language-lua language-moonscript language-pug processing-language`
 
+##### Linter
+`apm-beta busy-signal intentions linter linter-ui-default`
+
+##### Linters
+`apm-beta linter-glsl linter-js-standard-engine linter-jsonlint linter-less linter-moonscript linter-xmllint`
+
+##### Other
+`apm-beta atom-clock atom-ternjs autocomplete-glsl docblockr file-icons filesize flow-ide git-plus highlight-selected keyboard-sounds minimap minimap-git-diff minimap-highlight-selected processing sync-settings termination tool-bar tool-bar-atom`
+
+##### Dead Weight Packages
+`apm-beta pigments color-picker minimap-pigments`
+
+##### Manual Installation
 Go into the atom packages folder `cd ~/.atom/packages`.
 
 Building from source:
