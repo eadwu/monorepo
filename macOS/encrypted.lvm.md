@@ -1,4 +1,4 @@
-# **Encrypted LVM Arch Linux and macSO dual boot**
+# **Encrypted LVM Arch Linux and macOS dual boot**
 ## Sources
 Pandeiro's [Arch on Air](https://github.com/pandeiro/arch-on-air)
 
