@@ -20,6 +20,10 @@ wiki.archlinux.org [Bluetooth_headset](https://wiki.archlinux.org/index.php/Blue
 Run `pacman -Sy pulseaudio alsa-utils` and then `alsamixer`. Unmute by pressing M and bring the scales up until the dB gain is 0.00. "The MM label below a channel indicates that the channel is muted, and 00 indicates that it is open." -- [wiki.archlinux.org](https://wiki.archlinux.org/index.php/PulseAudio/Troubleshooting)
 
 #### Editing /etc/pacman.conf
+Run `curl "https://raw.githubusercontent.com/munashi/arch-x-os/master/files/pacman.conf" > /etc/pacman.conf`
+
+OR
+
 Run `nano /etc/pacman.conf`
 Uncomment
 
@@ -67,7 +71,13 @@ Then run `systemctl daemon-reload` and then `systemctl enable bluetooth`.
 Find your headset from running `pacmd ls` and then get the index value of your headset and run `pacmd set-card-profile INDEX_HERE a2dp_sink`.
 
 **Headset Output Autoswitch**
-Edit /etc/pulse/default.pa by running `nano /etc/pulse/default.pa` and add the following snippet to it.
+Edit /etc/pulse/default.pa by running
+
+`curl "https://raw.githubusercontent.com/munashi/arch-x-os/master/files/default.pa" > /etc/pulse/default.pa`
+
+OR
+
+`nano /etc/pulse/default.pa` and add the following snippet to it.
 
     ### automatically switch to newly-connected devices
     load-module module-switch-on-connect
@@ -75,7 +85,13 @@ Edit /etc/pulse/default.pa by running `nano /etc/pulse/default.pa` and add the f
 #### Trackpad Configuration
 The default Apple trackpad movements is clickfinger based (see [here](https://wayland.freedesktop.org/libinput/doc/latest/clickpad_softbuttons.html#clickfinger)). This changes it to a button area based format (see [here](https://wayland.freedesktop.org/libinput/doc/latest/clickpad_softbuttons.html#software_buttons)). This also changes the Middle Mouse to be clicking the left and right buttons at the same time inside of the center of the trackpad.
 
-Generate `30-touchpad.conf` by running `nano /etc/X11/xorg.conf.d/30-touchpad.conf` and put the following snippet inside it.
+Generate `30-touchpad.conf` by running
+
+`curl "https://raw.githubusercontent.com/munashi/arch-x-os/master/files/30-touchpad.conf" > /etc/X11/xorg.conf.d/30-touchpad.conf`
+
+OR
+
+`nano /etc/X11/xorg.conf.d/30-touchpad.conf` and put the following snippet inside it.
 
     Section "InputClass"
       Identifier "touchpad"
@@ -153,6 +169,10 @@ ngrok: `yaourt ngrok` (for exposing localhost) [or download manually from [ngrok
 Moonscript: `sudo luarocks install moonscript`
 
 ### Battery Configuration
+Run `curl "https://raw.githubusercontent.com/munashi/arch-x-os/master/files/powertop.service" > /etc/systemd/system/powertop.service`
+
+OR
+
 Run `sudo nano /etc/systemd/system/powertop.service` and put the following inside it
 
     [Unit]
