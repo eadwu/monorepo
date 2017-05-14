@@ -1,5 +1,5 @@
 # Post Installation
-Setup your wifi with [netctl](https://github.com/munashi/arch-x-os/blob/master/resources/netctl.md) and run `ping -c 3 google.com` to verify that you have a connection.
+Setup your wifi with [netctl](https://github.com/kaketa/arch-x-os/blob/master/resources/netctl.md) and run `ping -c 3 google.com` to verify that you have a connection.
 
 ## Sources
 LearnLinux.tv's [Installing Arch Linux (Post Install)](https://www.youtube.com/watch?v=GCUmGtCYPWM)
@@ -20,7 +20,7 @@ wiki.archlinux.org [Bluetooth_headset](https://wiki.archlinux.org/index.php/Blue
 Run `pacman -Sy pulseaudio alsa-utils` and then `alsamixer`. Unmute by pressing M and bring the scales up until the dB gain is 0.00. "The MM label below a channel indicates that the channel is muted, and 00 indicates that it is open." -- [wiki.archlinux.org](https://wiki.archlinux.org/index.php/PulseAudio/Troubleshooting)
 
 #### Editing /etc/pacman.conf
-Run `curl "https://raw.githubusercontent.com/munashi/arch-x-os/master/files/pacman.conf" > /etc/pacman.conf`
+Run `curl "https://raw.githubusercontent.com/kaketa/arch-x-os/master/files/pacman.conf" > /etc/pacman.conf`
 
 OR
 
@@ -73,7 +73,7 @@ Find your headset from running `pacmd ls` and then get the index value of your h
 **Headset Output Autoswitch**
 Edit /etc/pulse/default.pa by running
 
-`curl "https://raw.githubusercontent.com/munashi/arch-x-os/master/files/default.pa" > /etc/pulse/default.pa`
+`curl "https://raw.githubusercontent.com/kaketa/arch-x-os/master/files/default.pa" > /etc/pulse/default.pa`
 
 OR
 
@@ -87,7 +87,7 @@ The default Apple trackpad movements is clickfinger based (see [here](https://wa
 
 Generate `30-touchpad.conf` by running
 
-`curl "https://raw.githubusercontent.com/munashi/arch-x-os/master/files/30-touchpad.conf" > /etc/X11/xorg.conf.d/30-touchpad.conf`
+`curl "https://raw.githubusercontent.com/kaketa/arch-x-os/master/files/30-touchpad.conf" > /etc/X11/xorg.conf.d/30-touchpad.conf`
 
 OR
 
@@ -169,7 +169,7 @@ ngrok: `yaourt ngrok` (for exposing localhost) [or download manually from [ngrok
 Moonscript: `sudo luarocks install moonscript`
 
 ### Battery Configuration
-Run `curl "https://raw.githubusercontent.com/munashi/arch-x-os/master/files/powertop.service" > /etc/systemd/system/powertop.service`
+Run `curl "https://raw.githubusercontent.com/kaketa/arch-x-os/master/files/powertop.service" > /etc/systemd/system/powertop.service`
 
 OR
 
