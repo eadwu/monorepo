@@ -43,14 +43,14 @@ Run `pacman -Sy yaourt` to install yaourt. Verify yaourt is installed by `which 
 Run `pacman -Sy networkmanager network-manager-applet wireless_tools wpa_supplicant gnome-keyring`
 
 #### XOrg and Trackpad Driver
-Run `pacman -Sy xf86-input-libinput xorg-server xorg-xinit xorg-server-utils mesa`
+Run `pacman -Sy xf86-input-libinput xorg-server xorg-xinit mesa`
 
 #### Graphic Drivers
 This is assuming that you have Intel Graphics.
 If not look [here](https://wiki.archlinux.org/index.php/xorg#Driver_installation) or for a spreadsheet made by other Linux users look [here](https://docs.google.com/spreadsheets/d/1nG9Y9nhA615IkjNUE_ew7JmiVHD7ORA4BExW0-teQ40/edit#gid=897452601).
 **Remember that the distro is Arch Linux.**
 
-Run `pacman -Sy mesa-libgl` to install the drivers for Intel cards. I use the modesetting driver.
+Run `pacman -Sy mesa` to install the drivers for Intel cards. I use the modesetting driver.
 
 If you want the 32-bit drivers as well then run `pacman -Sy lib32-intel-dri lib32-mesa lib32-libgl`
 
