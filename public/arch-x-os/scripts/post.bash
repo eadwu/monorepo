@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/bash
 curl "https://raw.githubusercontent.com/eadwu/arch-x-os/master/files/pacman.conf" > /etc/pacman.conf
 pacman -Syy
 pacman -S pulseaudio alsa-utils
@@ -14,11 +14,12 @@ curl "https://raw.githubusercontent.com/eadwu/arch-x-os/master/files/nsswitch.co
 pacman -S lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings
 pacman -S xfce4 xfce4-notifyd xfce4-screenshooter xfce4-taskmanager
 systemctl daemon-reload
+systemctl start org.cups.cupsd.service
+systemctl disable netctl
 systemctl enable ntpd
 systemctl enable bluetooth
 systemctl enable org.cups.cupsd.service
 systemctl enable avahi-daemon.service
 systemctl enable lightdm.service
-systemctl disable netctl
 systemctl enable NetworkManager
 curl "https://raw.githubusercontent.com/eadwu/arch-x-os/master/files/powertop.service" > /etc/systemd/system/powertop.service
