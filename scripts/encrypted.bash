@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/bash
 # cgdisk /dev/sda
 # cryptsetup luksFormat /dev/sda6
 # cryptsetup open --type luks /dev/sda6 lvm
