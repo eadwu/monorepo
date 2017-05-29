@@ -231,6 +231,11 @@ Git Config
 ##### Dead Weight Packages
 `apm-beta install pigments color-picker minimap-pigments`
 
+##### Scala
+`apm-beta install ensime language-scala`
+
+`pacman -S scala sbt jre8-openjdk` and if you don't have jdk8-openjdk `pacman -S jdk8-openjdk`
+
 ##### Manual Installation
 Go into the atom packages folder `cd ~/.atom/packages`.
 
