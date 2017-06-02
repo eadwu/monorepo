@@ -1,5 +1,5 @@
-#!/usr/bin/bash
-curl "https://raw.githubusercontent.com/eadwu/arch-x-os/master/files/pacman.conf" > /etc/pacman.conf
+#!/usr/bin/env bash
+perl -0777 -i -pe 's/#\[multilib\]\n#Include = \/etc\/pacman.d\/mirrorlist/\[multilib\]\nInclude = \/etc\/pacman.d\/mirrorlist\n\n\[archlinuxfr\]\nSigLevel = Never\nServer = http:\/\/repo.archlinux.fr\/$arch/' /etc/pacman.conf
 pacman -Syy
 pacman -S pulseaudio alsa-utils
 pacman -S yaourt
@@ -7,10 +7,23 @@ pacman -S networkmanager network-manager-applet gnome-keyring
 pacman -S xf86-input-libinput xorg-server xorg-xinit
 pacman -S ntp
 pacman -S bluez bluez-utils blueman pulseaudio-bluetooth
-curl "https://raw.githubusercontent.com/eadwu/arch-x-os/master/files/default.pa" > /etc/pulse/default.pa
-curl "https://raw.githubusercontent.com/eadwu/arch-x-os/master/files/30-touchpad.conf" > /etc/X11/xorg.conf.d/30-touchpad.conf
+cat <<EOF >> /etc/pulse/default.pa
+
+### Automatically switch to newly-connected devices
+load-module module-switch-on-connect
+EOF
+cat <<EOF > /etc/X11/xorg.conf.d/30-touchpad.conf
+Section "InputClass"
+  Identifier "touchpad"
+  Driver "libinput"
+  MatchIsTouchpad "on"
+  Option "ClickMethod" "buttonareas"
+  Option "DisableWhileTyping" "off"
+  Option "MiddleEmulation" "on"
+EndSection
+EOF
 pacman -S conky git openssh nodejs npm php redshift python-xdg blender chromium compton ark p7zip zip unzip unrar nitrogen rofi lsb-release powerline processing xclip glslang i3status luarocks lm_sensors powertop tlp cups avahi hplip thunar-volman gvfs noto-fonts-cjk ttf-liberation
-curl "https://raw.githubusercontent.com/eadwu/arch-x-os/master/files/nsswitch.conf" > /etc/nsswitch.conf
+perl -0777 -i -pe 's/resolve \[!UNAVAIL=return\] dns/mdns_minimal \[NOTFOUND=return\] resolve \[!UNAVAIL=return\] dns/' /etc/nsswitch.conf
 pacman -S lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings
 pacman -S xfce4 xfce4-notifyd xfce4-screenshooter xfce4-taskmanager
 systemctl daemon-reload
@@ -22,4 +35,14 @@ systemctl enable org.cups.cupsd.service
 systemctl enable avahi-daemon.service
 systemctl enable lightdm.service
 systemctl enable NetworkManager
-curl "https://raw.githubusercontent.com/eadwu/arch-x-os/master/files/powertop.service" > /etc/systemd/system/powertop.service
+cat <<EOF > /etc/systemd/systemd/powertop.service
+[Unit]
+Description=Powertop tunings
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/powertop --auto-tune
+
+[Install]
+WantedBy=multi-user.target
+EOF
