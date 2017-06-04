@@ -22,8 +22,8 @@ Section "InputClass"
   Option "MiddleEmulation" "on"
 EndSection
 EOF
-pacman -S conky git openssh nodejs npm php redshift python-xdg blender chromium compton ark p7zip zip unzip unrar nitrogen rofi lsb-release powerline processing xclip glslang i3status luarocks lm_sensors powertop tlp cups avahi hplip thunar-volman gvfs noto-fonts-cjk ttf-liberation
 perl -0777 -i -pe 's/resolve \[!UNAVAIL=return\] dns/mdns_minimal \[NOTFOUND=return\] resolve \[!UNAVAIL=return\] dns/' /etc/nsswitch.conf
+pacman -S conky git openssh nodejs npm php redshift python-xdg blender chromium compton ark p7zip zip unzip unrar nitrogen rofi lsb-release powerline clang processing xclip glslang i3status luarocks lm_sensors powertop tlp cups avahi hplip thunar-volman gvfs noto-fonts-cjk ttf-liberation
 pacman -S lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings
 pacman -S xfce4 xfce4-notifyd xfce4-screenshooter xfce4-taskmanager
 systemctl daemon-reload
