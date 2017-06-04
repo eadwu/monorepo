@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-perl -0777 -i -pe 's/#\[multilib\]\n#Include = \/etc\/pacman.d\/mirrorlist/\[multilib\]\nInclude = \/etc\/pacman.d\/mirrorlist\n\n\[archlinuxfr\]\nSigLevel = Never\nServer = http:\/\/repo.archlinux.fr\/$arch/' /etc/pacman.conf
+perl -0777 -i -pe 's/#\[multilib\]\n#Include = \/etc\/pacman.d\/mirrorlist/\[multilib\]\nInclude = \/etc\/pacman.d\/mirrorlist\n\n\[archlinuxfr\]\nSigLevel = Never\nServer = http:\/\/repo.archlinux.fr\/\$arch/' /etc/pacman.conf
 pacman -Syy
 pacman -S pulseaudio alsa-utils
 pacman -S yaourt
@@ -22,8 +22,8 @@ Section "InputClass"
   Option "MiddleEmulation" "on"
 EndSection
 EOF
-perl -0777 -i -pe 's/resolve \[!UNAVAIL=return\] dns/mdns_minimal \[NOTFOUND=return\] resolve \[!UNAVAIL=return\] dns/' /etc/nsswitch.conf
 pacman -S conky git openssh nodejs npm php redshift python-xdg blender chromium compton ark p7zip zip unzip unrar nitrogen rofi lsb-release powerline clang processing xclip glslang i3status luarocks lm_sensors powertop tlp cups avahi hplip thunar-volman gvfs noto-fonts-cjk ttf-liberation
+perl -0777 -i -pe 's/hosts: (.+)(resolve \[!UNAVAIL=return\])(.+)\n/hosts: $1mdns_minimal \[NOTFOUND=return\] $2$3\n/' /etc/nsswitch.conf
 pacman -S lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings
 pacman -S xfce4 xfce4-notifyd xfce4-screenshooter xfce4-taskmanager
 systemctl daemon-reload
@@ -35,7 +35,7 @@ systemctl enable org.cups.cupsd.service
 systemctl enable avahi-daemon.service
 systemctl enable lightdm.service
 systemctl enable NetworkManager
-cat <<EOF > /etc/systemd/systemd/powertop.service
+cat <<EOF > /etc/systemd/system/powertop.service
 [Unit]
 Description=Powertop tunings
 
