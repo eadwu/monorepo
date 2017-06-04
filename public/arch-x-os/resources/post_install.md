@@ -223,7 +223,7 @@ Git Config
 `apm-beta install busy-signal intentions linter linter-ui-default`
 
 ##### Linters
-`apm-beta install linter-glsl linter-js-standard-engine linter-jsonlint linter-less linter-moonscript linter-xmllint`
+`apm-beta install linter-glsl linter-less linter-clang linter-xmllint linter-jsonlint linter-moonscript linter-js-standard-engine`
 
 ##### Other
 `apm-beta install atom-clock atom-ternjs autocomplete-glsl docblockr file-icons filesize flow-ide git-plus highlight-selected keyboard-sounds minimap minimap-git-diff minimap-highlight-selected processing sync-settings toggle-packages termination tool-bar tool-bar-atom`
