@@ -59,8 +59,8 @@ cpu_temperature 1 {
   format = "  : %degrees °C "
   max_threshold = 80
   format_above_threshold = "  : %degrees °C "
-  path = "/sys/devices/platform/coretemp.0/hwmon/hwmon0/temp2_input"
-  #path = "/sys/devices/platform/coretemp.0/hwmon/hwmon1/temp2_input"
+  #path = "/sys/devices/platform/coretemp.0/hwmon/hwmon0/temp2_input"
+  path = "/sys/devices/platform/coretemp.0/hwmon/hwmon1/temp2_input"
   #path = "/sys/devices/platform/coretemp.0/hwmon/hwmon2/temp2_input"
 }
 # Core 2
@@ -68,8 +68,8 @@ cpu_temperature 2 {
   format = "  : %degrees °C "
   max_threshold = 80
   format_above_threshold = "  : %degrees °C "
-  path = "/sys/devices/platform/coretemp.0/hwmon/hwmon0/temp3_input"
-  #path = "/sys/devices/platform/coretemp.0/hwmon/hwmon1/temp3_input"
+  #path = "/sys/devices/platform/coretemp.0/hwmon/hwmon0/temp3_input"
+  path = "/sys/devices/platform/coretemp.0/hwmon/hwmon1/temp3_input"
   #path = "/sys/devices/platform/coretemp.0/hwmon/hwmon2/temp3_input"
 }
 
