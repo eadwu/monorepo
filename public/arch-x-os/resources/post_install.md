@@ -103,7 +103,7 @@ OR
     EndSection
 
 #### Packages
-Pacman Stuff: `pacman -Sy conky git openssh nodejs npm php redshift python-gobject python-xdg librsvg blender chromium screenfetch compton ark p7zip zip unzip unrar nitrogen rofi lsb-release ranger feh powerline processing xclip glslang i3status luarocks lm_sensors powertop tlp cups cups-pdf avahi hplip docker jenkins noto-fonts-cjk ttf-liberation`
+Pacman Stuff: `pacman -Sy conky git openssh nodejs npm php redshift python-xdg blender chromium compton ark p7zip zip unzip unrar nitrogen rofi lsb-release cmake powerline clang processing xclip glslang i3status luarocks lm_sensors powertop tlp cups avahi hplip noto-fonts-cjk ttf-liberation`
 
 Screen recorder: `pacman -Sy simplescreenrecorder`
 
