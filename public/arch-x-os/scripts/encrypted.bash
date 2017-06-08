@@ -16,7 +16,7 @@ printf $cryptPassword | cryptsetup -c aes-xts-plain64 --use-random luksFormat /d
 printf $cryptPassword | cryptsetup open --type luks /dev/sda6 lvm -
 pvcreate --dataalignment 1m /dev/mapper/lvm
 vgcreate volgroup0 /dev/mapper/lvm
-lvcreate -L 2G volgroup0 -n lv_swap
+lvcreate -L 4G volgroup0 -n lv_swap
 lvcreate -l 100%FREE volgroup0 -n lv_root
 modprobe dm_mod
 vgscan
