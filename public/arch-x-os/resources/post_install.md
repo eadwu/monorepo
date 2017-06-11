@@ -103,7 +103,7 @@ OR
     EndSection
 
 #### Packages
-Pacman Stuff: `pacman -Sy conky git openssh nodejs npm php vim redshift python-xdg blender chromium compton ark p7zip zip unzip unrar nitrogen rofi lsb-release cmake powerline clang processing xclip glslang i3status luarocks lm_sensors powertop tlp cups avahi hplip noto-fonts-cjk ttf-liberation`
+Pacman Stuff: `pacman -Sy conky git openssh nodejs npm php vim redshift python-xdg blender chromium compton ark p7zip zip unzip unrar nitrogen rofi lsb-release cmake powerline clang processing xclip glslang i3status luarocks lm_sensors powertop tlp cups avahi hplip broadcom-wl-dkms adapta-gtk-theme noto-fonts-cjk ttf-liberation`
 
 Screen recorder: `pacman -Sy simplescreenrecorder`
 
@@ -139,7 +139,7 @@ Run yaourt in your user `su $USER`
 To install i3 run `yaourt i3-gaps`.
 
 #### Enabling NetworkManager
-Run `yaourt -S xfce4-indicator-plugin` then `systemctl disable netctl.service` to disable netctl and then to enable NetworkManager run `systemctl enable NetworkManager.service`.
+Run `systemctl disable netctl.service` to disable netctl and then to enable NetworkManager run `systemctl enable NetworkManager.service`.
 
 #### Misc/Other Applications
 oblogout-blurlock: `yaourt oblogout-blurlock` (i3lock blurlock function)
@@ -159,8 +159,6 @@ Discord: `yaourt discord` (discord)
 Pamac: `yaourt pamac-aur`
 
 Paper Icons: `yaourt paper-icon-theme-git`
-
-Adapta: `yaourt adapta-gtk-theme` (for notifications)
 
 Arc Dark: `yaourt gtk-theme-arc-git` (normal theme)
 
