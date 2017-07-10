@@ -224,7 +224,7 @@ Git Config
 `apm-beta install linter-glsl linter-less linter-clang linter-xmllint linter-jsonlint linter-moonscript linter-js-standard-engine`
 
 ##### Other
-`apm-beta install atom-clock atom-ternjs autocomplete-glsl docblockr file-icons filesize flow-ide git-plus highlight-selected keyboard-sounds minimap minimap-git-diff minimap-highlight-selected processing sync-settings toggle-packages termination tool-bar tool-bar-atom`
+`apm-beta install atom-clock atom-ternjs autocomplete-glsl docblockr file-icons filesize flow-ide git-plus highlight-selected hyperclick keyboard-sounds minimap minimap-git-diff minimap-highlight-selected processing sync-settings toggle-packages termination tool-bar tool-bar-atom`
 
 ##### Dead Weight Packages
 `apm-beta install pigments color-picker minimap-pigments`
