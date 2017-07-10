@@ -6,6 +6,7 @@ Plug 'scrooloose/nerdtree'
 Plug 'vim-airline/vim-airline'
 Plug 'arcticicestudio/nord-vim'
 Plug 'pangloss/vim-javascript'
+Plug 'sophacles/vim-processing'
 Plug 'leafgarland/typescript-vim'
 call plug#end()
 " general settings
