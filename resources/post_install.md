@@ -17,7 +17,7 @@ wiki.archlinux.org [PulseAudio/Troubleshooting](https://wiki.archlinux.org/index
 wiki.archlinux.org [Bluetooth_headset](https://wiki.archlinux.org/index.php/Bluetooth_headset)
 
 #### Audio
-Run `pacman -Sy pulseaudio alsa-utils` and then `alsamixer`. Unmute by pressing M and bring the scales up until the dB gain is 0.00. "The MM label below a channel indicates that the channel is muted, and 00 indicates that it is open." -- [wiki.archlinux.org](https://wiki.archlinux.org/index.php/PulseAudio/Troubleshooting)
+Run `pacman -S pulseaudio alsa-utils` and then `alsamixer`. Unmute by pressing M and bring the scales up until the dB gain is 0.00. "The MM label below a channel indicates that the channel is muted, and 00 indicates that it is open." -- [wiki.archlinux.org](https://wiki.archlinux.org/index.php/PulseAudio/Troubleshooting)
 
 #### Editing /etc/pacman.conf
 Run `curl "https://raw.githubusercontent.com/eadwu/arch-x-os/master/files/pacman.conf" > /etc/pacman.conf`
@@ -31,39 +31,42 @@ Uncomment
     Include=/etc/pacman.d/mirrorlist
 
 for 32-bit package installation.
-Add the following for AUR package support
+Add the following for AUR package support and for precompiled __opera-ffmpeg-codecs__
 
     [archlinuxfr]
     SigLevel = Never
     Server = http://repo.archlinux.fr/$arch
 
-Run `pacman -Sy yaourt` to install yaourt. Verify yaourt is installed by `which yaourt`.
+    [herecura]
+    Server = https://repo.herecura.be/herecura/x86_64
+
+Run `pacman -S yaourt` to install yaourt. Verify yaourt is installed by `which yaourt`.
 
 #### Wireless Connection
-Run `pacman -Sy networkmanager network-manager-applet wireless_tools wpa_supplicant gnome-keyring`
+Run `pacman -S networkmanager network-manager-applet wireless_tools wpa_supplicant gnome-keyring`
 
 #### XOrg and Trackpad Driver
-Run `pacman -Sy xf86-input-libinput xorg-server xorg-xinit mesa`
+Run `pacman -S xf86-input-libinput xorg-server xorg-xinit mesa`
 
 #### Graphic Drivers
 This is assuming that you have Intel Graphics.
 If not look [here](https://wiki.archlinux.org/index.php/xorg#Driver_installation) or for a spreadsheet made by other Linux users look [here](https://docs.google.com/spreadsheets/d/1nG9Y9nhA615IkjNUE_ew7JmiVHD7ORA4BExW0-teQ40/edit#gid=897452601).
 **Remember that the distro is Arch Linux.**
 
-Run `pacman -Sy mesa` to install the drivers for Intel cards. I use the modesetting driver.
+Run `pacman -S mesa` to install the drivers for Intel cards. I use the modesetting driver.
 
-If you want the 32-bit drivers as well then run `pacman -Sy lib32-intel-dri lib32-mesa lib32-libgl`
+If you want the 32-bit drivers as well then run `pacman -S lib32-intel-dri lib32-mesa lib32-libgl`
 
 #### NTP (Network Time Protocol)
 Basically checks your time with internet time servers to verify it's accurate. See [here](https://wiki.archlinux.org/index.php/Network_Time_Protocol_daemon) for more information.
 
-Run `pacman -Sy ntp` to install NTP.
+Run `pacman -S ntp` to install NTP.
 
 Run `systemctl daemon-reload` and then `systemctl enable ntpd`.
 
 #### Bluetooth
 
-Run `pacman -Sy bluez bluez-utils blueman pulseaudio-bluetooth`.
+Run `pacman -S bluez bluez-utils blueman pulseaudio-bluetooth`.
 
 Then run `systemctl daemon-reload` and then `systemctl enable bluetooth`.
 
@@ -103,13 +106,7 @@ OR
     EndSection
 
 #### Packages
-Pacman Stuff: `pacman -Sy conky git openssh nodejs npm php vim redshift python-xdg blender chromium compton ark p7zip zip unzip unrar nitrogen rofi lsb-release cmake powerline clang processing xclip glslang i3status luarocks lm_sensors powertop tlp cups avahi hplip broadcom-wl-dkms adapta-gtk-theme noto-fonts-cjk ttf-liberation`
-
-Screen recorder: `pacman -Sy simplescreenrecorder`
-
-Disable XFCE's default compositor and enable compton.
-
-Edit `~/.bashrc` and add `screenfetch` to it.
+Pacman Stuff: `pacman -S conky git openssh nodejs npm yarn php mysql-workbench vim redshift python-xdg blender opera opera-ffmpeg-codecs compton ark p7zip zip unzip unrar nitrogen rofi lsb-release cmake powerline clang processing xclip glslang i3status luarocks lm_sensors powertop tlp cups avahi hplip thunar-volman gvfs broadcom-wl-dkms adapta-gtk-theme pepper-flash noto-fonts-cjk ttf-liberation`
 
 Enable cups by running `systemctl enable org.cups.cupsd.service`
 
@@ -126,22 +123,20 @@ Edit `/etc/nsswitch.conf` to change the `hosts` line to be
 For the driver I prefer `hpijs` over `hpcups`
 
 #### USB Mounting support
-Run `pacman -Sy thunar-volman gvfs`.
+Run `pacman -S thunar-volman gvfs`.
 
 #### Graphical Enviornment
 ###### LightDM
-Run `pacman -Sy lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings`. Then enable it by running `systemctl enable lightdm.service`
+Run `pacman -S lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings`. Then enable it by running `systemctl enable lightdm.service`
 ###### XFCE
-To install XFCE run `pacman -Sy xfce4 xfce4-notifyd xfce4-screenshooter xfce4-taskmanager`.
-###### i3
-Run yaourt in your user `su $USER`
-
-To install i3 run `yaourt i3-gaps`.
+To install XFCE run `pacman -S xfce4 xfce4-notifyd xfce4-screenshooter xfce4-taskmanager`.
 
 #### Enabling NetworkManager
 Run `systemctl disable netctl.service` to disable netctl and then to enable NetworkManager run `systemctl enable NetworkManager.service`.
 
 #### Misc/Other Applications
+i3-gaps: `yaourt i3-gaps`
+
 oblogout-blurlock: `yaourt oblogout-blurlock` (i3lock blurlock function)
 
 pa-applet: `yaourt pa-applet`
@@ -164,7 +159,7 @@ Arc Dark: `yaourt gtk-theme-arc-git` (normal theme)
 
 ngrok: `yaourt ngrok` (for exposing localhost) [or download manually from [ngrok](https://ngrok.com/download) and move to /usr/bin and `sudo chmod +x path/to/ngrok`]
 
-Moonscript: `sudo luarocks install moonscript`
+Moonscript: `yaourt moonscript` or `sudo luarocks install moonscript`
 
 ### Battery Configuration
 Run `curl "https://raw.githubusercontent.com/eadwu/arch-x-os/master/files/powertop.service" > /etc/systemd/system/powertop.service`
@@ -209,7 +204,7 @@ Git Config
     git config --global user.signingkey GPG_IDENTIFIER
     git config --global commit.gpgsign true
 
-#### Atom Dependencies
+#### Atom Packages
 
 ##### Theme
 `apm-beta install northem-dark-atom-ui northem-dark-atom-syntax`
@@ -225,26 +220,3 @@ Git Config
 
 ##### Other
 `apm-beta install atom-clock atom-ternjs autocomplete-glsl docblockr file-icons filesize flow-ide git-plus highlight-selected hyperclick keyboard-sounds minimap minimap-git-diff minimap-highlight-selected processing sync-settings toggle-packages termination tool-bar tool-bar-atom`
-
-##### Dead Weight Packages
-`apm-beta install pigments color-picker minimap-pigments`
-
-##### Scala
-`apm-beta install ensime language-scala`
-
-`pacman -S scala sbt jre8-openjdk` and if you don't have jdk8-openjdk `pacman -S jdk8-openjdk`
-
-##### Manual Installation
-Go into the atom packages folder `cd ~/.atom/packages`.
-
-Building from source:
-
-1) Uninstall the package currently installed
-
-2) Clone repo by `git clone HTTP_REPO_GIT`
-
-3) Cd to the folder `cd FOLDER_NAME`
-
-4) Install dependencies `npm i`
-
-Build `Browser Plus` from source.
