@@ -1,12 +1,12 @@
 [Unit]
-Description=i3lock
+Description=i3lock with suspend/sleep
 Before=sleep.target
 
 [Service]
-User=ead
+User=dreamforce
 Type=forking
 Environment=DISPLAY=:0
-ExecStart=/usr/bin/i3exit lock
+ExecStart=/usr/local/bin/xflock4
 
 [Install]
 WantedBy=sleep.target

@@ -106,7 +106,7 @@ OR
     EndSection
 
 #### Packages
-Pacman Stuff: `pacman -S conky git openssh nodejs npm yarn php mysql-workbench vim redshift python-xdg blender opera opera-ffmpeg-codecs compton ark p7zip zip unzip unrar nitrogen rofi lsb-release cmake powerline clang processing xclip glslang i3status luarocks lm_sensors powertop tlp cups avahi hplip thunar-volman gvfs broadcom-wl-dkms adapta-gtk-theme pepper-flash noto-fonts-cjk ttf-liberation`
+Pacman Stuff: `pacman -S conky git openssh nodejs npm yarn php mysql-workbench vim redshift python-xdg blender opera opera-ffmpeg-codecs compton ark p7zip zip unzip unrar nitrogen rofi lsb-release cmake powerline clang processing xclip glslang i3status i3lock luarocks lm_sensors powertop tlp cups avahi hplip thunar-volman gvfs broadcom-wl-dkms adapta-gtk-theme pepper-flash noto-fonts-cjk ttf-liberation`
 
 Enable cups by running `systemctl enable org.cups.cupsd.service`
 
