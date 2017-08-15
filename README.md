@@ -9,4 +9,4 @@ Click on the headers to goto the link.
 Written off the top of my head after installing Arch Linux. Might be missing some things.
 
 #### [LVM Encrypted Installation](https://github.com/eadwu/arch-x-os/blob/master/macOS/encrypted.lvm.md)
-**Last Built: 6/11/2017**
+**Last Built: 8/15/2017**
