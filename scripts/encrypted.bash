@@ -39,7 +39,7 @@ pacstrap /mnt base base-devel
 genfstab -U -p /mnt >> /mnt/etc/fstab
 nano /mnt/etc/fstab < /dev/tty
 
-# Instructions to execute in arch-chroot
+# Main Program
 cat <<SOF > /mnt/chroot.sh
 (echo $rootPassword; echo $rootPassword) | passwd
 pacman -S wpa_supplicant wireless_tools linux-headers < /dev/tty
