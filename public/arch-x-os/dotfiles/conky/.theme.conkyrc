@@ -18,10 +18,9 @@ conky.config = {
 	alignment = 'top_right',
 
 	font = 'Input:size=9',
-	default_color = '#212121', --[[ Main color ]]
-
-	color2 = '#757575', --[[ Accent color ]]
-	color3 = '#BDBDBD' --[[ Divider color]]
+	default_color = '#90A4AE', --[[ Main color ]]
+	color2 = '#00897B', --[[ Accent color ]]
+	color3 = '#90A4AE' --[[ Divider color]]
 }
 
 conky.text = [[
