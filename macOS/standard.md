@@ -89,9 +89,9 @@ If you followed the above directions and assuming you only have macOS then
     mkdir /mnt/boot && mount /dev/sda5 /mnt/boot
 
 #### Installation
-We will be setting up wireless here. You can use `wifi-menu` or [netctl](https://github.com/eadwu/arch-x-os/blob/master/resources/netctl.md). Verify you have internet access with `ping -c 3 google.com`
+We will be setting up wireless here. You can use `wifi-menu` or [netctl](../resources/netctl.md). Verify you have internet access with `ping -c 3 google.com`
 
-To set up the mirrorlist read [here](https://github.com/eadwu/arch-x-os/blob/master/resources/mirrorlist.md)
+To set up the mirrorlist read [here](../resources/mirrorlist.md)
 
     pacstrap /mnt base base-devel   
 #### FStab
@@ -215,4 +215,4 @@ Open up terminal and run `sudo bless --device /dev/disk0s4 --setBoot` and it sho
 To reenable System Integrity Protection go back to recovery mode and its Terminal and run `csrutil enable`.
 
 ## Post Install
-This is more like a reference for what I do after I finish this part. But if you want to see it look [here](https://github.com/eadwu/arch-x-os/blob/master/resources/post_install.md).
+This is more like a reference for what I do after I finish this part. But if you want to see it look [here](../resources/post_install.md).

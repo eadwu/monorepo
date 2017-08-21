@@ -3,10 +3,10 @@ Instructions for dual booting Arch Linux.
 
 Click on the headers to goto the link.
 ## Dual booting Arch Linux and macOS
-#### [Standard Installation](https://github.com/eadwu/arch-x-os/blob/master/macOS/standard.md)
+#### [Standard Installation](./macOS/standard.md)
 **Last Built:**
 
 Written off the top of my head after installing Arch Linux. Might be missing some things.
 
-#### [LVM Encrypted Installation](https://github.com/eadwu/arch-x-os/blob/master/macOS/encrypted.lvm.md)
+#### [LVM Encrypted Installation](./macOS/encrypted.lvm.md)
 **Last Built: 8/15/2017**

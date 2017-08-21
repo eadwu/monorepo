@@ -1,5 +1,5 @@
 # Post Installation
-Setup your wifi with [netctl](https://github.com/eadwu/arch-x-os/blob/master/resources/netctl.md) and run `ping -c 3 google.com` to verify that you have a connection.
+Setup your wifi with [netctl](../resources/netctl.md) and run `ping -c 3 google.com` to verify that you have a connection.
 
 ## Sources
 LearnLinux.tv's [Installing Arch Linux (Post Install)](https://www.youtube.com/watch?v=GCUmGtCYPWM)
