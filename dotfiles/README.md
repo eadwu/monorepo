@@ -1,13 +1,15 @@
 ### Other Stuff
 Install awesome from [here](http://fontawesome.io/) into `~/.local/share/fonts`.
 
-File manager __ranger__: `pacman -Sy ranger`. Run by running `ranger`.
+File manager __ranger__: `pacman -S ranger`. Run by running `ranger`.
 
-Image Viewer __feh__: `pacman -Sy feh`
+Image Viewer __feh__: `pacman -S feh`
 
 CLI Music: `pacman -Sy cmus` and visualizer `yaourt cli-visualizer` see [here](https://github.com/dpayne/cli-visualizer)
+
+Statusline Plugin __powerline__: `pacman -S powerline`
 ### Installation
-The __.bashrc__, __.vimrc__, and __.Xresources__ files and __.vim__ folder goes to your home directory `/home/$USER` or `~`.
+The __.zshrc__, __.vimrc__, and __.Xresources__ files and __.vim__ folder goes to your home directory `/home/$USER` or `~`.
 
 The __compton.conf__ file and __i3__, __i3status__, and __conky__ folders go to the config directory `/home/$USER/.config` or `~/.config`.
 

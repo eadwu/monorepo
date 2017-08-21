@@ -33,9 +33,6 @@ floating_modifier $mod
 #bindsym $mod+Return exec i3-sensible-terminal
 bindsym $mod+Return exec tilix
 
-# custom terminal session
-#bindsym $mod+Shift+Return exec tilix -s ~/Desktop/Default.json
-
 # kill focused window
 bindsym $mod+Shift+q kill
 
@@ -99,7 +96,7 @@ bindsym $mod+a focus parent
 #bindsym $mod+d focus child
 
 # define workspaces
-set $workspace_1 "1 "
+set $workspace_1 "1 "
 set $workspace_2 "2 "
 set $workspace_3 "3 "
 set $workspace_4 "4 "
@@ -156,11 +153,10 @@ mode "resize" {
 bindsym $mod+r mode "resize"
 
 # workspace specific applications
-assign [class="Chromium"] $workspace_1
+assign [class="Opera"] $workspace_1
 assign [class="Atom"] $workspace_2
 assign [class="Blender"] $workspace_2
 assign [class="discord"] $workspace_3
-assign [class="Molecule"] $workspace_6
 
 # define colors
 set $bg-color 	         #333333
@@ -175,7 +171,7 @@ client.unfocused  #333333   #333333       #ffffff
 
 # start certain windows in float mode
 for_window [class="Nitrogen"] floating enable sticky enable border normal
-# for_window [class="Molecule"] floating enable sticky enable border normal
+for_window [class="pinentry"] floating enable sticky enable border normal
 
 # i3-gaps config
 for_window [class="^.*"] border pixel 1
@@ -214,10 +210,6 @@ mode "$mode_system" {
 }
 
 # Autostart certain applications
-#exec --no-startup-id chromium
-#exec --no-startup-id discord
-#exec --no-startup-id atom-beta
-#
 exec --no-startup-id pa-applet
 exec --no-startup-id nitrogen --restore
 exec --no-startup-id /home/dreamforce/.config/conky/init-conky
