@@ -100,24 +100,18 @@ set $workspace_1 "1 "
 set $workspace_2 "2 "
 set $workspace_3 "3 "
 set $workspace_4 "4 "
-set $workspace_5 "5 "
-set $workspace_6 "6 "
 
 # switch to workspace
 bindsym $mod+1 workspace $workspace_1
 bindsym $mod+2 workspace $workspace_2
 bindsym $mod+3 workspace $workspace_3
 bindsym $mod+4 workspace $workspace_4
-bindsym $mod+5 workspace $workspace_5
-bindsym $mod+6 workspace $workspace_6
 
 # move focused container to workspace
 bindsym $mod+Shift+1 move container to workspace $workspace_1
 bindsym $mod+Shift+2 move container to workspace $workspace_2
 bindsym $mod+Shift+3 move container to workspace $workspace_3
 bindsym $mod+Shift+4 move container to workspace $workspace_4
-bindsym $mod+Shift+5 move container to workspace $workspace_5
-bindsym $mod+Shift+6 move container to workspace $workspace_6
 
 # reload the configuration file
 bindsym $mod+Shift+c reload
@@ -171,7 +165,7 @@ client.unfocused  #333333   #333333       #ffffff
 
 # start certain windows in float mode
 for_window [class="Nitrogen"] floating enable sticky enable border normal
-for_window [class="pinentry"] floating enable sticky enable border normal
+for_window [class="Pinentry"] floating enable sticky enable border normal
 
 # i3-gaps config
 for_window [class="^.*"] border pixel 1
@@ -223,7 +217,7 @@ bar {
   status_command i3status
   colors {
     background $bg-color
-      separator #757575
+    separator #757575
     #                  border             background         text
     focused_workspace  $bg-color          $bg-color          $text-color
     inactive_workspace $inactive-bg-color $inactive-bg-color $inactive-text-color
