@@ -42,7 +42,7 @@ Run `pacman -S yaourt` to install yaourt. Verify yaourt is installed by `which y
 Run `pacman -S networkmanager network-manager-applet wireless_tools wpa_supplicant gnome-keyring`
 
 #### XOrg and Trackpad Driver
-Run `pacman -S xf86-input-libinput xorg-server xorg-xinit mesa`
+Run `pacman -S xf86-input-libinput xorg-server xorg-xinit xorg-xwininfo`
 
 #### Graphic Drivers
 This is assuming that you have Intel Graphics.
@@ -94,7 +94,7 @@ Generate `30-touchpad.conf` by running
     EndSection
 
 #### Packages
-Pacman Stuff: `pacman -S conky git openssh nodejs npm yarn php mysql-workbench vim redshift python-xdg blender opera opera-ffmpeg-codecs compton ark p7zip zip unzip unrar nitrogen rofi lsb-release cmake powerline clang processing xclip glslang i3status i3lock luarocks lm_sensors powertop tlp cups avahi hplip thunar-volman gvfs broadcom-wl-dkms adapta-gtk-theme pepper-flash noto-fonts-cjk ttf-liberation`
+Pacman Stuff: `pacman -S zsh conky git hub openssh nodejs npm yarn php mysql-workbench vim docker openvpn redshift python-xdg python-fonttools blender opera opera-ffmpeg-codecs compton ark p7zip zip unzip unrar nitrogen rofi lsb-release ranger feh cmake clang processing xclip glslang i3status i3lock luarocks lm_sensors powertop tlp cups avahi hplip thunar-volman gvfs broadcom-wl-dkms adapta-gtk-theme pepper-flash noto-fonts-cjk ttf-liberation`
 
 Enable cups by running `systemctl enable org.cups.cupsd.service`
 
@@ -142,6 +142,8 @@ Discord: `yaourt discord` (discord)
 Pamac: `yaourt pamac-aur`
 
 Paper Icons: `yaourt paper-icon-theme-git`
+
+Angular CLI (ng): `yaourt angular-cli`
 
 Arc Dark: `yaourt gtk-theme-arc-git` (normal theme)
 
