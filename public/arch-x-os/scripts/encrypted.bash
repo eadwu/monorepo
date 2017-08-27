@@ -32,7 +32,7 @@ mkdir /mnt/boot
 mount /dev/sda5 /mnt/boot
 
 # Base installation
-curl "https://www.archlinux.org/mirrorlist/?country=$country&protocol=http&protocol=https&ip_version=4" > /etc/pacman.d/mirrorlist.source
+curl "https://www.archlinux.org/mirrorlist/?country=$country&protocol=http&protocol=https&ip_version=4&use_mirror_status=on" > /etc/pacman.d/mirrorlist.source
 sed -i 's/^#Server/Server/' /etc/pacman.d/mirrorlist.source
 rankmirrors -n 6 /etc/pacman.d/mirrorlist.source > /etc/pacman.d/mirrorlist
 pacstrap /mnt base base-devel
@@ -42,7 +42,7 @@ nano /mnt/etc/fstab < /dev/tty
 # Main Program
 cat <<SOF > /mnt/chroot.sh
 (echo $rootPassword; echo $rootPassword) | passwd
-pacman -S wpa_supplicant wireless_tools linux-headers < /dev/tty
+pacman -S intel-ucode wpa_supplicant wireless_tools linux-headers < /dev/tty
 echo $hostname > /etc/hostname
 ln -sf /usr/share/zoneinfo$geographicZone /etc/localtime
 hwclock --systohc --utc
