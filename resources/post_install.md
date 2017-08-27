@@ -184,7 +184,7 @@ Git Config
 
     git config --global user.name NAME_HERE
     git config --global user.email EMAIL_HERE
-    git config --global core.editor "atom-beta --wait"
+    git config --global core.editor "vim"
     git config --global user.signingkey GPG_IDENTIFIER
     git config --global commit.gpgsign true
 
