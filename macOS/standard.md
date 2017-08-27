@@ -113,6 +113,8 @@ Get into root by `arch-chroot /mnt /bin/bash` and then set the root password by 
 
 **Wireless packages for post installation, if you're going to follow the post installation for this you should run `pacman -S wpa_supplicant wireless_tools` otherwise continue.**
 
+OPTIONAL: Install intel-ucode by `pacman -S intel-ucode`
+
 OPTIONAL: Install linux-headers by `pacman -S linux-headers`
 
 Set the hostname by `echo HOST_NAME > /etc/hostname`.
