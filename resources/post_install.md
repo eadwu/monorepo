@@ -191,16 +191,20 @@ Git Config
 #### Atom Packages
 
 ##### Theme
-`apm-beta install northem-dark-atom-ui northem-dark-atom-syntax`
+`apm-beta install nord-atom-syntax nord-atom-ui`
 
 ##### Language Support
-`apm-beta install atom-typescript language-babel language-glsl language-lua language-moonscript language-pug processing-language`
+`apm-beta install atom-typescript language-babel language-elm language-glsl language-haskell language-lua language-moonscript language-pug language-rust`
 
 ##### Linter
 `apm-beta install busy-signal intentions linter linter-ui-default`
 
 ##### Linters
-`apm-beta install linter-glsl linter-less linter-clang linter-xmllint linter-jsonlint linter-moonscript linter-js-standard-engine`
+`apm-beta install linter-clang linter-glsl linter-js-standard-engine linter-jsonlint linter-less linter-moonscript linter-xmllint`
 
 ##### Other
-`apm-beta install atom-clock atom-ternjs autocomplete-glsl docblockr file-icons filesize flow-ide git-plus highlight-selected hyperclick keyboard-sounds minimap minimap-git-diff minimap-highlight-selected processing sync-settings toggle-packages tool-bar tool-bar-atom`
+`apm-beta install atom-clock atom-ternjs autocomplete-glsl docblockr file-icons filesize flow-ide git-plus highlight-selected hyperclick keyboard-sounds minimap minimap-git-diff minimap-highlight-selected processing processing-language sync-settings tool-bar`
+
+##### Git Packages
+* __[package-status](https://github.com/eadwu/package-status)__
+* __[tool-bar-custom](https://github.com/eadwu/tool-bar-custom)__
