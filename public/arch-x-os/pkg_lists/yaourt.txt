@@ -1,0 +1,15 @@
+angular-cli
+atom-editor-beta-bin
+discord
+flow-bin
+gtk-theme-arc-git
+i3-gaps
+monitorix
+moonscript
+oblogout-blurlock
+pa-applet-git
+pamac-aur
+paper-icon-theme-git
+tilix-bin
+universal-ctags-git
+visual-studio-code

@@ -6,11 +6,11 @@ Plug 'scrooloose/nerdtree'
 Plug 'vim-airline/vim-airline'
 " Plug 'arcticicestudio/nord-vim'
 Plug 'pangloss/vim-javascript'
-Plug 'sophacles/vim-processing'
+" Plug 'sophacles/vim-processing'
 Plug 'leafgarland/typescript-vim'
 call plug#end()
 " general settings
-set guifont=Input:h12
+set guifont=Operator:h12
 set tabstop=2
 set softtabstop=0 noexpandtab
 set shiftwidth=2

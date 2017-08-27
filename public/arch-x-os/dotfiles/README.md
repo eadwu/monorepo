@@ -11,7 +11,7 @@ Statusline Plugin __powerline__: `pacman -S powerline`
 ### Installation
 The __.zshrc__, __.vimrc__, and __.Xresources__ files and __.vim__ folder goes to your home directory `/home/$USER` or `~`.
 
-The __compton.conf__ file and __i3__, __i3status__, and __conky__ folders go to the config directory `/home/$USER/.config` or `~/.config`.
+The __compton.conf__ file and __i3__, __i3status__, __tilix__, and __conky__ folders go to the config directory `/home/$USER/.config` or `~/.config`.
 
 The __xflock4__ file goes to `/usr/local/bin`.
 
