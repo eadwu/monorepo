@@ -97,7 +97,7 @@ bindsym $mod+a focus parent
 
 # define workspaces
 set $workspace_1 "1 "
-set $workspace_2 "2 "
+set $workspace_2 "2 "
 set $workspace_3 "3 "
 set $workspace_4 "4 "
 
@@ -183,8 +183,8 @@ bindsym $mod+Shift+minus gaps outer current minus 1
 bindsym $mod+Shift+0 gaps outer current set 0
 
 # toggle compton opaque
-bindsym $mod+o exec --no-startup-id compton-trans -c -o 92
-bindsym $mod+shift+o exec --no-startup-id compton-trans -c -o 100
+bindsym $mod+o exec --no-startup-id compton-trans -c -o 85
+bindsym $mod+shift+o exec --no-startup-id compton-trans -c -o 99
 
 # lock, suspend, logout, switch user, hibernate, reboot, and shutdown features
 bindsym $mod+BackSpace mode "$mode_system"

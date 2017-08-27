@@ -18,8 +18,8 @@ conky.config = {
 	alignment = 'top_right',
 
 	font = 'Input:size=9',
-	default_color = '#90A4AE', --[[ Main color ]]
-	color2 = '#00897B', --[[ Accent color ]]
+	default_color = '#34515e', --[[ Main color ]]
+	color2 = '#ff6659', --[[ Accent color ]]
 	color3 = '#90A4AE' --[[ Divider color]]
 }
 
@@ -44,9 +44,8 @@ conky.text = [[
 	${goto 12.5}${font Input:size=8}$color2${top_mem name 5}$alignr${top_mem mem_res 5}
 	#
 	${voffset 10}${goto 12.5}${color}${font Input:size=9}Fan$alignr$color2${execi 2 sensors | grep Exhaust | cut -c 14-21}
-	${voffset 10}${goto 12.5}${color}${font Input:size=9}Swap$alignr$color2${swap} / ${swapfree}
-	# ${voffset 15}${color}${font Input:size=9}$alignr${execi 10000 awk -F= '/TION/ {print $2}' /etc/lsb-release |sed 's/"//g'} \
-	# ${execi 10000 awk -F= '/EASE=/ {printf $2" "} /NAME/ {print $2}' /etc/lsb-release}
+	${voffset 10}${goto 12.5}${color}${font Input:size=9}Swap$alignr$color2${swap}
+	#
 	${voffset 10}${color}${alignr}${execi 1200 whoami}@${nodename}
 	${alignr}${color}${font Input:size=8}uptime: $color2${uptime_short}
 	${voffset 5}${color}${font Input:size=8}${alignr}kernel: $color2${kernel}

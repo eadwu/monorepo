@@ -11,9 +11,3 @@ prompt pure
 if [ $TILIX_ID ] || [ $VTE_VERSION ]; then
   source /etc/profile.d/vte.sh
 fi
-
-# Powerline
-#if [ -f `which powerline-daemon` ]; then
-#  powerline-daemon -q
-#  . /usr/lib/python3.6/site-packages/powerline/bindings/zsh/powerline.zsh
-#fi
