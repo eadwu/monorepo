@@ -3,11 +3,11 @@ Mainly just for the setting up, later this won't really be needed.
 
 This is assuming your wifi password is WPA/WPA2 encrypted.
 
-Copy the configuration file `cp /etc/netctl/examples/wireless-wpa /etc/netctl/temp-wifi`.
+Copy the configuration file `cp /etc/netctl/examples/wireless-wpa /etc/netctl/temp`.
 
 Get your wifi card device by `ip a`. It should start with w. For this it will be **wlp2s0**
 
-Edit the copied configuration file by `nano /etc/netctl/temp-wifi`.
+Edit the copied configuration file by `nano /etc/netctl/temp`.
 
 Set "Interface" to the device, `Interface=wlp2s0`.
 
@@ -17,7 +17,7 @@ Set "Key" to the network password.
 
 Save and exit.
 
-Run it by `netctl start temp-wifi` and then `ping -c 3 google.com` to verify you have an internet connection.
+Run it by `netctl start temp` and then `ping -c 3 google.com` to verify you have an internet connection.
 
 ## Source
 LearnLinux.tv's [Installing Arch Linux (Standard Procedure)](https://youtu.be/lizdpoZj_vU?t=12m30s)
