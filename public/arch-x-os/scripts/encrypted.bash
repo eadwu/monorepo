@@ -1,19 +1,40 @@
 #!/usr/bin/env bash
 
+# USAGE:
+#   curl https://gitlab.com/arch-dual-boot/arch-x-os/blob/master/scripts/encrypted.bash | bash -s -- boot_partition crypt_password country geographic_zone hostname root_password user password locale dual_boot 
+
 # Variables
-cryptPassword=$1
-country=$2 # From https://www.archlinux.org/mirrorlist
-geographicZone=$3 # Format as /:Area/:Region like /America/New_York
-hostname=$4
-rootPassword=$5
-user=$6
-password=$7
-locale=$8
+boot_partition=$1 # Boot Partition, normally /dev/sda{1|5}
+crypt_password=$2
+country=$3 # From https://www.archlinux.org/mirrorlist
+geographic_zone=$4 # Format as /:Area/:Region like /America/New_York
+hostname=$5
+root_password=$6
+user=$7
+password=$8
+locale=$9 # Normally en_US.UTF-8
+dual_boot=$10 # Whether or not this is a dual boot; true|false
+
+root_partition=$[boot_partition+1]
 
 # Partitioning
-cgdisk /dev/sda < /dev/tty
-printf $cryptPassword | cryptsetup -c aes-xts-plain64 --use-random luksFormat /dev/sda6 -
-printf $cryptPassword | cryptsetup open --type luks /dev/sda6 lvm -
+if [ "${dual_boot}" = true ]; then
+  sgdisk -d 4 \
+    -n 4::+128M \
+    -n 5:+128M:+256M \
+    -N 6 \
+    -t 4:af00 \
+    -t 6:8e00 \
+    /dev/sda
+else
+  sgdisk -o \
+    -n 1::+256M \
+    -N 2 \
+    -t 2:8e00 \
+    /dev/sda
+fi
+printf ${crypt_password} | cryptsetup -c aes-xts-plain64 --use-random luksFormat /dev/sda${root_partition} -
+printf ${crypt_password} | cryptsetup open --type luks /dev/sda${root_partition} lvm -
 pvcreate --dataalignment 1m /dev/mapper/lvm
 vgcreate volgroup0 /dev/mapper/lvm
 lvcreate -L 4G volgroup0 -n lv_swap
@@ -23,16 +44,16 @@ vgscan
 vgchange -ay
 
 # Formatting
-mkfs.ext4 /dev/sda5
+mkfs.ext4 /dev/sda${boot_partition}
 mkfs.ext4 /dev/volgroup0/lv_root
 mkswap /dev/volgroup0/lv_swap
 swapon /dev/volgroup0/lv_swap
 mount /dev/volgroup0/lv_root /mnt
 mkdir /mnt/boot
-mount /dev/sda5 /mnt/boot
+mount /dev/sda${boot_partition} /mnt/boot
 
 # Base installation
-curl "https://www.archlinux.org/mirrorlist/?country=$country&protocol=http&protocol=https&ip_version=4&use_mirror_status=on" > /etc/pacman.d/mirrorlist.source
+curl "https://www.archlinux.org/mirrorlist/?country=${country}&protocol=http&protocol=https&ip_version=4&use_mirror_status=on" > /etc/pacman.d/mirrorlist.source
 sed -i 's/^#Server/Server/' /etc/pacman.d/mirrorlist.source
 rankmirrors -n 6 /etc/pacman.d/mirrorlist.source > /etc/pacman.d/mirrorlist
 pacstrap /mnt base base-devel
@@ -41,33 +62,39 @@ nano /mnt/etc/fstab < /dev/tty
 
 # Main Program
 cat <<SOF > /mnt/chroot.sh
-(echo $rootPassword; echo $rootPassword) | passwd
+(echo ${root_password}; echo ${root_password}) | passwd
 pacman -S intel-ucode wpa_supplicant wireless_tools linux-headers < /dev/tty
-echo $hostname > /etc/hostname
-ln -sf /usr/share/zoneinfo$geographicZone /etc/localtime
+echo ${hostname} > /etc/hostname
+ln -sf /usr/share/zoneinfo${geographic_zone} /etc/localtime
 hwclock --systohc --utc
-useradd -m -g users -G wheel -s /bin/bash $user
-(echo $password; echo $password) | passwd $user
+useradd -m -g users -G wheel -s /bin/bash ${user}
+(echo ${password}; echo ${password}) | passwd ${user}
 echo "%wheel ALL=(ALL) ALL" > /etc/sudoers.d/10-grant-wheel-group
-sed -i "s/^#$locale UTF-8/$locale UTF-8/" /etc/locale.gen
+sed -i "s/^#${locale} UTF-8/${locale} UTF-8/" /etc/locale.gen
 locale-gen
-echo LANG=$locale > /etc/locale.conf
-export LANG=$locale
+echo LANG=${locale} > /etc/locale.conf
+export LANG=${locale}
 sed -i 's/^HOOKS="base udev autodetect modconf block filesystems keyboard fsck"/HOOKS="base udev autodetect keyboard modconf block encrypt lvm2 filesystems fsck"/' /etc/mkinitcpio.conf
 mkinitcpio -p linux
-pacman -S grub-efi-x86_64 < /dev/tty
-sed -i 's/^GRUB_CMDLINE_LINUX_DEFAULT="quiet"/GRUB_CMDLINE_LINUX_DEFAULT="cryptdevice=\/dev\/sda6:volgroup0 quiet rootflags=data=writeback libata.force=1:noncq"/' /etc/default/grub
+pacman -S grub < /dev/tty
+sed -i 's/^GRUB_CMDLINE_LINUX_DEFAULT="quiet"/GRUB_CMDLINE_LINUX_DEFAULT="cryptdevice=\/dev\/sda${root_partition}:volgroup0 quiet rootflags=data=writeback libata.force=1:noncq"/' /etc/default/grub
 cat <<EOF >> /etc/default/grub
 
 # Fix broken grub.cfg gen
 GRUB_DISABLE_SUBMENU=y
 EOF
+if [ "${dual_boot}" = false ]; then
+  grub-install --target=i386-pc --recheck /dev/sda
+  cp /usr/share/locale/en\@quot/LC_MESSAGES/grub.mo /boot/grub/locale/en.mo
+fi
 grub-mkconfig -o boot/grub/grub.cfg
-grub-mkstandalone -o boot.efi -d usr/lib/grub/x86_64-efi -O x86_64-efi --compress=xz boot/grub/grub.cfg
-mkdir /mnt/usbdisk && mount /dev/sdd1 /mnt/usbdisk
-cp boot.efi /mnt/usbdisk
-umount /mnt/usbdisk
-rm -rf boot.efi
+if [ "${dual_boot}" = true ]; then
+  grub-mkstandalone -o boot.efi -d usr/lib/grub/x86_64-efi -O x86_64-efi --compress=xz boot/grub/grub.cfg
+  mkdir /mnt/usbdisk && mount /dev/sdd1 /mnt/usbdisk
+  cp boot.efi /mnt/usbdisk
+  umount /mnt/usbdisk
+  rm -rf boot.efi
+fi
 exit
 SOF
 
