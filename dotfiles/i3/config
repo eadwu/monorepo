@@ -149,7 +149,6 @@ bindsym $mod+r mode "resize"
 # workspace specific applications
 assign [class="Opera"] $workspace_1
 assign [class="Atom"] $workspace_2
-assign [class="Blender"] $workspace_2
 assign [class="discord"] $workspace_3
 
 # define colors
@@ -206,15 +205,15 @@ mode "$mode_system" {
 # Autostart certain applications
 exec --no-startup-id pa-applet
 exec --no-startup-id nitrogen --restore
-exec --no-startup-id /home/dreamforce/.config/conky/init-conky
-exec --no-startup-id compton -b -f --config /home/dreamforce/.config/compton.conf
+exec --no-startup-id ~/.config/conky/init-conky
+exec --no-startup-id compton -b -f --config ~/.config/compton.conf
 
 # Start i3bar to display a workspace bar (plus the system information i3status
 # finds out, if available)
 bar {
   position top
   tray_output none
-  status_command i3status
+  status_command i3blocks
   colors {
     background $bg-color
     separator #757575
@@ -222,5 +221,5 @@ bar {
     focused_workspace  $bg-color          $bg-color          $text-color
     inactive_workspace $inactive-bg-color $inactive-bg-color $inactive-text-color
     urgent_workspace   $urgent-bg-color   $urgent-bg-color   $text-color
-	}
+  }
 }
