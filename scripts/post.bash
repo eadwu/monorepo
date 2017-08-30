@@ -1,4 +1,12 @@
 #!/usr/bin/env bash
+
+# Usage
+#   bash <(curl https://gitlab.com/arch-dual-boot/arch-x-os/raw/master/scripts/post.bash) user
+
+# Variables
+user=$1
+
+# Program
 perl -0777 -i -pe 's/#\[multilib\]\n#Include = \/etc\/pacman.d\/mirrorlist/\[multilib\]\nInclude = \/etc\/pacman.d\/mirrorlist\n\n\[archlinuxfr\]\nSigLevel = Never\nServer = http:\/\/repo.archlinux.fr\/\$arch\n\n\[herecura\]\nServer = https:\/\/repo.herecura.be\/herecura\/x86_64/' /etc/pacman.conf
 pacman -Syy
 pacman -S pulseaudio alsa-utils
@@ -25,18 +33,26 @@ Section "InputClass"
   Option "MiddleEmulation" "on"
 EndSection
 EOF
-pacman -S zsh conky git hub openssh nodejs npm yarn php mysql-workbench rxvt-unicode vim docker openvpn redshift python-xdg python-fonttools blender opera opera-ffmpeg-codecs compton ark p7zip zip unzip unrar nitrogen rofi lsb-release ranger feh cmake clang processing xclip glslang i3blocks i3lock luarocks lm_sensors powertop tlp cups avahi hplip thunar-volman gvfs broadcom-wl-dkms adapta-gtk-theme pepper-flash noto-fonts-cjk ttf-liberation
+pacman -S sddm
+sudo -u ${user} yaourt -S i3-gaps-next-git
+pacman -S compton i3lock thunar vgfs thunar-volman nitrogen rxvt-unicode
+pacman -S xfce4-settings xfce4-session xfce4-power-manager xfce4-notifyd xfce4-screenshooter xfce4-taskmanager
+pacman -S zsh conky git openssh nodejs npm yarn php mysql-workbench vim docker openvpn redshift python-xdg python-fonttools blender opera opera-ffmpeg-codecs ark p7zip zip unzip unrar rofi lsb-release ranger feh cmake clang processing xclip glslang i3blocks luarocks lm_sensors powertop tlp cups avahi hplip broadcom-wl-dkms adapta-gtk-theme pepper-flash noto-fonts-cjk ttf-liberation
+gpg --recv-keys 11E521D646982372EB577A1F8F0871F202119294
+sudo -u ${user} yaourt -S oblogout-blurlock monitorix atom-editor-beta-bin discord pamac-aur paper-icon-theme-git angular-cli gtk-theme-arc-git moonscript
+sudo -u ${user} yaourt flow-bin
+sddm --example-config > /etc/sddm.conf
+perl -0777 -i -pe 's/(enabled = )n/$1y/' /etc/monitorix/monitorix.conf
 perl -0777 -i -pe 's/hosts: (.+)(resolve \[!UNAVAIL=return\])(.+)\n/hosts: $1mdns_minimal \[NOTFOUND=return\] $2$3\n/' /etc/nsswitch.conf
-pacman -S lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings
-pacman -S xfce4 xfce4-notifyd xfce4-screenshooter xfce4-taskmanager
 systemctl daemon-reload
 systemctl enable ntpd
 systemctl enable bluetooth
 systemctl enable org.cups.cupsd.service
 systemctl enable avahi-daemon.service
 systemctl enable docker
-systemctl enable lightdm.service
+systemctl enable sddm.service
 systemctl enable NetworkManager
+systemctl enable monitorix.service
 cat <<EOF > /etc/systemd/system/powertop.service
 [Unit]
 Description=Powertop tunings
