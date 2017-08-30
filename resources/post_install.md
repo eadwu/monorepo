@@ -131,8 +131,6 @@ pa-applet: `yaourt pa-applet`
 
 monitorix: `yaourt monitorix`
 
-Tilix: `yaourt tilix` (tilix-bin)
-
 Atom Beta: `yaourt atom-editor-beta-bin`
 
 Flow: `yaourt flow javascript` (flow-bin)

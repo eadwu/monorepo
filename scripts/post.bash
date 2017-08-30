@@ -25,7 +25,7 @@ Section "InputClass"
   Option "MiddleEmulation" "on"
 EndSection
 EOF
-pacman -S zsh conky git hub openssh nodejs npm yarn php mysql-workbench vim docker openvpn redshift python-xdg python-fonttools blender opera opera-ffmpeg-codecs compton ark p7zip zip unzip unrar nitrogen rofi lsb-release ranger feh cmake clang processing xclip glslang i3blocks i3lock luarocks lm_sensors powertop tlp cups avahi hplip thunar-volman gvfs broadcom-wl-dkms adapta-gtk-theme pepper-flash noto-fonts-cjk ttf-liberation
+pacman -S zsh conky git hub openssh nodejs npm yarn php mysql-workbench rxvt-unicode vim docker openvpn redshift python-xdg python-fonttools blender opera opera-ffmpeg-codecs compton ark p7zip zip unzip unrar nitrogen rofi lsb-release ranger feh cmake clang processing xclip glslang i3blocks i3lock luarocks lm_sensors powertop tlp cups avahi hplip thunar-volman gvfs broadcom-wl-dkms adapta-gtk-theme pepper-flash noto-fonts-cjk ttf-liberation
 perl -0777 -i -pe 's/hosts: (.+)(resolve \[!UNAVAIL=return\])(.+)\n/hosts: $1mdns_minimal \[NOTFOUND=return\] $2$3\n/' /etc/nsswitch.conf
 pacman -S lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings
 pacman -S xfce4 xfce4-notifyd xfce4-screenshooter xfce4-taskmanager
