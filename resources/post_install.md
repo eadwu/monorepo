@@ -123,7 +123,7 @@ To install XFCE run `pacman -S xfce4 xfce4-notifyd xfce4-screenshooter xfce4-tas
 Run `systemctl disable netctl.service` to disable netctl and then to enable NetworkManager run `systemctl enable NetworkManager.service`.
 
 #### Misc/Other Applications
-i3-gaps: `yaourt i3-gaps`
+i3-gaps-next: `yaourt i3-gaps-next-git`
 
 oblogout-blurlock: `yaourt oblogout-blurlock` (i3lock blurlock function)
 

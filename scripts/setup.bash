@@ -27,7 +27,6 @@ mv $DOTFILES/.Xresources $HOME
 mv $DOTFILES/.vim $HOME
 mv $DOTFILES/compton.conf $CONFIG
 mv $DOTFILES/i3 $CONFIG
-mv $DOTFILES/i3status $CONFIG
 mv $DOTFILES/conky $CONFIG
 mv $DOTFILES/xflock4 /usr/local/bin
 mv $DOTFILES/i3lock.service /etc/systemd/system
