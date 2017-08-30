@@ -11,6 +11,9 @@ cat <<EOF >> /etc/pulse/default.pa
 
 ### Automatically switch to newly-connected devices
 load-module module-switch-on-connect
+
+### Support for audio in Docker containers
+load-module module-native-protocol-unix
 EOF
 cat <<EOF > /etc/X11/xorg.conf.d/30-touchpad.conf
 Section "InputClass"
