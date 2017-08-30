@@ -1,8 +1,13 @@
 #!/usr/bin/env bash
 
+# USAGE:
+#   curl https://gitlab.com/arch-dual-boot/arch-x-os/raw/master/scripts/setup.bash | bash -s -- user
+
 ### Variables
-CONFIG=$HOME/.config
-DOWNLOADS=$HOME/Downloads
+user=$1
+
+CONFIG=/home/${user}/.config
+DOWNLOADS=/home/${user}/Downloads
 
 ### Zsh
 ## Set Zsh as default shell
@@ -21,10 +26,10 @@ curl -Lo $DOWNLOADS/arch-x-os.zip https://gitlab.com/arch-dual-boot/arch-x-os/re
 unzip $DOWNLOADS/arch-x-os.zip
 
 DOTFILES=$DOWNLOADS/arch-x-os-master-$ZIP_COMMIT/dotfiles
-mv $DOTFILES/.zshrc $HOME
-mv $DOTFILES/.vimrc $HOME
-mv $DOTFILES/.Xresources $HOME
-mv $DOTFILES/.vim $HOME
+mv $DOTFILES/.zshrc /home/${user}
+mv $DOTFILES/.vimrc /home/${user}
+mv $DOTFILES/.Xresources /home/${user}
+mv $DOTFILES/.vim /home/${user}
 mv $DOTFILES/compton.conf $CONFIG
 mv $DOTFILES/i3 $CONFIG
 mv $DOTFILES/conky $CONFIG
@@ -44,8 +49,8 @@ curl -Lo $DOWNLOADS/fira-code-font.zip https://github.com/tonsky/FiraCode/releas
 unzip $DOWNLOADS/awesome-font.zip
 unzip $DOWNLOADS/fira-code-font.zip -d $DOWNLOADS/fira-code
 
-mkdir -p $HOME/.local/share/fonts
-FONTS=$HOME/.local/share/fonts
+mkdir -p /home/${user}/.local/share/fonts
+FONTS=/home/${user}/.local/share/fonts
 
 mv $DOWNLOADS/font-awesome-4.7.0/fonts/FontAwesome.otf $FONTS
 mv $DOWNLOADS/fira-code/otf/FiraCode-Bold.otf $FONTS
