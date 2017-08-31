@@ -64,21 +64,21 @@ genfstab -pU /mnt >> /mnt/etc/fstab
 # Main Program
 cat <<SOF > /mnt/chroot.sh
 (echo ${root_password}; echo ${root_password}) | passwd
-pacman -S intel-ucode wpa_supplicant wireless_tools util-linux linux-headers < /dev/tty
+pacman -S intel-ucode wpa_supplicant wireless_tools linux-headers < /dev/tty
 echo ${hostname} > /etc/hostname
 ln -sf /usr/share/zoneinfo${geographic_zone} /etc/localtime
 hwclock --systohc --utc
 useradd -m -g users -G wheel -s /bin/bash ${user}
 (echo ${password}; echo ${password}) | passwd ${user}
 echo "%wheel ALL=(ALL) ALL" > /etc/sudoers.d/10-grant-wheel-group
-sed -i "s/^#(${locale} UTF-8)/$1/" /etc/locale.gen
+sed -i 's/^#\(${locale} UTF-8\)/\1/' /etc/locale.gen
 locale-gen
 echo LANG=${locale} > /etc/locale.conf
 export LANG=${locale}
-sed -i 's/^HOOKS="base udev autodetect modconf block filesystems keyboard fsck"/HOOKS="base udev autodetect keyboard modconf block encrypt lvm2 filesystems fsck"/' /etc/mkinitcpio.conf
+perl -0777 -i -pe 's/(HOOKS="base udev autodetect )modconf block filesystems keyboard fsck"/\1keyboard modconf block encrypt lvm2 filesystems fsck"/' /etc/mkinitcpio.conf
 mkinitcpio -p linux
 pacman -S grub < /dev/tty
-sed -i 's/^GRUB_CMDLINE_LINUX_DEFAULT="quiet"/GRUB_CMDLINE_LINUX_DEFAULT="cryptdevice=\/dev\/sda${root_partition}:volgroup0 rootflags=data=writeback libata.force=1:noncq"/' /etc/default/grub
+perl -0777 -i -pe "s/(GRUB_CMDLINE_LINUX_DEFAULT=\")quiet\"\n(GRUB_CMDLINE_LINUX=\")\"/\1cryptdevice=UUID=$(blkid | grep /dev/sda${root_partition} | grep -oP '(?<= UUID=\")[^ ]+(?=\")'):volgroup0 libata.force=1:noncq\"\n\2scsi_mod.use_blk_mq=y dm_mod.use_blk_mq=y\"/" /etc/default/grub
 cat <<EOF >> /etc/default/grub
 
 # Fix broken grub.cfg gen
@@ -86,7 +86,7 @@ GRUB_DISABLE_SUBMENU=y
 EOF
 if [ "${dual_boot}" = false ]; then
   pacman -S efibootmgr < /dev/tty
-  grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=grub
+  grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=arch
   cp /usr/share/locale/en\@quot/LC_MESSAGES/grub.mo /boot/grub/locale/en.mo
 fi
 grub-mkconfig -o boot/grub/grub.cfg
@@ -98,9 +98,6 @@ if [ "${dual_boot}" = true ]; then
   umount /mnt/usbdisk
   rm -rf boot.efi
 fi
-systemctl daemon-reload
-systemctl enable fstrim.service
-systemctl enable fstrim.timer
 exit
 SOF
 
