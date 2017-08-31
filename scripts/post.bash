@@ -103,6 +103,7 @@ perl -0777 -i -pe 's/hosts: (.+)(resolve \[!UNAVAIL=return\])(.+)\n/hosts: $1mdn
 # Enable all daemons/services
 systemctl daemon-reload
 systemctl enable acpid.service
+systemctl enable fstrim.timer
 systemctl enable ntpd
 systemctl enable bluetooth
 systemctl enable org.cups.cupsd.service
