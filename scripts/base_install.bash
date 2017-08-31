@@ -62,7 +62,7 @@ pacstrap /mnt base base-devel
 genfstab -pU /mnt >> /mnt/etc/fstab
 
 # Main Program
-cat <<SOF > /mnt/chroot.sh
+cat <<SOF > /mnt/core.sh
 (echo ${root_password}; echo ${root_password}) | passwd
 pacman -S intel-ucode wpa_supplicant wireless_tools linux-headers < /dev/tty
 echo ${hostname} > /etc/hostname
@@ -101,7 +101,7 @@ fi
 exit
 SOF
 
-chmod +x /mnt/chroot.sh
-arch-chroot /mnt ./chroot.sh
-rm -rf /mnt/chroot.sh
+chmod +x /mnt/core.sh
+arch-chroot /mnt ./core.sh
+rm -rf /mnt/core.sh
 umount -R /mnt
