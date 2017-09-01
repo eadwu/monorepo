@@ -40,7 +40,6 @@ chmod +x $CONFIG/conky/init-conky
 
 systemctl daemon-reload
 systemctl enable i3lock.service
-systemctl start i3lock.service
 
 ### Fonts
 ## Operator and Input require a manual installation
@@ -49,8 +48,8 @@ curl -Lo $DOWNLOADS/fira-code-font.zip https://github.com/tonsky/FiraCode/releas
 unzip $DOWNLOADS/awesome-font.zip
 unzip $DOWNLOADS/fira-code-font.zip -d $DOWNLOADS/fira-code
 
-mkdir -p /home/${user}/.local/share/fonts
 FONTS=/home/${user}/.local/share/fonts
+mkdir ${FONTS}
 
 mv $DOWNLOADS/font-awesome-4.7.0/fonts/FontAwesome.otf $FONTS
 mv $DOWNLOADS/fira-code/otf/FiraCode-Bold.otf $FONTS

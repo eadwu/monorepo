@@ -123,5 +123,3 @@ ExecStart=/usr/bin/powertop --auto-tune
 [Install]
 WantedBy=multi-user.target
 EOF
-# Incorporate setup.bash
-curl https://gitlab.com/arch-dual-boot/arch-x-os/raw/master/scripts/setup.bash | bash -s -- ${user}
