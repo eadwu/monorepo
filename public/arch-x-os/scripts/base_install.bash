@@ -77,26 +77,29 @@ echo LANG=${locale} > /etc/locale.conf
 export LANG=${locale}
 perl -0777 -i -pe 's/(HOOKS="base udev autodetect )modconf block filesystems keyboard fsck"/\1keyboard modconf block encrypt lvm2 filesystems fsck"/' /etc/mkinitcpio.conf
 mkinitcpio -p linux
-pacman -S grub < /dev/tty
-perl -0777 -i -pe "s/(GRUB_CMDLINE_LINUX_DEFAULT=\")quiet\"\n(GRUB_CMDLINE_LINUX=\")\"/\1cryptdevice=UUID=$(blkid | grep /dev/sda${root_partition} | grep -oP '(?<= UUID=\")[^ ]+(?=\")'):volgroup0 libata.force=1:noncq\"\n\2scsi_mod.use_blk_mq=y dm_mod.use_blk_mq=y\"/" /etc/default/grub
-cat <<EOF >> /etc/default/grub
+if [ "${dual_boot}" = true ]; then
+  pacman -S grub < /dev/tty
+  perl -0777 -i -pe "s/(GRUB_CMDLINE_LINUX_DEFAULT=\")quiet\"\n(GRUB_CMDLINE_LINUX=\")\"/\1cryptdevice=UUID=$(blkid | grep /dev/sda${root_partition} | grep -oP '(?<= UUID=\")[^ ]+(?=\")'):volgroup0 libata.force=1:noncq\"\n\2scsi_mod.use_blk_mq=y dm_mod.use_blk_mq=y\"/" /etc/default/grub
+  cat <<EOF >> /etc/default/grub
 
 # Fix broken grub.cfg gen
 GRUB_DISABLE_SUBMENU=y
 EOF
-if [ "${dual_boot}" = false ]; then
-  pacman -S efibootmgr < /dev/tty
-  grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=arch
-  cp /usr/share/locale/en\@quot/LC_MESSAGES/grub.mo /boot/grub/locale/en.mo
-fi
-grub-mkconfig -o boot/grub/grub.cfg
-if [ "${dual_boot}" = true ]; then
+  grub-mkconfig -o boot/grub/grub.cfg
   grub-mkstandalone -o boot.efi -d usr/lib/grub/x86_64-efi -O x86_64-efi --compress=xz boot/grub/grub.cfg
   mkdir /mnt/usbdisk
   mount /dev/sdd1 /mnt/usbdisk
   cp boot.efi /mnt/usbdisk
   umount /mnt/usbdisk
   rm -rf boot.efi
+else
+  bootctl install
+  echo "default arch
+timeout 5" > /boot/loader/loader.conf
+  echo "title Arch Linux
+linux /vmlinuz-linux
+initrd /initramfs-linux.img
+options rw cryptdevice=UUID=$(blkid | grep /dev/sda${root_partition} | grep -oP '(?<= UUID=\")[^ ]+(?=\")'):volgroup0 root=/dev/mapper/volgroup0-lv_root" > /boot/loader/entries/arch.conf
 fi
 exit
 SOF
