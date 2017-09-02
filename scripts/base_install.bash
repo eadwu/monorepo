@@ -98,6 +98,7 @@ else
 timeout 5" > /boot/loader/loader.conf
   echo "title Arch Linux
 linux /vmlinuz-linux
+initrd /intel-ucode.img
 initrd /initramfs-linux.img
 options rw cryptdevice=UUID=$(blkid | grep /dev/sda${root_partition} | grep -oP '(?<= UUID=\")[^ ]+(?=\")'):volgroup0 root=/dev/mapper/volgroup0-lv_root" > /boot/loader/entries/arch.conf
 fi
