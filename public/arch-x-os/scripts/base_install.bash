@@ -75,7 +75,7 @@ sed -i 's/^#\(${locale} UTF-8\)/\1/' /etc/locale.gen
 locale-gen
 echo LANG=${locale} > /etc/locale.conf
 export LANG=${locale}
-perl -0777 -i -pe 's/(HOOKS="base udev autodetect )modconf block filesystems keyboard fsck"/\1keyboard modconf block encrypt lvm2 filesystems fsck"/' /etc/mkinitcpio.conf
+perl -0777 -i -pe 's/(MODULES=")(".+HOOKS="base udev autodetect )modconf block filesystems keyboard fsck"/\1ext4\2keyboard modconf block encrypt lvm2 filesystems fsck"/s' /etc/mkinitcpio.conf
 mkinitcpio -p linux
 if [ "${dual_boot}" = true ]; then
   pacman -S grub < /dev/tty
@@ -93,14 +93,14 @@ EOF
   umount /mnt/usbdisk
   rm -rf boot.efi
 else
-  bootctl install
+  bootctl --path /boot install
   echo "default arch
 timeout 5" > /boot/loader/loader.conf
   echo "title Arch Linux
 linux /vmlinuz-linux
 initrd /intel-ucode.img
 initrd /initramfs-linux.img
-options rw cryptdevice=UUID=$(blkid | grep /dev/sda${root_partition} | grep -oP '(?<= UUID=\")[^ ]+(?=\")'):volgroup0 root=/dev/mapper/volgroup0-lv_root" > /boot/loader/entries/arch.conf
+options cryptdevice=UUID=$(blkid | grep /dev/sda${root_partition} | grep -oP '(?<= UUID=\")[^ ]+(?=\")'):volgroup0:allow-discards root=/dev/mapper/volgroup0-lv_root rw" > /boot/loader/entries/arch.conf
 fi
 exit
 SOF
