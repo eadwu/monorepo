@@ -1,106 +1,81 @@
 #!/usr/bin/env bash
 
 # Usage
-#   bash <(curl https://gitlab.com/arch-dual-boot/arch-x-os/raw/master/scripts/post.bash) user
+#   bash <(curl https://gitlab.com/arch-dual-boot/arch-x-os/raw/master/scripts/post.bash) virutalbox
 
-## Variables
-user=$1
+# Variables
+virtualbox=${1} # |true
 
-## Program
-# Basic packages
-perl -0777 -i -pe 's/#\[multilib\]\n#Include = \/etc\/pacman.d\/mirrorlist/\[multilib\]\nInclude = \/etc\/pacman.d\/mirrorlist\n\n\[archlinuxfr\]\nSigLevel = Never\nServer = http:\/\/repo.archlinux.fr\/\$arch\n\n\[herecura\]\nServer = https:\/\/repo.herecura.be\/herecura\/x86_64/' /etc/pacman.conf
-pacman -Syy
-pacman -S pulseaudio alsa-utils
-pacman -S yaourt
-pacman -S networkmanager network-manager-applet gnome-keyring
-pacman -S xf86-input-libinput xorg-server xorg-xinit xorg-xwininfo mesa
-pacman -S ntp
-pacman -S bluez bluez-utils blueman pulseaudio-bluetooth
+# Pacman Repositories
+perl -0777 -i -pe 's/#(\[multilib\])\n#(Include = \/etc\/pacman.d\/mirrorlist)/\1\n\2\n\n\[archlinuxfr\]\nSigLevel = Never\nServer = http:\/\/repo.archlinux.fr\/\$arch\n\n\[herecura\]\nServer = https:\/\/repo.herecura.be\/herecura\/x86_64/' /etc/pacman.conf
+pacman -Sy
+# Core Packages
+pacman -S \
+  pulseaudio alsa-utils \
+  yaourt \
+  networkmanager network-manager-applet gnome-keyring \
+  xf86-input-libinput xorg-server xorg-xinit xorg-xwininfo \
+  ntp \
+  bluez bluez-utils blueman pulseaudio-bluetooth
+# Graphical Environment
+pacman -S \
+  lightdm lightdm-gtk-greeter \
+  xmonad xmonad-contrib xmobar \
+  compton i3lock thunar gvfs thunar-volman nitrogen rxvt-unicode \
+  acpid xfce4-screenshooter xfce4-taskmanager
+# Additional Packages
+pacman -S \
+  zsh vim \
+  ark p7zip zip unzip unrar \
+  cmake clang xclip openssh \
+  broadcom-wl-dkms pepper-flash \
+  powertop tlp cups avahi hplip \
+  git npm yarn nodejs php glslang \
+  adapta-gtk-theme deepin-gtk-theme \
+  conky docker openvpn redshift rofi ranger feh \
+  luarocks lm_sensors python-fonttools lsb-release \
+  blender opera-developer opera-developer-ffmpeg-codecs \
+  noto-fonts-cjk ttf-liberation
+## Virtualbox Guest Utils
+if [ "${virtualbox}" = true ]; then
+  pacman -S virtualbox-guest-utils
+  modprobe -a vboxguest vboxsf vboxvideo
+  echo 'vboxguest
+vboxsf
+vboxvideo' > /etc/modules-load.d/virtualbox.conf
+  cp /etc/X11/xinit/xinitrc ~/.xinitrc
+  perl -0777 -i -pe 's/(#!\/bin\/sh)/\1\n\/usr\/bin\/VBoxClient-all/' ~/.xinitrc
+fi
 # Configuration
-cat <<EOF >> /etc/pulse/default.pa
-
+perl -0777 -i -pe 's/hosts: (.+)(resolve \[!UNAVAIL=return\])(.+)\n/hosts: \1mdns_minimal \[NOTFOUND=return\] \2\3\n/' /etc/nsswitch.conf
+echo '
 ### Automatically switch to newly-connected devices
 load-module module-switch-on-connect
 
 ### Support for audio in Docker containers
-load-module module-native-protocol-unix
-EOF
-cat <<EOF > /etc/X11/xorg.conf.d/30-touchpad.conf
-Section "InputClass"
+load-module module-native-protocol-unix' >> /etc/pulse/default.pa
+echo 'Section "InputClass"
   Identifier "touchpad"
   Driver "libinput"
   MatchIsTouchpad "on"
   Option "ClickMethod" "buttonareas"
   Option "DisableWhileTyping" "off"
   Option "MiddleEmulation" "on"
-EndSection
-EOF
-# More packages
-pacman -S sddm
-sudo -u ${user} yaourt -S i3-gaps-next-git
-pacman -S compton i3lock thunar vgfs thunar-volman nitrogen rxvt-unicode
-pacman -S acpid xfce4-notifyd xfce4-screenshooter xfce4-taskmanager
-pacman -S zsh conky git openssh nodejs npm yarn php mysql-workbench vim docker openvpn redshift python-xdg python-fonttools blender opera opera-ffmpeg-codecs ark p7zip zip unzip unrar rofi lsb-release ranger feh cmake clang processing xclip glslang i3blocks luarocks oblogout lm_sensors powertop tlp cups avahi hplip broadcom-wl-dkms adapta-gtk-theme pepper-flash noto-fonts-cjk ttf-liberation
-gpg --recv-keys 11E521D646982372EB577A1F8F0871F202119294
-sudo -u ${user} yaourt -S oblogout-blurlock pa-applet monitorix atom-editor-beta-bin discord pamac-aur paper-icon-theme-git angular-cli gtk-theme-arc-git moonscript
-sudo -u ${user} yaourt flow-bin
-# More configuration
-sddm --example-config > /etc/sddm.conf
-cat <<EOF > /etc/acpi/events/power-button
-event=button/power
-action=/etc/acpi/actions/power-button.sh %e
-EOF
-cat <<EOF > /etc/acpi/events/lid
-event=button/lid
-action=/etc/acpi/actions/lid.sh %e
-EOF
-cat <<EOF > /etc/acpi/events/backlightdown
-event=video/brightnessdown
-action=/etc/acpi/handlers/backlight +
-EOF
-cat <<EOF > /etc/acpi/events/backlightup
-event=video/brightnessdown
-action=/etc/acpi/handlers/backlight -
-EOF
-mkdir -p /etc/acpi/handlers
-cat <<EOF > /etc/acpi/handlers/backlight
-#!/usr/bin/env sh
-bl_dev=/sys/class/backlight/acpi_video0
-step=1
-
-case $1 in
-  -)
-    echo $(($(< $bl_dev/brightness) - $step)) > $bl_dev/brightness ;;
-  +)
-    echo $(($(< $bl_dev/brightness) + $step)) > $bl_dev/brightness ;;
-esac
-EOF
-mkdir -p /etc/acpi/actions
-cat <<EOF > /etc/acpi/actions/power-button.sh
-#!/usr/bin/env sh
-
-case "$2" in
-  PBTN|PWRF)
-    oblogout_blur ;;
-  *) logger "ACPI action undefined: $2" ;;
-esac
-EOF
-cat <<EOF > /etc/acpi/actions/lid.sh
-#!/usr/bin/env sh
+EndSection' > /etc/X11/xorg.conf.d/30-touchpad.conf
+## ACPID keybinds
+echo 'event=button/lid
+action=/etc/acpi/actions/lid.sh %e' > /etc/acpi/events/lid
+mkdir /etc/acpi/actions
+echo '#!/usr/bin/env sh
 
 case "$3" in
   open)
     blurlock ;;
-  close) logger 'LID closed' ;;
+  close) logger "LID closed" ;;
   *) logger "ACPI action undefined: $3" ;;
-esac
-EOF
-chmod +x /etc/acpi/handlers/backlight
-chmod +x /etc/acpi/actions/power-button.sh
+esac' > /etc/acpi/actions/lid.sh
 chmod +x /etc/acpi/actions/lid.sh
-perl -0777 -i -pe 's/(enabled = )n/$1y/' /etc/monitorix/monitorix.conf
-perl -0777 -i -pe 's/hosts: (.+)(resolve \[!UNAVAIL=return\])(.+)\n/hosts: $1mdns_minimal \[NOTFOUND=return\] $2$3\n/' /etc/nsswitch.conf
-# Enable all daemons/services
+# Systemctl daemons/services
 systemctl daemon-reload
 systemctl enable acpid.service
 systemctl enable fstrim.timer
@@ -109,11 +84,9 @@ systemctl enable bluetooth
 systemctl enable org.cups.cupsd.service
 systemctl enable avahi-daemon.service
 systemctl enable docker
-systemctl enable sddm.service
+systemctl enable lightdm.service
 systemctl enable NetworkManager
-systemctl enable monitorix.service
-cat <<EOF > /etc/systemd/system/powertop.service
-[Unit]
+echo '[Unit]
 Description=Powertop tunings
 
 [Service]
@@ -121,5 +94,4 @@ Type=oneshot
 ExecStart=/usr/bin/powertop --auto-tune
 
 [Install]
-WantedBy=multi-user.target
-EOF
+WantedBy=multi-user.target' > /etc/systemd/system/powertop.service
