@@ -12,7 +12,7 @@ conky.config = {
 	own_window_transparent = true,
 
 	gap_x = 25,
-	gap_y = 20,
+	gap_y = 30,
 	background = true,
 	minimum_width = 225,
 	alignment = 'top_right',

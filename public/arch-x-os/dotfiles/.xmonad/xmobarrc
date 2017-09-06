@@ -1,0 +1,49 @@
+Config {
+  -- appearance
+  font = "xft:Sans:size=9,style=regular:antialias=true",
+  additionalFonts = [ "xft:FontAwesome:size=9,style=regular:antialias=true" ],
+  bgColor = "#282828",
+  fgColor = "#FFFFFF",
+  position = Top,
+  border = BottomB,
+  borderColor = "#282828",
+  -- layout
+  sepChar = "%", -- delineator between plugin names and straight text
+  alignSep = "><", -- separator between left-right alignment
+  template = "%StdinReader% >< %disku% | %coretemp% | %LocalTime% |%LocalDate%",
+  -- general
+  lowerOnStart = True, -- send to bottom of window stack on start
+  hideOnStart = False, -- start with window unmapped (hidden)
+  allDesktops = True, -- show on all desktops
+  overrideRedirect = True, -- set the Override Redirect flag (Xlib)
+  pickBroadest = False, -- choose widest display (multi-monitor)
+  persistent = True, -- enable/disable hiding (True = disabled)
+
+  -- plugins
+  commands = [
+    -- output
+    Run StdinReader,
+    -- cpu usage
+    -- disk usage
+    Run DiskU [ ("/", "<free> / <size>"), ("sda2", "<usedbar>")] [
+      "-d", "1"
+    ] 20,
+    -- cpu core(s) temperature (coretemp module kernel?)
+    Run CoreTemp [
+      "-t", "<core1>°C <core2>°C",
+      "-L", "40",
+      "-l", "#DC322F",
+      "-n", "#2AA198",
+      "-H", "80",
+      "-h", "#586E75"
+    ] 10,
+    -- wifi essid or ip
+    -- battery %
+    -- est time
+    Run DateZone "%r %Z" "en_US.UTF-8" "America/New_York" "LocalTime" 10,
+    -- jst time
+    Run DateZone "%r %Z" "en_US.UTF-8" "Asia/Tokyo" "WeebTime" 10,
+    -- local date
+    Run Date "%e-%b-%Y" "LocalDate" 10
+  ]
+}
