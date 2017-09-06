@@ -1,8 +1,37 @@
 ! ------------------------------------------------------------------------------
-! ROFI Color theme
+! ROFI
 ! ------------------------------------------------------------------------------
+! Configuration
 rofi.color-enabled: true
+! Scheme
 rofi.color-window: argb:ee273238, #273238, argb:3a1e2529
 rofi.color-normal: argb:00273238, #c1c1c1, argb:3a273238, #394249, #ffffff
 rofi.color-active: argb:00273238, #80cbc4, argb:3a273238, #394249, #80cbc4
 rofi.color-urgent: argb:00273238, #ff1844, argb:3a273238, #394249, #ff1844
+
+! ------------------------------------------------------------------------------
+! URXVT
+! ------------------------------------------------------------------------------
+! Configuration
+URxvt.scrollBar: false
+! Scheme
+URxvt*background: #1E1F28
+URxvt*foreground: #EBECE6
+URxvt*cursorColor: #E4E4E4
+
+URxvt*color0: #000000
+URxvt*color1: #FB4245
+URxvt*color2: #50FA7B
+URxvt*color3: #F0FA8B
+URxvt*color4: #49B9FE
+URxvt*color5: #FB4CB3
+URxvt*color6: #8BE9FD
+URxvt*color7: #EDEDEC
+URxvt*color8: #555555
+URxvt*color9: #FB4245
+URxvt*color10: #50FA7B
+URxvt*color11: #F0FA8B
+URxvt*color12: #49B9FE
+URxvt*color13: #FB4CB3
+URxvt*color14: #8BE9FD
+URxvt*color15: #EDEDEC

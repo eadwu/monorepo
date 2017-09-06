@@ -10,12 +10,13 @@ Plug 'pangloss/vim-javascript'
 Plug 'leafgarland/typescript-vim'
 call plug#end()
 " general settings
+filetype plugin indent on
 set guifont=Operator:h12
 set tabstop=2
-set softtabstop=0 noexpandtab
 set shiftwidth=2
 set laststatus=2
 set ttimeoutlen=50
+set expandtab
 " powerline integration
 " set rtp+=/usr/lib/python3.6/site-packages/powerline/bindings/vim
 " set laststatus=2
