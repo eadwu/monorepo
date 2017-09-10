@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 
-# Usage
-#   bash <(curl https://gitlab.com/arch-dual-boot/arch-x-os/raw/master/scripts/post.bash) virutalbox
+# USAGE:
+#   curl https://gitlab.com/arch-dual-boot/arch-x-os/raw/master/scripts/post.bash > post.bash && \
+#     chmod +x post.bash && \
+#     sudo ./post.bash virtualbox && \
+#     rm post.bash
 
 # Variables
 virtualbox=${1} # |true
