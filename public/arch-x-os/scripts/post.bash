@@ -25,7 +25,7 @@ pacman -S \
   lightdm lightdm-gtk-greeter \
   xmonad xmonad-contrib xmobar \
   compton i3lock thunar gvfs thunar-volman nitrogen rxvt-unicode \
-  acpid xfce4-screenshooter xfce4-taskmanager
+  xfce4-screenshooter xfce4-taskmanager
 # Additional Packages
 pacman -S \
   zsh vim \
@@ -65,22 +65,8 @@ echo 'Section "InputClass"
   Option "DisableWhileTyping" "off"
   Option "MiddleEmulation" "on"
 EndSection' > /etc/X11/xorg.conf.d/30-touchpad.conf
-## ACPID keybinds
-echo 'event=button/lid
-action=/etc/acpi/actions/lid.sh %e' > /etc/acpi/events/lid
-mkdir /etc/acpi/actions
-echo '#!/usr/bin/env sh
-
-case "$3" in
-  open)
-    blurlock ;;
-  close) logger "LID closed" ;;
-  *) logger "ACPI action undefined: $3" ;;
-esac' > /etc/acpi/actions/lid.sh
-chmod +x /etc/acpi/actions/lid.sh
 # Systemctl daemons/services
 systemctl daemon-reload
-systemctl enable acpid.service
 systemctl enable fstrim.timer
 systemctl enable ntpd
 systemctl enable bluetooth
