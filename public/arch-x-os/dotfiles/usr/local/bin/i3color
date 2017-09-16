@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+image="$(mktemp).png"
+
+param=(--textcolor=FFFFFF00 \
+  --insidecolor=FADDC500 \
+  --ringcolor=FAFAFA00 \
+  --linecolor=2D283E00 \
+  --keyhlcolor=FABB5CAA \
+  --ringvercolor=FADD5CAA \
+  --separatorcolor=22222200 \
+  --insidevercolor=FADD5C00 \
+  --ringwrongcolor=F13459AA \
+  --insidewrongcolor=F1345900)
+
+ffmpeg -y -s 1440x900 -probesize 10MB -f x11grab -i ${DISPLAY} -vframes 1 -vf "gblur=sigma=16" "${image}"
+convert "${image}" /usr/share/pixmaps/lock-overlay.png -gravity center -composite "${image}"
+i3lock "${param[@]}" -i "${image}"

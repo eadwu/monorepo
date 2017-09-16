@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+# USAGE:
+#   su root && \
+#     echo "${USER} ALL=(ALL) NOPASSWD: /home/${USER}/.xmonad/bin/mon_backlight" >> /etc/sudoers.d/grant-client-overrides && \
+#     exit && \
+#   sudo ~/.xmonad/bin/mon_backlight {-|+} var_tick
+
+bl_intel=/sys/class/backlight/intel_backlight
+steps=15
+
+var_tick=${2}
+tick=${var_tick:-1}
+
+case $1 in
+  -)
+    if (( $(cat ${bl_intel}/brightness) == 0 )); then exit 0; fi
+    new=$(( $(cat ${bl_intel}/brightness) - $(cat ${bl_intel}/max_brightness) / ( ${steps} * ${tick} ) ))
+    if (( ${new} < 0 )); then
+      echo "0" | tee ${bl_intel}/brightness
+      exit 1
+    fi
+    ;;
+  +)
+    if (( $(cat ${bl_intel}/brightness) == $(cat ${bl_intel}/max_brightness) )); then exit 0; fi
+    new=$(( $(cat ${bl_intel}/brightness) + $(cat ${bl_intel}/max_brightness) / ( ${steps} * ${tick} ) ))
+    if (( ${new} > $(cat ${bl_intel}/max_brightness) )); then
+      echo "$(cat ${bl_intel}/max_brightness)" | tee ${bl_intel}/brightness
+      exit 1
+    fi
+esac
+
+echo "${new}" | tee ${bl_intel}/brightness
