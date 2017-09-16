@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 # USAGE:
-#   curl https://gitlab.com/arch-dual-boot/arch-x-os/raw/master/scripts/base_install.bash | bash -s -- boot_partition crypt_password country geographic_zone hostname root_password user password locale dual_boot 
+#   curl https://gitlab.com/arch-dual-boot/arch-x-os/raw/master/scripts/base_install.bash | \
+#     bash -s -- boot_partition crypt_password country geographic_zone hostname root_password user password locale dual_boot
 
 # Variables
 boot_partition=${1} # Boot Partition, normally /dev/sda{1|5}
