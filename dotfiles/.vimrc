@@ -4,23 +4,18 @@ Plug 'w0rp/ale'
 Plug 'tpope/vim-fugitive'
 Plug 'scrooloose/nerdtree'
 Plug 'vim-airline/vim-airline'
-" Plug 'arcticicestudio/nord-vim'
 Plug 'pangloss/vim-javascript'
-" Plug 'sophacles/vim-processing'
+Plug 'sophacles/vim-processing'
 Plug 'leafgarland/typescript-vim'
 call plug#end()
 " general settings
 filetype plugin indent on
-set guifont=Operator:h12
+set guifont=Operator Mono Lig Book:h10
 set tabstop=2
 set shiftwidth=2
 set laststatus=2
 set ttimeoutlen=50
 set expandtab
-" powerline integration
-" set rtp+=/usr/lib/python3.6/site-packages/powerline/bindings/vim
-" set laststatus=2
-" set t_Co=256
 " nord theme settings
 let g:nord_italic_comments = 1
 " vim-airline configuration

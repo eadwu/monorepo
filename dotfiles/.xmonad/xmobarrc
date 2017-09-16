@@ -1,7 +1,7 @@
 Config {
   -- appearance
-  font = "xft:Sans:size=9,style=regular:antialias=true",
-  additionalFonts = [ "xft:FontAwesome:size=9,style=regular:antialias=true" ],
+  font = "xft:Operator Mono Lig Book:size=10,style=regular:antialias=true",
+  additionalFonts = [ "xft:FontAwesome:size=10,style=regular:antialias=true" ],
   bgColor = "#282828",
   fgColor = "#FFFFFF",
   position = Top,
@@ -10,7 +10,7 @@ Config {
   -- layout
   sepChar = "%", -- delineator between plugin names and straight text
   alignSep = "><", -- separator between left-right alignment
-  template = "%StdinReader% >< %disku% | %coretemp% | %LocalTime% |%LocalDate%",
+  template = "%StdinReader% >< %multicpu% | %disku% | %coretemp% | %wlp2s0wi% | %battery% | %LocalTime% |%LocalDate% %KJRB%",
   -- general
   lowerOnStart = True, -- send to bottom of window stack on start
   hideOnStart = False, -- start with window unmapped (hidden)
@@ -24,26 +24,55 @@ Config {
     -- output
     Run StdinReader,
     -- cpu usage
-    -- disk usage
-    Run DiskU [ ("/", "<free> / <size>"), ("sda2", "<usedbar>")] [
-      "-d", "1"
-    ] 20,
-    -- cpu core(s) temperature (coretemp module kernel?)
-    Run CoreTemp [
-      "-t", "<core1>°C <core2>°C",
-      "-L", "40",
+    Run MultiCpu [
+      "-t", "<fn=1></fn> <total>%",
+      "-L", "1",
       "-l", "#DC322F",
       "-n", "#2AA198",
-      "-H", "80",
+      "-H", "90",
       "-h", "#586E75"
     ] 10,
-    -- wifi essid or ip
+    -- disk usage
+    Run DiskU [ ("/", "<fn=1></fn> <free> / <size>"), ("sda2", "<usedbar>")] [
+      "-L", "10",
+      "-l", "#DC322F",
+      "-n", "#2AA198",
+      "-H", "95",
+      "-h", "#586E75"
+    ] 30,
+    -- cpu core(s) temperature
+    Run CoreTemp [
+      "-t", "<fn=1></fn> <core1>°C  <fn=1></fn> <core2>°C",
+      "-L", "30",
+      "-l", "#DC322F",
+      "-n", "#2AA198",
+      "-H", "85",
+      "-h", "#586E75"
+    ] 10,
+    -- wifi
+    Run Wireless "wlp2s0" [
+      "-t", "<fn=1></fn> <essid>"
+    ] 30,
     -- battery %
+    Run Battery [
+      "-t", "<fn=1></fn> <left>% (<timeleft> <watts>)",
+      "-d", "2",
+      "--",
+      "-L", "20",
+      "-l", "#DC322F",
+      "-m", "#2AA198",
+      "-H", "95",
+      "-h", "#586E75"
+    ] 10,
     -- est time
-    Run DateZone "%r %Z" "en_US.UTF-8" "America/New_York" "LocalTime" 10,
+    Run DateZone "<fn=1></fn> %r %Z" "en_US.UTF-8" "America/New_York" "LocalTime" 10,
     -- jst time
-    Run DateZone "%r %Z" "en_US.UTF-8" "Asia/Tokyo" "WeebTime" 10,
+    --Run DateZone "%r %Z" "en_US.UTF-8" "Asia/Tokyo" "WeebTime" 10,
     -- local date
-    Run Date "%e-%b-%Y" "LocalDate" 10
+    Run Date " <fn=1></fn> %e-%b-%Y" "LocalDate" 10,
+    -- weather
+    Run Weather "KJRB" [
+      "-t", "<tempF>°F, RH <rh>%"
+    ] 6000
   ]
 }

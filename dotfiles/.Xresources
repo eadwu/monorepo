@@ -1,18 +1,27 @@
-! ------------------------------------------------------------------------------
 ! ROFI
-! ------------------------------------------------------------------------------
 ! Configuration
-rofi.color-enabled: true
-! Scheme
-rofi.color-window: argb:ee273238, #273238, argb:3a1e2529
-rofi.color-normal: argb:00273238, #c1c1c1, argb:3a273238, #394249, #ffffff
-rofi.color-active: argb:00273238, #80cbc4, argb:3a273238, #394249, #80cbc4
-rofi.color-urgent: argb:00273238, #ff1844, argb:3a273238, #394249, #ff1844
+rofi.bw: 0
+rofi.lines: 30
+rofi.width: 455
+rofi.columns: 1
+rofi.padding: 28
+rofi.location: 8
 
-! ------------------------------------------------------------------------------
+rofi.fuzzy: false
+rofi.color-enabled: true
+rofi.hide-scrollbar: true
+rofi.separator-style: none
+
+rofi.font: Operator Mono Lig Book 12
+! Scheme
+rofi.color-window: #2F343F, #EBDBB2
+rofi.color-normal: #2F343F, #EBDBB2, #2F343F, #EBDBB2, #2F343F
+rofi.color-active: #2F343F, #EBDBB2, #2F343F, #EBDBB2, #2F343F
+rofi-color-urgent: #2F343F, #EBDBB2, #2F343F, #EBDBB2, #2F343F
+
 ! URXVT
-! ------------------------------------------------------------------------------
 ! Configuration
+URxvt.font: xft:Operator Mono Lig Book:size=12,style=regular:antialias=true
 URxvt.scrollBar: false
 ! Scheme
 URxvt*background: #1E1F28

@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+# USAGE:
+#   su root && \
+#     echo "${USER} ALL=(ALL) NOPASSWD: /home/${USER}/.xmonad/bin/kbd_backlight" >> /etc/sudoers.d/grant-client-overrides && \
+#     exit && \
+#   sudo ~/.xmonad/bin/kbd_backlight {-|+} var_tick
+
+kl_smc=/sys/class/leds/smc::kbd_backlight
+steps=15
+
+var_tick=${2}
+tick=${var_tick:-1}
+
+case $1 in
+  -)
+    if (( $(cat ${kl_smc}/brightness) == 0 )); then exit 0; fi
+    new=$(( $(cat ${kl_smc}/brightness) - $(cat ${kl_smc}/max_brightness) / ( ${steps} * ${tick} ) ))
+    if (( ${new} < 0 )); then
+      echo "0" | tee ${kl_smc}/brightness
+      exit 1
+    fi
+    ;;
+  +)
+    if (( $(cat ${kl_smc}/brightness) == $(cat ${kl_smc}/max_brightness) )); then exit 0; fi
+    new=$(( $(cat ${kl_smc}/brightness) + $(cat ${kl_smc}/max_brightness) / ( ${steps} * ${tick} ) ))
+    if (( ${new} > $(cat ${kl_smc}/max_brightness) )); then
+      echo "$(cat ${kl_smc}/max_brightness)" | tee ${kl_smc}/brightness
+      exit 1
+    fi
+    ;;
+esac
+
+echo "${new}" | tee ${kl_smc}/brightness
