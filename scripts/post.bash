@@ -14,17 +14,17 @@ perl -0777 -i -pe 's/#(\[multilib\])\n#(Include = \/etc\/pacman.d\/mirrorlist)/\
 pacman -Sy
 # Core Packages
 pacman -S \
-  pulseaudio alsa-utils \
+  pulseaudio pulseaudio-alsa pulseaudio-bluetooth \
   yaourt \
   networkmanager network-manager-applet gnome-keyring \
   xf86-input-libinput xorg-server xorg-xinit xorg-xwininfo \
   ntp \
-  bluez bluez-utils blueman pulseaudio-bluetooth
+  bluez bluez-libs bluez-utils
 # Graphical Environment
 pacman -S \
   lightdm lightdm-gtk-greeter \
-  xmonad xmonad-contrib xmobar \
-  compton i3lock thunar gvfs thunar-volman nitrogen rxvt-unicode \
+  xmonad xmonad-contrib xmobar hlint \
+  compton thunar gvfs thunar-volman nitrogen rxvt-unicode \
   xfce4-screenshooter xfce4-taskmanager
 # Additional Packages
 pacman -S \
@@ -35,8 +35,8 @@ pacman -S \
   powertop tlp cups avahi hplip \
   git npm yarn nodejs php glslang \
   adapta-gtk-theme deepin-gtk-theme \
-  conky docker openvpn redshift rofi ranger feh \
-  luarocks lm_sensors python-fonttools lsb-release \
+  conky docker openvpn redshift rofi ranger feh cmus \
+  luarocks lm_sensors python-fonttools lsb-release scrot cmatrix \
   blender opera-developer opera-developer-ffmpeg-codecs \
   noto-fonts-cjk ttf-liberation
 ## Virtualbox Guest Utils
