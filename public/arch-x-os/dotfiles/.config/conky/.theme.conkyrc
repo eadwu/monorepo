@@ -6,10 +6,10 @@ conky.config = {
 
   maximum_width = 400,
 
-  gap_x = 5,
+  gap_x = 60,
   gap_y = 25,
 
-  alignment = 'top_right',
+  alignment = 'tl',
   --[=[ Font Settings ]=]
   override_utf8_locale = true,
   use_xft = true,
@@ -21,8 +21,8 @@ conky.config = {
   draw_outline = false,
   default_outline_color = '000000',
 
-  default_color = '2F343F',
-  color0 = 'FFFFFF',
+  default_color = 'E64A19',
+  color0 = '2196F3',
   color1 = '777777',
   --[=[ Border Configuration ]=]
   draw_borders = false,
@@ -43,17 +43,20 @@ conky.config = {
 
 conky.text = [[
 ${font Operator Mono Lig Book:Light:size=58}${alignr}${time %l}${color0}:${time %M} ${time %p}${font}
-${font Operator Mono Lig Book:Light:size=24}${voffset 12}${alignr}${execi 300 LANG=en_US.utf8 LC_TIME=en_US.utf8 date +"%A"},${color}\
- ${execi 300 LANG=en_US.utf8 LC_TIME=en_US.utf8 date +"%d"}\
- ${color0}${execi 300 LANG=${template9} LC_TIME=${template9} date +"%B"}${font}${voffset 2}
+${font Operator Mono Lig Book:Light:size=24}${voffset 12}${alignr}${execi 300 date +"%A"},${color}\
+ ${execi 300 date +"%d"}\
+ ${color0}${execi 300 date +"%B"}${font}${voffset 2}
+#
 ${hr}${color}${voffset 4}
+#
 ${font Operator Mono Lig Book:Regular:size=10}${alignr}ARCHITECTURE: ${color0}${machine} ${color1}|${color} KERNEL: ${color0}${kernel}${color}
 ${alignr}USER: ${color0}${execi 5000 whoami} ${color1}|${color} MACHINE: ${color0}${nodename} ${color1}|${color} UPTIME: ${color0}${uptime_short}${color}
 ${alignr}DISTRIBUTION: ${color0}${exec awk -F'=' '/DESCRIPTION/ {print $2}' /etc/lsb-release |sed 's/"//g'} ${color1}|${color} VERSION: ${color0}${exec awk -F'=' '/DISTRIB_RELEASE=/ {printf $2" "} /CODENAME/ {print $2}' /etc/lsb-release}${color}
 ${alignr}ROOT: ${color0}${fs_used /} ${color}/${color0} ${fs_size /} ${color1}|${color} HOME: ${color0}${fs_used /home}${color} / ${color0}${fs_size /home}${color}
-${alignr}SWAP: ${color0}${swap} ${color}/${color0} ${swapmax} ${color1}|${color} FAN: ${color0}${execi 2 sensors | grep Exhaust | cut -c 14-21}${color}
+${alignr}SWAP: ${color0}${swap} ${color}/${color0} ${swapmax} ${color1}|${color} FAN: ${color0}${execi 2 sensors | grep -Po '[0-9]+ RPM' | head -n 1}${color}
 ${alignr}CPU: ${color0}${if_match ${cpu cpu0}<10}  ${cpu cpu0}\
 ${else}${if_match ${cpu cpu0}<100} ${cpu cpu0}\
 ${else}${cpu cpu0}${endif}${endif}% ${color1}|${color} RAM: ${color0}${mem} ${color}/${color0} ${memmax}${color}
-${alignr}${color0}${execpi 1800 pacman -Qu | wc -l}${color} UPDATE(S) AVAILABLE
+${alignr}${color0}${execi 1800 pacman -Qtdq | wc -l}${color} ORPHAN PACKAGE(S) FOUND
+${alignr}${color0}${execi 1800 checkupdates | wc -l}${color} UPDATE(S) AVAILABLE
 ]]
