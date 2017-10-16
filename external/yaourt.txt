@@ -1,0 +1,12 @@
+android-studio
+atom-editor-beta-bin
+cli-visualizer
+discord
+flow-bin
+libc++experimental
+lightdm-enso-os-greeter-git
+monitorix
+moonscript
+oblogout-blurlock
+papirus-icon-theme-git
+visual-studio-code-insiders
