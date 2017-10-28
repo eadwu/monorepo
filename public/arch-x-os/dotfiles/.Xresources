@@ -8,11 +8,13 @@ rofi.padding: 28
 rofi.location: 8
 
 rofi.fuzzy: false
+rofi.show-icons: true
 rofi.color-enabled: true
 rofi.hide-scrollbar: true
 rofi.separator-style: none
+rofi.modi: drun,run,window,ssh
 
-rofi.font: Operator Mono Lig Book 12
+rofi.font: Operator Mono 12
 ! Scheme
 rofi.color-window: #2F343F, #EBDBB2
 rofi.color-normal: #2F343F, #EBDBB2, #2F343F, #EBDBB2, #2F343F
@@ -21,7 +23,7 @@ rofi-color-urgent: #2F343F, #EBDBB2, #2F343F, #EBDBB2, #2F343F
 
 ! URXVT
 ! Configuration
-URxvt.font: xft:Operator Mono Lig Book:size=12,style=regular:antialias=true
+URxvt.font: xft:Operator Mono:size=12,style=regular:antialias=true
 URxvt.scrollBar: false
 ! Scheme
 URxvt*background: #1E1F28

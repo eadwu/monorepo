@@ -2,15 +2,13 @@
 call plug#begin('~/.vim/plugged')
 Plug 'w0rp/ale'
 Plug 'tpope/vim-fugitive'
-Plug 'scrooloose/nerdtree'
 Plug 'vim-airline/vim-airline'
 Plug 'pangloss/vim-javascript'
-Plug 'sophacles/vim-processing'
 Plug 'leafgarland/typescript-vim'
 call plug#end()
 " general settings
 filetype plugin indent on
-set guifont=Operator Mono Lig Book:h10
+set guifont=Operator Mono Lig:h10
 set tabstop=2
 set shiftwidth=2
 set laststatus=2
@@ -25,5 +23,3 @@ let g:javascript_plugin_jsdoc = 1
 let g:javascript_plugin_flow = 1
 " initialization
 colorscheme nord
-" keybinds
-map <C-n> :NERDTreeToggle<CR>

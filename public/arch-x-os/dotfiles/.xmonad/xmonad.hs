@@ -4,6 +4,8 @@ import XMonad.Hooks.SetWMName -- setWMName
 import XMonad.Hooks.DynamicLog -- dynamicLogWithPP, ppSep, ppTitle, ppOrder, ppOutput, ppCurrent
 import XMonad.Hooks.ManageDocks -- manageDocks, avoidStruts
 
+import XMonad.Layout.Circle -- Circle
+import XMonad.Layout.Spiral -- spiral
 import XMonad.Layout.Spacing -- smartSpacing
 import XMonad.Layout.Maximize -- maximizeWithPadding, maximizeRestore
 import XMonad.Layout.Minimize -- minimize, minimizeWindow, MinimizeMsg(RestoreNextMinimizedWin)
@@ -21,27 +23,27 @@ import qualified XMonad.StackSet as W
 {- Key Bindings  -}
 keybinds conf@ XConfig {XMonad.modMask = modm} = M.fromList $
   -- launch rofi
-  [((modm, xK_z), spawn "rofi -show run"),
+  [((modm, xK_z), spawn "rofi -show drun"),
   -- launch urxvt
   ((modm, xK_Return), safeSpawnProg $ XMonad.terminal conf),
   -- rorate layout(s)
   ((modm, xK_space), do
-    sendMessage $ ToggleStruts
-    sendMessage $ NextLayout),
+    sendMessage ToggleStruts
+    sendMessage NextLayout),
   -- default layout
   ((modm .|. shiftMask, xK_space), do
     sendMessage $ SetStruts [U] []
     setLayout $ XMonad.layoutHook conf),
   -- maximize focused window
   ((modm, xK_f), do
-    sendMessage $ ToggleStruts
+    sendMessage ToggleStruts
     withFocused $ sendMessage . maximizeRestore),
   -- minimize focused window
-  ((modm .|. shiftMask, xK_f), withFocused $ minimizeWindow),
+  ((modm .|. shiftMask, xK_f), withFocused minimizeWindow),
   -- restore windows
   ((modm .|. controlMask, xK_f), do
     sendMessage $ SetStruts [U] []
-    sendMessage $ RestoreNextMinimizedWin),
+    sendMessage RestoreNextMinimizedWin),
   -- close focused window
   ((modm .|. shiftMask, xK_q), kill),
   -- quit xmonad
@@ -49,21 +51,21 @@ keybinds conf@ XConfig {XMonad.modMask = modm} = M.fromList $
   -- restart xmonad
   ((modm .|. shiftMask, xK_r), spawn "killall conky redshift; xmonad --recompile; xmonad --restart")]
   ++
-  -- mod-[1..4], switch to workspace N
-  -- mod-shift-[1..4], move client to workspace N
+  -- mod-[1..5], switch to workspace N
+  -- mod-shift-[1..5], move client to workspace N
   [((m .|. modm, k), windows $ f i) |
-    (i, k) <- zip (XMonad.workspaces conf) [xK_1 .. xK_4],
+    (i, k) <- zip (XMonad.workspaces conf) [xK_1 .. xK_5],
     (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]]
 
 {- Mouse Bindings -}
 mousebinds XConfig {XMonad.modMask = modm} = M.fromList
-  -- mod-button1, Set the window to floating mode and move by dragging
-  [((modm, button1), \w -> focus w >> mouseMoveWindow w >> windows W.shiftMaster),
-  -- mod-button2, Raise the window to the top of the stack
-  ((modm, button2), \w -> focus w >> windows W.shiftMaster)]
+  -- mod4-button1, Set the window to floating mode and move by dragging
+  [((mod4Mask, button1), \w -> focus w >> mouseMoveWindow w >> windows W.shiftMaster),
+  -- mod4-button2, Raise the window to the top of the stack
+  ((mod4Mask, button2), \w -> focus w >> windows W.shiftMaster)]
 
 {- Layout -}
-layout = smartBorders . maximizeWithPadding 0 . minimize $ tiled ||| Full
+layout = smartBorders . maximizeWithPadding 0 . minimize $ tiled ||| spiral(6 / 7) ||| Circle
   where
     -- default tiling algorithm partitions the screen into two panes
     tiled = smartSpacing 5 $ Tall nmaster delta ratio
@@ -75,27 +77,32 @@ layout = smartBorders . maximizeWithPadding 0 . minimize $ tiled ||| Full
     delta = 3 / 100
 
 {- Window Rules -}
-rules = composeAll
-  [manageDocks,
+rules = composeAll . concat $
+  [[title =? t --> doFloat | t <- wmNames],
+  [className =? c --> doFloat | c <- wmClass],
 
-  title =? "Task Manager - Opera" --> doFloat,
-  title =? "File Operation Progress" --> doFloat,
-  title =? "Download Chrome Extension" --> doFloat,
-
-  className =? "Opera developer" --> doShift "1:WEB",
-  className =? "Atom" --> doShift "2:CODE",
-  className =? "discord" --> doShift "3:SOCIAL",
-
-  className =? "Nitrogen" --> doFloat,
-  className =? "Pinentry" --> doFloat,
-  className =? "Oblogout" --> doFloat,
-  className =? "Xfce4-screenshooter" --> doFloat,
-  className =? "Lightdm-gtk-greeter-settings" --> doFloat]
+  [className =? w --> doShift "1:WEB" | w <- web],
+  [className =? c --> doShift "2:CODE" | c <- code],
+  [className =? m --> doShift "3:MODEL" | m <- model],
+  [className =? s --> doShift "4:SOCIAL" | s <- social]] where
+  wmNames = ["Task Manager - Opera",
+    "File Operation Progress",
+    "Blender User Preferences"]
+  wmClass = ["Steam",
+    "Zenity",
+    "Nitrogen",
+    "Pinentry",
+    "Oblogout",
+    "Xfce4-screenshooter",
+    "Xfce4-notifyd-config"]
+  web = [ "Opera developer" ]
+  code = [ "Atom", "Code - Insiders" ]
+  model = [ "Blender" ]
+  social = [ "discord" ]
 
 main = do
   mapM_ spawn
-    ["~/.config/conky/init-conky",
-    "xsetroot -cursor_name left_ptr",
+    ["xsetroot -cursor_name left_ptr",
     "/usr/bin/env nitrogen --restore",
     "/usr/bin/env redshift -l 40.7:73.8",
     "/usr/bin/env compton -b -f --config ~/.config/compton.conf"]
@@ -105,23 +112,23 @@ main = do
     focusFollowsMouse = True, -- focus on window on hover
     clickJustFocuses = False, -- focus on window on click also
     borderWidth = 1,
-    modMask = mod1Mask, -- left alt; for right alt mod3Mask
-    workspaces = [ "1:WEB", "2:CODE", "3:SOCIAL", "4:OTHER" ],
+    modMask = mod1Mask, -- mod1Mask left alt; mod3Mask right alt; mod4Mask Super
+    workspaces = [ "1:WEB", "2:CODE", "3:MODEL", "4:SOCIAL", "5:OTHER" ],
     normalBorderColor = "#333333", -- unfocused border color for windows
-    focusedBorderColor = "#1793D1", -- focused border color for windows
+    focusedBorderColor = "#1793d1", -- focused border color for windows
 
     keys = keybinds,
     mouseBindings = mousebinds,
 
     layoutHook = avoidStrutsOn [U] layout,
-    manageHook = rules <+> manageHook def,
+    manageHook = manageDocks <+> rules <+> manageHook def,
     handleEventHook = mempty,
     logHook = dynamicLogWithPP $ xmobarPP {
-      ppSep = "  ->  ",
-      ppTitle = xmobarColor "D3869B" "" . shorten 42,
+      ppSep = "  >=>  ",
+      ppTitle = xmobarColor "#567" "" . shorten 50,
       ppOrder = \(ws:_:t:_) -> [ws,t],
       ppOutput = hPutStrLn xmproc,
-      ppCurrent = xmobarColor "#83A598" "" . wrap "[" "]"
+      ppCurrent = xmobarColor "#567" "" . wrap "[" "]"
     },
     startupHook = setWMName "LG3D"
   } `additionalKeys`
