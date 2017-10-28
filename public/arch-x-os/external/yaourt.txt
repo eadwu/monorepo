@@ -1,5 +1,3 @@
-android-studio
-atom-editor-beta-bin
 cli-visualizer
 discord
 flow-bin
@@ -9,4 +7,6 @@ monitorix
 moonscript
 oblogout-blurlock
 papirus-icon-theme-git
+react-native-cli
 visual-studio-code-insiders
+watchman
