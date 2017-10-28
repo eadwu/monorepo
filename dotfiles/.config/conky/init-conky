@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-conky -c ~/.config/conky/.theme.conkyrc &&
-exit 0

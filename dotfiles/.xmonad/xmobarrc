@@ -1,16 +1,14 @@
 Config {
   -- appearance
-  font = "xft:Operator Mono Lig Book:size=10,style=regular:antialias=true",
-  additionalFonts = [ "xft:FontAwesome:size=10,style=regular:antialias=true" ],
-  bgColor = "#282828",
-  fgColor = "#FFFFFF",
+  font = "xft:Operator Mono:size=9,style=regular:antialias=true",
+  bgColor = "#050508",
+  fgColor = "#ca5",
+  alpha = 70,
   position = Top,
-  border = BottomB,
-  borderColor = "#282828",
   -- layout
   sepChar = "%", -- delineator between plugin names and straight text
   alignSep = "><", -- separator between left-right alignment
-  template = "%StdinReader% >< %multicpu% | %disku% | %coretemp% | %wlp2s0wi% | %battery% | %LocalTime% |%LocalDate% %KJRB%",
+  template = "%StdinReader% >< %updates% %orphans%  %multicpu%  %memory%  %exhaust%  %disku%  %wlp2s0wi%  %battery%  %LocalDate%  %KLGA%",
   -- general
   lowerOnStart = True, -- send to bottom of window stack on start
   hideOnStart = False, -- start with window unmapped (hidden)
@@ -23,56 +21,47 @@ Config {
   commands = [
     -- output
     Run StdinReader,
+    -- updates
+    Run Com "/bin/zsh" ["-c", "echo \"UPD <fc=#567>$(checkupdates | wc -l)</fc>\""] "updates" 6000,
+    -- orphans
+    Run Com "/bin/zsh" ["-c", "echo \"ORP <fc=#567>$(pacman -Qtdq | wc -l)</fc>\""] "orphans" 6000,
     -- cpu usage
     Run MultiCpu [
-      "-t", "<fn=1></fn> <total>%",
-      "-L", "1",
-      "-l", "#DC322F",
-      "-n", "#2AA198",
-      "-H", "90",
-      "-h", "#586E75"
+      "-t", "CPU <fc=#567><total>%</fc>"
     ] 10,
+    -- memory usage
+    Run Memory [
+      "-t", "RAM <fc=#567><used>M</fc>"
+    ] 10,
+    -- fan speed
+    Run Com "/bin/zsh" ["-c", "echo \"FAN <fc=#567>$(sensors | grep -Po '[0-9]+ RPM' | head -n 1)</fc>\""] "exhaust" 10,
     -- disk usage
-    Run DiskU [ ("/", "<fn=1></fn> <free> / <size>"), ("sda2", "<usedbar>")] [
+    Run DiskU [ ("/", "DISK <fc=#567><free></fc> / <fc=#567><size></fc>"), ("sda2", "<usedbar>")] [
       "-L", "10",
-      "-l", "#DC322F",
-      "-n", "#2AA198",
-      "-H", "95",
-      "-h", "#586E75"
+      "-n", "#556677",
+      "-H", "95"
     ] 30,
-    -- cpu core(s) temperature
-    Run CoreTemp [
-      "-t", "<fn=1></fn> <core1>°C  <fn=1></fn> <core2>°C",
-      "-L", "30",
-      "-l", "#DC322F",
-      "-n", "#2AA198",
-      "-H", "85",
-      "-h", "#586E75"
-    ] 10,
     -- wifi
     Run Wireless "wlp2s0" [
-      "-t", "<fn=1></fn> <essid>"
+      "-t", "ESSID <fc=#567><essid></fc>"
     ] 30,
     -- battery %
     Run Battery [
-      "-t", "<fn=1></fn> <left>% (<timeleft> <watts>)",
+      "-t", "BAT <acstatus>",
       "-d", "2",
       "--",
       "-L", "20",
-      "-l", "#DC322F",
-      "-m", "#2AA198",
+      "-m", "#606060",
       "-H", "95",
-      "-h", "#586E75"
+      "-i", "<fc=#567><left>%</fc>",
+      "-O", "<fc=#567><left>%</fc> (<timeleft>)",
+      "-o", "<fc=#567><left>%</fc> (<timeleft> <watts>)"
     ] 10,
-    -- est time
-    Run DateZone "<fn=1></fn> %r %Z" "en_US.UTF-8" "America/New_York" "LocalTime" 10,
-    -- jst time
-    --Run DateZone "%r %Z" "en_US.UTF-8" "Asia/Tokyo" "WeebTime" 10,
     -- local date
-    Run Date " <fn=1></fn> %e-%b-%Y" "LocalDate" 10,
+    Run Date "<fc=#567>%a %b %e %l:%M %p</fc>" "LocalDate" 10,
     -- weather
-    Run Weather "KJRB" [
-      "-t", "<tempF>°F, RH <rh>%"
+    Run Weather "KLGA" [
+      "-t", "<fc=#567><tempF>°F</fc>, RH <fc=#567><rh>%</fc>"
     ] 6000
   ]
 }
