@@ -1,4 +1,5 @@
 adapta-gtk-theme
+apg
 ark
 autoconf
 automake
@@ -12,6 +13,7 @@ cmatrix
 cmus
 compton
 conky
+cool-retro-term
 cups
 deepin-gtk-theme
 dhcpcd
@@ -21,7 +23,6 @@ fcron
 feh
 flex
 gimp
-git
 glslang
 gnome-keyring
 haskell-hlint
@@ -56,12 +57,14 @@ openssh
 opera-developer
 opera-developer-ffmpeg-codecs
 p7zip
+pass
 pcmciautils
 pepper-flash
 php
 powertop
 pulseaudio-alsa
 pulseaudio-bluetooth
+pwgen
 python-fonttools
 qt5-doc
 ranger
@@ -93,7 +96,6 @@ vi
 vim
 which
 wine
-xclip
 xfce4-notifyd
 xfce4-screenshooter
 xfce4-taskmanager

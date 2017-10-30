@@ -1,6 +1,7 @@
 cli-visualizer
 discord
 flow-bin
+git-secrets
 libc++experimental
 lightdm-enso-os-greeter-git
 monitorix
