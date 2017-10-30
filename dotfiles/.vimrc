@@ -8,7 +8,7 @@ Plug 'leafgarland/typescript-vim'
 call plug#end()
 " general settings
 filetype plugin indent on
-set guifont=Operator Mono Lig:h10
+set guifont="Operator Mono Lig:h10"
 set tabstop=2
 set shiftwidth=2
 set laststatus=2
