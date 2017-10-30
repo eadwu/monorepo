@@ -24,10 +24,11 @@ pacman -S \
   bluez bluez-libs bluez-utils
 # Graphical Environment
 pacman -S \
+  apg pass pwgen \
   qt5-base qt5-doc \
   lightdm lightdm-gtk-greeter \
   haskell-xmonad haskell-xmonad-contrib xmobar haskell-hlint haskell-stack \
-  compton thunar gvfs thunar-volman nitrogen rxvt-unicode \
+  compton thunar gvfs thunar-volman nitrogen rxvt-unicode cool-retro-term \
   xfce4-notifyd xfce4-screenshooter xfce4-taskmanager
 # Additional Packages
 pacman -S \
