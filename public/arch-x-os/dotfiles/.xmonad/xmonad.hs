@@ -34,6 +34,12 @@ keybinds conf@ XConfig {XMonad.modMask = modm} = M.fromList $
   ((modm .|. shiftMask, xK_space), do
     sendMessage $ SetStruts [U] []
     setLayout $ XMonad.layoutHook conf),
+  -- swap next window
+  ((modm, xK_Right), windows W.swapDown),
+  -- swap previous window
+  ((modm, xK_Left), windows W.swapUp),
+  -- swap focused window
+  ((modm .|. shiftMask, xK_Up), windows W.swapMaster),
   -- maximize focused window
   ((modm, xK_f), do
     sendMessage ToggleStruts
@@ -111,11 +117,11 @@ main = do
     terminal = "urxvt",
     focusFollowsMouse = True, -- focus on window on hover
     clickJustFocuses = False, -- focus on window on click also
-    borderWidth = 1,
+    borderWidth = 3,
     modMask = mod1Mask, -- mod1Mask left alt; mod3Mask right alt; mod4Mask Super
     workspaces = [ "1:WEB", "2:CODE", "3:MODEL", "4:SOCIAL", "5:OTHER" ],
-    normalBorderColor = "#333333", -- unfocused border color for windows
-    focusedBorderColor = "#1793d1", -- focused border color for windows
+    normalBorderColor = "#1793d1", -- unfocused border color for windows
+    focusedBorderColor = "#ca5", -- focused border color for windows
 
     keys = keybinds,
     mouseBindings = mousebinds,
