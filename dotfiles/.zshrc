@@ -3,7 +3,7 @@ HISTSIZE=50
 SAVEHIST=500
 HISTFILE=~/.zsh_history
 
-# Fix PATH
+# Add ~/.local/bin to PATH
 export PATH=${PATH}:${HOME}/.local/bin
 
 # Pure Prompt

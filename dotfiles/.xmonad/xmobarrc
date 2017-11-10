@@ -61,7 +61,7 @@ Config {
     Run Date "<fc=#567>%a %b %e %l:%M %p</fc>" "LocalDate" 10,
     -- weather
     Run Weather "KLGA" [
-      "-t", "<fc=#567><tempF>°F</fc>, RH <fc=#567><rh>%</fc>"
+      "-t", "<fc=#567><tempF>°F</fc> RH <fc=#567><rh>%</fc>"
     ] 6000
   ]
 }
