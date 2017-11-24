@@ -34,14 +34,15 @@ pacman -S \
 pacman -S \
   zsh vim \
   ark p7zip zip unzip unrar \
-  cmake clang xclip openssh \
   broadcom-wl-dkms pepper-flash \
   powertop tlp cups avahi hplip \
+  ruby cmake clang xclip openssh \
   adapta-gtk-theme deepin-gtk-theme \
   scrot cmatrix simplescreenrecorder \
   git npm yarn nodejs php glslang texlive-most \
   java-runtime-common java-environment-common jdk8-openjdk jdk9-openjdk \
-  luarocks lm_sensors python-fonttools lsb-release \
+  libreoffice-fresh hunspell hyphen hunspell-en hyphen-en libmythes mythes-en \
+  luarocks lm_sensors python-pip python-pylint python2-pip python2-pylint python-fonttools lsb-release \
   fcron conky docker openvpn redshift rofi ranger feh cmus \
   blender opera-developer opera-developer-ffmpeg-codecs \
   noto-fonts-cjk ttf-liberation
