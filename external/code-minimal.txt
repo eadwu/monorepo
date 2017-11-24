@@ -1,6 +1,8 @@
 James-Yu.latex-workshop
+christian-kohler.path-intellisense
 dbaeumer.vscode-eslint
 flowtype.flow-for-vscode
+formulahendry.auto-rename-tag
 justusadam.language-haskell
 mgmcdermott.vscode-language-babel
 mkxml.vscode-filesize

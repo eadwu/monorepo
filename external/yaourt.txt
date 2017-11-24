@@ -3,6 +3,7 @@ discord
 flow-bin
 git-secrets
 libc++experimental
+libreoffice-extension-languagetool
 lightdm-enso-os-greeter-git
 monitorix
 moonscript

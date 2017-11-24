@@ -29,6 +29,8 @@ haskell-hlint
 haskell-stack
 haskell-xmonad-contrib
 hplip
+hunspell-en
+hyphen-en
 inkscape
 intel-ucode
 iputils
@@ -36,6 +38,8 @@ jdk8-openjdk
 jdk9-openjdk
 jfsutils
 lib32-libpulse
+libfbclient
+libmythes
 licenses
 linux
 linux-headers
@@ -45,6 +49,7 @@ man-db
 man-pages
 mono
 mplayer
+mythes-en
 nano
 netctl
 network-manager-applet
@@ -66,11 +71,16 @@ pulseaudio-alsa
 pulseaudio-bluetooth
 pwgen
 python-fonttools
+python-pip
+python-pylint
+python2-pip
+python2-pylint
 qt5-doc
 ranger
 redshift
 reiserfsprogs
 rofi
+ruby
 rxvt-unicode
 s-nail
 scrot
@@ -95,7 +105,7 @@ unrar
 vi
 vim
 which
-wine
+winetricks
 xfce4-notifyd
 xfce4-screenshooter
 xfce4-taskmanager
@@ -106,4 +116,5 @@ xorg-xprop
 xorg-xwininfo
 yaourt
 yarn
+youtube-dl
 zsh
