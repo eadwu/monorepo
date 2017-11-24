@@ -97,8 +97,8 @@ rules = composeAll . concat $
   wmClass = ["Steam",
     "Zenity",
     "Nitrogen",
-    "Pinentry",
     "Oblogout",
+    "Pinentry",
     "Xfce4-screenshooter",
     "Xfce4-notifyd-config"]
   web = [ "Opera developer" ]
