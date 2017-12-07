@@ -1,4 +1,5 @@
 adapta-gtk-theme
+apache-ant
 apg
 ark
 autoconf
@@ -34,8 +35,6 @@ hyphen-en
 inkscape
 intel-ucode
 iputils
-jdk8-openjdk
-jdk9-openjdk
 jfsutils
 lib32-libpulse
 libfbclient

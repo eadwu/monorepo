@@ -1,13 +1,14 @@
-James-Yu.latex-workshop
+christian-kohler.npm-intellisense
 christian-kohler.path-intellisense
 dbaeumer.vscode-eslint
-flowtype.flow-for-vscode
+eg2.tslint
 formulahendry.auto-rename-tag
 justusadam.language-haskell
 mgmcdermott.vscode-language-babel
 mkxml.vscode-filesize
 monokai.theme-monokai-pro-vscode
-ms-vscode.atom-keybindings
+ms-python.python
+ms-vscode.vs-keybindings
 msjsdiag.debugger-for-chrome
 patrys.vscode-code-outline
 robertohuertasm.vscode-icons
