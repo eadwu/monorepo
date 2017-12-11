@@ -12,3 +12,4 @@ papirus-icon-theme-git
 react-native-cli
 visual-studio-code-insiders
 watchman
+windscribe-cli
