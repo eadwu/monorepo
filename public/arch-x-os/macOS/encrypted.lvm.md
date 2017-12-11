@@ -82,9 +82,9 @@ We will be setting up wireless here. You can use `wifi-menu` or [netctl](../reso
 
 To set up the mirrorlist read [here](../resources/mirrorlist.md)
 
-    pacstrap /mnt base base-devel   
+    pacstrap /mnt base base-devel
 #### FStab
-    genfstab -U -p /mnt >> /mnt/etc/fstab   
+    genfstab -U -p /mnt >> /mnt/etc/fstab
 
 **This next step is recommended for people with SSDs. See [here](https://wiki.archlinux.org/index.php/Solid_State_Drives#TRIM)**
 
