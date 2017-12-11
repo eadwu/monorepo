@@ -57,6 +57,7 @@ nitrogen
 noto-fonts-cjk
 npm
 ntp
+ocl-icd
 openssh
 opera-developer
 opera-developer-ffmpeg-codecs
