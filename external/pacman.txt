@@ -81,6 +81,7 @@ redshift
 reiserfsprogs
 rofi
 ruby
+rustup
 rxvt-unicode
 s-nail
 scrot

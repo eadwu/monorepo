@@ -22,6 +22,7 @@ patrys.vscode-code-outline
 rebornix.Ruby
 redhat.java
 robertohuertasm.vscode-icons
+rust-lang.rust
 searKing.preview-vscode
 twxs.cmake
 vscjava.vscode-java-debug
