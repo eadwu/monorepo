@@ -44,7 +44,7 @@ pacman -S \
   libreoffice-fresh hunspell hyphen hunspell-en hyphen-en libmythes mythes-en \
   luarocks lm_sensors python-pip python-pylint python2-pip python2-pylint python-fonttools lsb-release \
   fcron conky docker openvpn redshift rofi ranger feh cmus \
-  blender opera-developer opera-developer-ffmpeg-codecs \
+  blender vivaldi-snapshot vivaldi-snapshot-ffmpeg-codecs \
   noto-fonts-cjk ttf-liberation
 ## Virtualbox Guest Utils
 if [ "${virtualbox}" = true ]; then

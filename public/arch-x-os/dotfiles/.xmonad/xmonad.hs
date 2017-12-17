@@ -91,7 +91,7 @@ rules = composeAll . concat $
   [className =? c --> doShift "2:CODE" | c <- code],
   [className =? m --> doShift "3:MODEL" | m <- model],
   [className =? s --> doShift "4:SOCIAL" | s <- social]] where
-  wmNames = ["Task Manager - Opera",
+  wmNames = ["Task Manager - Vivaldi",
     "File Operation Progress",
     "Blender User Preferences"]
   wmClass = ["Steam",
@@ -101,8 +101,8 @@ rules = composeAll . concat $
     "Pinentry",
     "Xfce4-screenshooter",
     "Xfce4-notifyd-config"]
-  web = [ "Opera developer" ]
-  code = [ "Atom", "Code - Insiders" ]
+  web = [ "Vivaldi-stable" ]
+  code = [ "Code - Insiders" ]
   model = [ "Blender" ]
   social = [ "discord" ]
 

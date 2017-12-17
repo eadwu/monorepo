@@ -59,8 +59,6 @@ npm
 ntp
 ocl-icd
 openssh
-opera-developer
-opera-developer-ffmpeg-codecs
 p7zip
 pass
 pcmciautils
@@ -105,6 +103,8 @@ tlp
 unrar
 vi
 vim
+vivaldi-snapshot
+vivaldi-snapshot-ffmpeg-codecs
 which
 winetricks
 xfce4-notifyd
