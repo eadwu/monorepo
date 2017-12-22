@@ -24,6 +24,7 @@ redhat.java
 robertohuertasm.vscode-icons
 rust-lang.rust
 searKing.preview-vscode
+streetsidesoftware.code-spell-checker
 twxs.cmake
 vscjava.vscode-java-debug
 vscjava.vscode-java-pack
