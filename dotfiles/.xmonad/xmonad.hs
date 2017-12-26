@@ -10,6 +10,8 @@ import XMonad.Layout.Spacing -- smartSpacing
 import XMonad.Layout.Maximize -- maximizeWithPadding, maximizeRestore
 import XMonad.Layout.Minimize -- minimize, minimizeWindow, MinimizeMsg(RestoreNextMinimizedWin)
 import XMonad.Layout.NoBorders -- smartBorders
+import XMonad.Layout.ThreeColumns -- ThreeColMid
+import XMonad.Layout.ResizableTile -- ResizableTall
 
 import XMonad.Util.Run -- hPutStrLn, spawnPipe, safeSpawnProg
 import XMonad.Util.EZConfig -- additionalKeys
@@ -25,19 +27,23 @@ keybinds conf@ XConfig {XMonad.modMask = modm} = M.fromList $
   -- launch rofi
   [((modm, xK_z), spawn "rofi -show drun"),
   -- launch urxvt
-  ((modm, xK_Return), safeSpawnProg $ XMonad.terminal conf),
+  ((modm, xK_grave), safeSpawnProg $ XMonad.terminal conf),
+  -- toggle other struts
+  ((modm .|. shiftMask, xK_z), sendMessage $ ToggleStrut D),
+  -- reset struts
+  ((modm .|. controlMask, xK_z), sendMessage $ SetStruts [U,R,L] [D]),
+  -- toggle struts
+  ((modm .|. shiftMask .|. controlMask, xK_z), sendMessage $ ToggleStruts),
   -- rorate layout(s)
   ((modm, xK_space), do
-    sendMessage ToggleStruts
     sendMessage NextLayout),
   -- default layout
   ((modm .|. shiftMask, xK_space), do
-    sendMessage $ SetStruts [U] []
     setLayout $ XMonad.layoutHook conf),
   -- swap next window
-  ((modm, xK_Right), windows W.swapDown),
+  ((modm .|. shiftMask, xK_Right), windows W.swapDown),
   -- swap previous window
-  ((modm, xK_Left), windows W.swapUp),
+  ((modm .|. shiftMask, xK_Left), windows W.swapUp),
   -- swap focused window
   ((modm .|. shiftMask, xK_Up), windows W.swapMaster),
   -- maximize focused window
@@ -48,14 +54,13 @@ keybinds conf@ XConfig {XMonad.modMask = modm} = M.fromList $
   ((modm .|. shiftMask, xK_f), withFocused minimizeWindow),
   -- restore windows
   ((modm .|. controlMask, xK_f), do
-    sendMessage $ SetStruts [U] []
     sendMessage RestoreNextMinimizedWin),
   -- close focused window
   ((modm .|. shiftMask, xK_q), kill),
   -- quit xmonad
   ((modm .|. shiftMask, xK_e), io $ exitWith ExitSuccess),
   -- restart xmonad
-  ((modm .|. shiftMask, xK_r), spawn "killall conky redshift; xmonad --recompile; xmonad --restart")]
+  ((modm .|. shiftMask, xK_r), spawn "killall dzen2 conky xmobar redshift; xmonad --recompile; xmonad --restart")]
   ++
   -- mod-[1..5], switch to workspace N
   -- mod-shift-[1..5], move client to workspace N
@@ -71,16 +76,20 @@ mousebinds XConfig {XMonad.modMask = modm} = M.fromList
   ((mod4Mask, button2), \w -> focus w >> windows W.shiftMaster)]
 
 {- Layout -}
-layout = smartBorders . maximizeWithPadding 0 . minimize $ tiled ||| spiral(6 / 7) ||| Circle
+layout = smartBorders . maximizeWithPadding 0 . minimize $ (bigMonitor ||| tiledSpace ||| Mirror tiled) ||| tiled -- ||| spiral(6 / 7) ||| Circle
   where
     -- default tiling algorithm partitions the screen into two panes
-    tiled = smartSpacing 5 $ Tall nmaster delta ratio
+    tiled = smartSpacing 5 $ ResizableTall nmaster delta ratio []
+    -- tiledSpace tiling algorithm
+    tiledSpace = smartSpacing 60 $ ResizableTall nmaster delta ratio []
+    -- bigMonitor tiling algorithm
+    bigMonitor = smartSpacing 5 $ ThreeColMid nmaster delta ratio
     -- The default number of windows in the master pane
     nmaster = 1
     -- Default proportion of screen occupied by master pane
     ratio = 1 / 2
     -- Percent of screen to increment by when resizing panes
-    delta = 3 / 100
+    delta = toRational (2 / (1 + sqrt 5 :: Double))
 
 {- Window Rules -}
 rules = composeAll . concat $
@@ -112,12 +121,14 @@ main = do
     "/usr/bin/env nitrogen --restore",
     "/usr/bin/env redshift -l 40.7:73.8",
     "/usr/bin/env compton -b -f --config ~/.config/compton.conf"]
-  xmproc <- spawnPipe "/usr/bin/env xmobar ~/.xmonad/xmobarrc"
+  xmstat <- spawnPipe "/usr/bin/env conky -qc ~/.xmonad/.stats.conkyrc | /usr/bin/env dzen2 -p -dock -w 840 -h 20 -ta 'l' -e 'button3=' -bg '#252526' -fg '#ca5' -fn 'Operator Mono:pixelsize=13'"
+  xmarch <- spawnPipe "/usr/bin/env conky -qc ~/.xmonad/.distro.conkyrc | /usr/bin/env dzen2 -p -dock -x 840 -w 600 -h 20 -ta 'r' -e 'button3=' -bg '#252526' -fg '#ca5' -fn 'Operator Mono:pixelsize=13'"
+  xmproc <- spawnPipe "/usr/bin/env dzen2 -p -dock -w 1440 -y 880 -h 20 -ta 'l' -e 'button3=' -bg '#252526' -fg '#ca5' -fn 'Operator Mono:pixelsize=13'"
   xmonad $ docks def {
     terminal = "urxvt",
     focusFollowsMouse = True, -- focus on window on hover
     clickJustFocuses = False, -- focus on window on click also
-    borderWidth = 3,
+    borderWidth = 2,
     modMask = mod1Mask, -- mod1Mask left alt; mod3Mask right alt; mod4Mask Super
     workspaces = [ "1:WEB", "2:CODE", "3:MODEL", "4:SOCIAL", "5:OTHER" ],
     normalBorderColor = "#1793d1", -- unfocused border color for windows
@@ -131,10 +142,10 @@ main = do
     handleEventHook = mempty,
     logHook = dynamicLogWithPP $ xmobarPP {
       ppSep = "  >=>  ",
-      ppTitle = xmobarColor "#567" "" . shorten 50,
+      ppTitle = dzenColor "#567" "" . shorten 35,
       ppOrder = \(ws:_:t:_) -> [ws,t],
       ppOutput = hPutStrLn xmproc,
-      ppCurrent = xmobarColor "#567" "" . wrap "[" "]"
+      ppCurrent = dzenColor "#567" "" . wrap "[" "]"
     },
     startupHook = setWMName "LG3D"
   } `additionalKeys`
