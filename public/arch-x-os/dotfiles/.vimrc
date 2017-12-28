@@ -8,12 +8,13 @@ Plug 'leafgarland/typescript-vim'
 call plug#end()
 " general settings
 filetype plugin indent on
-set guifont="Operator Mono Lig:h10"
-set tabstop=2
-set shiftwidth=2
-set laststatus=2
-set ttimeoutlen=50
+set background=dark
 set expandtab
+set guifont="Operator Mono Lig:h10"
+set laststatus=2
+set shiftwidth=2
+set tabstop=2
+set ttimeoutlen=50
 " nord theme settings
 let g:nord_italic_comments = 1
 " vim-airline configuration
@@ -22,4 +23,4 @@ let g:airline_theme='nord'
 let g:javascript_plugin_jsdoc = 1
 let g:javascript_plugin_flow = 1
 " initialization
-colorscheme nord
+colorscheme hybrid
