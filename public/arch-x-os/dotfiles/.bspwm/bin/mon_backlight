@@ -2,17 +2,16 @@
 
 # USAGE:
 #   su root && \
-#     echo "${USER} ALL=(ALL) NOPASSWD: /home/${USER}/.xmonad/bin/mon_backlight" >> /etc/sudoers.d/grant-client-overrides && \
+#     echo "${USER} ALL=(ALL) NOPASSWD: ${PATH}/bin/mon_backlight" >> /etc/sudoers.d/grant-client-overrides && \
 #     exit && \
-#   sudo ~/.xmonad/bin/mon_backlight {-|+} var_tick
+#   sudo ${PATH}/bin/mon_backlight tick {-|+}
 
 bl_intel=/sys/class/backlight/intel_backlight
 steps=15
 
-var_tick=${2}
-tick=${var_tick:-1}
+tick=${1}
 
-case $1 in
+case $2 in
   -)
     if (( $(cat ${bl_intel}/brightness) == 0 )); then exit 0; fi
     new=$(( $(cat ${bl_intel}/brightness) - $(cat ${bl_intel}/max_brightness) / ( ${steps} * ${tick} ) ))

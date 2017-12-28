@@ -2,17 +2,16 @@
 
 # USAGE:
 #   su root && \
-#     echo "${USER} ALL=(ALL) NOPASSWD: /home/${USER}/.xmonad/bin/kbd_backlight" >> /etc/sudoers.d/grant-client-overrides && \
+#     echo "${USER} ALL=(ALL) NOPASSWD: ${PATH}/bin/kbd_backlight" >> /etc/sudoers.d/grant-client-overrides && \
 #     exit && \
-#   sudo ~/.xmonad/bin/kbd_backlight {-|+} var_tick
+#   sudo ${PATH}/bin/kbd_backlight tick {-|+}
 
 kl_smc=/sys/class/leds/smc::kbd_backlight
 steps=15
 
-var_tick=${2}
-tick=${var_tick:-1}
+tick=${1}
 
-case $1 in
+case $2 in
   -)
     if (( $(cat ${kl_smc}/brightness) == 0 )); then exit 0; fi
     new=$(( $(cat ${kl_smc}/brightness) - $(cat ${kl_smc}/max_brightness) / ( ${steps} * ${tick} ) ))
