@@ -43,6 +43,7 @@ mkdir ${VIM}/autoload/airline/themes
 curl https://raw.githubusercontent.com/arcticicestudio/nord-vim/develop/autoload/airline/themes/nord.vim > ${VIM}/autoload/airline/themes/nord.vim
 ###   colors
 mkdir ${VIM}/colors
+curl https://raw.githubusercontent.com/w0ng/vim-hybrid/master/colors/hybrid.vim > ${VIM}/colors/hybrid.vim
 curl https://raw.githubusercontent.com/arcticicestudio/nord-vim/master/colors/nord.vim > ${VIM}/colors/nord.vim
 
 ##  etc
