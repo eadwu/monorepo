@@ -1,0 +1,3 @@
+[submodule "dotfiles/.bspwm/gmail"]
+	path = dotfiles/.bspwm/gmail
+	url = git@github.com:vyachkonovalov/polybar-gmail.git

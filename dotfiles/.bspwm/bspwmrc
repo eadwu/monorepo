@@ -1,0 +1,49 @@
+#! /bin/sh
+
+sxhkd -c ~/.bspwm/sxhkdrc &
+
+bspc monitor -d web code model social other
+
+bspc config border_width 0
+bspc config window_gap 37
+
+bspc config split_ratio 0.52
+bspc config borderless_monocle true
+bspc config gapless_monocle true
+
+bspc desktop ^1 -l monocle
+
+bspc rule -a Vivaldi-stable -o desktop=^1
+bspc rule -a "Code - Insiders" -o desktop=^2
+bspc rule -a Blender -o desktop=^3
+bspc rule -a discord -o desktop=^4
+
+# wmNames = [
+#   "Task Manager - Vivaldi",
+#   "File Operation Progress",
+#   "Blender User Preferences"
+# ]
+
+bspc rule -a Steam state=floating
+bspc rule -a Zenity state=floating
+bspc rule -a Nitrogen state=floating
+bspc rule -a Oblogout state=floating
+bspc rule -a Pinentry state=floating
+bspc rule -a Xfce4-screenshooter state=floating
+bspc rule -a Xfce4-notifyd-config state=floating
+
+# bspc config super alt
+# bspc config pointer_action1 move
+# bspc config pointer_action2 none
+# bspc config pointer_action3 resize_corner
+bspc config click_to_focus true
+bspc config focus_follows_pointer true
+
+bspc config presel_feedback_color \#aaaaaa
+
+xsetroot -cursor_name left_ptr
+nitrogen --restore
+redshift -l 40.7:73.8 &
+compton -b --config ~/.config/compton.conf &
+polybar workspace -c ~/.bspwm/config.ini &
+polybar stat -c ~/.bspwm/config.ini &
