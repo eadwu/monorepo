@@ -14,33 +14,32 @@ rofi.hide-scrollbar: true
 rofi.separator-style: none
 rofi.modi: drun,run,window,ssh
 
-rofi.font: Operator Mono 12
-! Scheme
-rofi.color-window: #2F343F, #EBDBB2
-rofi.color-normal: #2F343F, #EBDBB2, #2F343F, #EBDBB2, #2F343F
-rofi.color-active: #2F343F, #EBDBB2, #2F343F, #EBDBB2, #2F343F
-rofi-color-urgent: #2F343F, #EBDBB2, #2F343F, #EBDBB2, #2F343F
+rofi.font: Ubuntu Mono 12
+rofi.color-normal: #FF0D1012, #9e99aa,   #FF0D1012, #FF51484F, #0D1012
+rofi.color-active: #FF0D1012, #9e99aa,   #FF0D1012, #FF51484F, #0D1012
+rofi.color-urgent: #FF0D1012, #FF51484F, #FF0D1012, #FF51484F, #9e99aa
+rofi.color-window: #FF0D1012, #FF0D1012, #FF0D1012
 
 ! URXVT
 ! Configuration
-URxvt.font: xft:Operator Mono:size=12,style=regular:antialias=true
+URxvt.font: xft:Source Code Pro:size=12,style=regular:antialias=true
 URxvt.scrollBar: false
 ! Scheme
-URxvt*background: #1D1F21
-URxvt*foreground: #C5C8C6
-URxvt*color0: #282A2E
-URxvt*color1: #A54242
-URxvt*color2: #8C9440
-URxvt*color3: #DE935F
-URxvt*color4: #5F819D
-URxvt*color5: #85678F
-URxvt*color6: #5E8D87
-URxvt*color7: #707880
-URxvt*color8: #373B41
-URxvt*color9: #CC6666
-URxvt*color10: #B5BD68
-URxvt*color11: #F0C674
-URxvt*color12: #81A2BE
-URxvt*color13: #B294BB
-URxvt*color14: #8ABEB7
-URxvt*color15: #C5C8C6
+*background: #0D1012
+*foreground: #9e99aa
+*color0: #0D1012
+*color1: #524447
+*color2: #51484F
+*color3: #6B575D
+*color4: #AB5E51
+*color5: #966A65
+*color6: #BB8D75
+*color7: #9e99aa
+*color8: #6e6b76
+*color9: #524447
+*color10: #51484F
+*color11: #6B575D
+*color12: #AB5E51
+*color13: #966A65
+*color14: #BB8D75
+*color15: #9e99aa
