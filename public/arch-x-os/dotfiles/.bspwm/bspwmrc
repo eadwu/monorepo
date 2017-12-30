@@ -1,5 +1,4 @@
 #! /bin/sh
-
 sxhkd -c ~/.bspwm/sxhkdrc &
 
 bspc monitor -d web code model social other
