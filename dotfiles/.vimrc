@@ -2,7 +2,7 @@
 call plug#begin('~/.vim/plugged')
 Plug 'w0rp/ale'
 Plug 'tpope/vim-fugitive'
-Plug 'vim-airline/vim-airline'
+" Plug 'vim-airline/vim-airline'
 Plug 'pangloss/vim-javascript'
 Plug 'leafgarland/typescript-vim'
 call plug#end()
@@ -10,7 +10,7 @@ call plug#end()
 filetype plugin indent on
 set background=dark
 set expandtab
-set guifont="Operator Mono Lig:h10"
+set guifont="Source Code Pro:h10"
 set laststatus=2
 set shiftwidth=2
 set tabstop=2
@@ -18,7 +18,7 @@ set ttimeoutlen=50
 " nord theme settings
 let g:nord_italic_comments = 1
 " vim-airline configuration
-let g:airline_theme='nord'
+" let g:airline_theme='nord'
 " vim-javascript configuration
 let g:javascript_plugin_jsdoc = 1
 let g:javascript_plugin_flow = 1
