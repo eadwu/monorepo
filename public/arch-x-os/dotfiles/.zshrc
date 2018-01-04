@@ -1,7 +1,7 @@
 # Default Configuration
 export HISTSIZE=50
 export SAVEHIST=500
-export HISTFILE=~/.zsh_history
+export HISTFILE="${HOME}/.zsh_history"
 
 setopt histignorespace
 # Add ~/.local/bin to PATH
