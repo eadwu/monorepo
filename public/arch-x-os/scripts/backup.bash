@@ -71,7 +71,7 @@ mkdir ${USR}/local/bin
 cp /usr/local/bin/i3color ${USR}/local/bin
 
 # package lists
-pacman -Qqttn > external/pacman.txt
-pacman -Qqttm > external/yaourt.txt
+pacman -Qen | awk '{print $1}' > external/pacman.txt
+pacman -Qem | awk '{print $1}' > external/yaourt.txt
 code-insiders --list-extensions > external/code.txt
 code-insiders --list-extensions > external/code-minimal.txt
