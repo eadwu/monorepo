@@ -13,7 +13,6 @@ tick=${1}
 
 case $2 in
   -)
-    if (( $(cat ${kl_smc}/brightness) == 0 )); then exit 0; fi
     new=$(( $(cat ${kl_smc}/brightness) - $(cat ${kl_smc}/max_brightness) / ( ${steps} * ${tick} ) ))
     if (( ${new} < 0 )); then
       echo "0" | tee ${kl_smc}/brightness
@@ -21,7 +20,6 @@ case $2 in
     fi
     ;;
   +)
-    if (( $(cat ${kl_smc}/brightness) == $(cat ${kl_smc}/max_brightness) )); then exit 0; fi
     new=$(( $(cat ${kl_smc}/brightness) + $(cat ${kl_smc}/max_brightness) / ( ${steps} * ${tick} ) ))
     if (( ${new} > $(cat ${kl_smc}/max_brightness) )); then
       echo "$(cat ${kl_smc}/max_brightness)" | tee ${kl_smc}/brightness
