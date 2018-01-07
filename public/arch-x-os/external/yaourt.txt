@@ -1,7 +1,8 @@
 cli-visualizer
 discord
+dotnet-sdk-2.0
 flow-bin
-git-secrets
+i3lock-color-git
 libc++experimental
 libreoffice-extension-languagetool
 lightdm-enso-os-greeter-git
@@ -9,7 +10,8 @@ monitorix
 moonscript
 oblogout-blurlock
 papirus-icon-theme-git
+polybar-git
+python-pywal-git
 react-native-cli
 visual-studio-code-insiders
 watchman
-windscribe-cli
