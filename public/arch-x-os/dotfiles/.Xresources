@@ -22,7 +22,7 @@ rofi.color-window: #0B090B, #0B090B, #636166
 
 ! URXVT
 ! Configuration
-URxvt.font: xft:Source Code Pro:size=13,style=regular:antialias=true
+URxvt.font: xft:Source Code Pro:pixelsize=13,style=regular:antialias=true
 URxvt.scrollBar: false
 ! Scheme
 *foreground: #b7b4b3
