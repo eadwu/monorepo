@@ -7,6 +7,7 @@ christian-kohler.path-intellisense
 dbaeumer.vscode-eslint
 eamodio.gitlens
 eg2.tslint
+esbenp.prettier-vscode
 formulahendry.auto-rename-tag
 justusadam.language-haskell
 mgmcdermott.vscode-language-babel

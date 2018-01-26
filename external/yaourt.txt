@@ -1,5 +1,4 @@
 cli-visualizer
-discord
 dotnet-sdk-2.0
 flow-bin
 i3lock-color-git
@@ -10,6 +9,7 @@ monitorix
 moonscript
 oblogout-blurlock
 papirus-icon-theme-git
+perl-file-homedir
 polybar-git
 python-pywal-git
 react-native-cli
