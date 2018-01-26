@@ -1,6 +1,5 @@
 acpi
 adapta-gtk-theme
-adobe-source-code-pro-fonts
 alsa-utils
 apache-ant
 ark
@@ -31,6 +30,7 @@ deepin-gtk-theme
 device-mapper
 dhcpcd
 diffutils
+discord
 docker
 dotnet-host
 dotnet-runtime
@@ -42,6 +42,7 @@ file
 filesystem
 findutils
 flex
+fontforge
 gawk
 gettext
 gimp
@@ -114,6 +115,8 @@ pciutils
 pcmciautils
 pepper-flash
 perl
+perl-unicode-linebreak
+perl-yaml-tiny
 php
 pkg-config
 powertop

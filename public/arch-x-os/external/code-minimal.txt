@@ -1,8 +1,8 @@
-James-Yu.latex-workshop
 christian-kohler.npm-intellisense
 christian-kohler.path-intellisense
 dbaeumer.vscode-eslint
 eg2.tslint
+esbenp.prettier-vscode
 formulahendry.auto-rename-tag
 mgmcdermott.vscode-language-babel
 mkxml.vscode-filesize
@@ -10,8 +10,12 @@ monokai.theme-monokai-pro-vscode
 ms-python.python
 ms-vscode.vs-keybindings
 patrys.vscode-code-outline
+redhat.java
 robertohuertasm.vscode-icons
 searKing.preview-vscode
 shinnn.stylelint
+streetsidesoftware.code-spell-checker
+vscjava.vscode-java-debug
+vscjava.vscode-java-pack
 wayou.vscode-todo-highlight
 wix.vscode-import-cost
