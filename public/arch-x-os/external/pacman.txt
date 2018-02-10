@@ -134,9 +134,7 @@ python2-autopep8
 python2-google-api-python-client
 python2-pip
 python2-pylint
-qt5-doc
-qt5-graphicaleffects
-qt5-quickcontrols
+qt5-tools
 ranger
 rclone
 redshift

@@ -1,5 +1,6 @@
 cli-visualizer
 dotnet-sdk-2.0
+evelauncher
 flow-bin
 i3lock-color-git
 libc++experimental
@@ -15,3 +16,4 @@ python-pywal-git
 react-native-cli
 visual-studio-code-insiders
 watchman
+windscribe-cli
