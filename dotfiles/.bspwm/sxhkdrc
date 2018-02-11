@@ -106,8 +106,8 @@ alt + {t,shift + t,s,f}
   # bspc wm -h on
 
 # focus or send to the given desktop
-alt + {_,shift + }{1-5}
-  bspc {desktop -f,node -d} '^{1-5}'
+alt + {_,shift + }{1-7}
+  bspc {desktop -f,node -d} '^{1-7}'
 
 # focus the next/previous node in the same window
 # super + {comma,period}
