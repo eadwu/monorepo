@@ -13,6 +13,9 @@ export VISUAL="vim"
 # Ruby Gem Installation Path
 export GEM_HOME=$(ruby -e 'print Gem.user_dir')
 
+# Aliases
+alias docker-clean="docker stop $(docker ps -aq); docker rm $(docker ps -aq); docker rmi $(docker images -q)"
+
 # Pure Prompt
 autoload -U promptinit; promptinit
 prompt pure
