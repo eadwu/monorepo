@@ -16,9 +16,9 @@ bspc rule -a Vivaldi-stable -o desktop=^1
 bspc rule -a "Code - Insiders" -o desktop=^2
 bspc rule -a Blender -o desktop=^3
 bspc rule -a discord -o desktop=^4
-bspc rule -a Wine -o desktop=^5
-bspc rule -a Steam -o desktop=^6
-bspc rule -a evelauncher -o desktop=^6
+bspc rule -a Steam -o desktop=^5
+bspc rule -a EVE -o desktop=^5
+bspc rule -a Wine -o desktop=^6
 
 # wmNames = [
 #   "Task Manager - Vivaldi",
