@@ -1,9 +1,12 @@
-# Aliases
-alias docker-clean="docker stop $(docker ps -aq); docker rm $(docker ps -aq); docker rmi $(docker images -q)"
-
-# Functions
+# Pseudo Aliases
 function docker-build () {
   docker build -t $1 -f $1/Dockerfile .
+}
+
+function docker-clean () {
+  docker stop $(docker ps -aq)
+  docker rm $(docker ps -aq)
+  docker rmi $(docker images -q)
 }
 
 function docker-push-image () {
