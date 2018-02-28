@@ -23,8 +23,8 @@ export DOCKER_ID_USER="tianxian"
 # Ruby Gem Installation Path
 export GEM_HOME=$(ruby -e 'print Gem.user_dir')
 
-# Add ~/.local/bin, ~/.cargo/bin, and ~/.gem/ruby/LATEST_RUBY_VERSION/bin to PATH
-export PATH=${PATH}:${HOME}/.local/bin:${HOME}/.cargo/bin:${HOME}/.gem/ruby/$(ruby --version | grep -Po '(?!ruby )[0-9\.]+(?=p)')/bin
+# Add /opt/anaconda/bin, ~/.local/bin, ~/.cargo/bin, and ~/.gem/ruby/LATEST_RUBY_VERSION/bin to PATH
+export PATH=${PATH}:/opt/anaconda/bin:${HOME}/.local/bin:${HOME}/.cargo/bin:${HOME}/.gem/ruby/$(ruby --version | grep -Po '(?!ruby )[0-9\.]+(?=p)')/bin
 
 # Default Configuration
 export HISTSIZE=50
