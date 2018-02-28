@@ -11,9 +11,13 @@ moonscript
 oblogout-blurlock
 papirus-icon-theme-git
 perl-file-homedir
+phpstorm
+phpstorm-jre
 polybar-git
 python-pywal-git
 react-native-cli
 visual-studio-code-insiders
 watchman
+webstorm
+webstorm-jre
 windscribe-cli

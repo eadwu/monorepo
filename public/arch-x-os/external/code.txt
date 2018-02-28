@@ -31,5 +31,7 @@ streetsidesoftware.code-spell-checker
 twxs.cmake
 vscjava.vscode-java-debug
 vscjava.vscode-java-pack
+vscjava.vscode-java-test
+vscjava.vscode-maven
 wayou.vscode-todo-highlight
 wix.vscode-import-cost
