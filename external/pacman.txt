@@ -64,6 +64,7 @@ hyphen-en
 inetutils
 inkscape
 intel-ucode
+intellij-idea-community-edition
 iproute2
 iputils
 java-environment-common
@@ -83,6 +84,7 @@ linux
 linux-headers
 logrotate
 lsb-release
+lsof
 luarocks
 lvm2
 m4
@@ -126,6 +128,7 @@ pulseaudio
 pulseaudio-alsa
 pulseaudio-bluetooth
 pwgen
+pycharm-community-edition
 python-fonttools
 python-google-api-python-client
 python-pip
@@ -194,6 +197,7 @@ xfce4-screenshooter
 xfce4-taskmanager
 xfsprogs
 xorg-server
+xorg-xhost
 xorg-xinit
 xorg-xprop
 xorg-xsetroot
