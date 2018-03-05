@@ -1,5 +1,7 @@
+anaconda
 cli-visualizer
 dotnet-sdk-2.0
+epubcheck
 evelauncher
 flow-bin
 i3lock-color-git

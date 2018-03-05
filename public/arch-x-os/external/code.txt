@@ -2,6 +2,7 @@ James-Yu.latex-workshop
 PeterJausovec.vscode-docker
 Shan.code-settings-sync
 WakaTime.vscode-wakatime
+castwide.solargraph
 christian-kohler.npm-intellisense
 christian-kohler.path-intellisense
 dbaeumer.vscode-eslint
@@ -34,4 +35,3 @@ vscjava.vscode-java-pack
 vscjava.vscode-java-test
 vscjava.vscode-maven
 wayou.vscode-todo-highlight
-wix.vscode-import-cost

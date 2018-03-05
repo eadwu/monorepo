@@ -13,6 +13,7 @@ blender
 bluez
 bluez-libs
 bluez-utils
+bookworm
 broadcom-wl-dkms
 bspwm
 bzip2
@@ -173,6 +174,7 @@ texlive-publishers
 texlive-science
 thunar
 thunar-volman
+tidy
 tlp
 ttf-liberation
 ttf-ubuntu-font-family
