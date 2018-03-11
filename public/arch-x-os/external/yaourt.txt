@@ -13,6 +13,7 @@ moonscript
 oblogout-blurlock
 papirus-icon-theme-git
 perl-file-homedir
+perl-log-dispatch
 phpstorm
 phpstorm-jre
 polybar-git
@@ -23,3 +24,4 @@ watchman
 webstorm
 webstorm-jre
 windscribe-cli
+woff2
