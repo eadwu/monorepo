@@ -1,6 +1,4 @@
 #! /bin/sh
-sxhkd -c ~/.bspwm/sxhkdrc &
-
 bspc monitor -d web code model social game idle other
 
 bspc config border_width 0
@@ -42,7 +40,9 @@ bspc config presel_feedback_color \#aaaaaa
 xsetroot -cursor_name left_ptr
 mpd ~/.config/mpd/mpd.conf
 nitrogen --restore
+bash ~/.bspwm/java_nonreparenting_wm_hack
 redshift -l 40.7:73.8 &
-compton -b --config ~/.config/compton.conf &
-polybar workspace -c ~/.bspwm/config.ini &
+sxhkd -c ~/.bspwm/sxhkdrc &
 polybar stat -c ~/.bspwm/config.ini &
+polybar workspace -c ~/.bspwm/config.ini &
+compton -b --config ~/.config/compton.conf &
