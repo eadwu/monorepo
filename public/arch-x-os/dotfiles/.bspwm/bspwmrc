@@ -12,6 +12,9 @@ bspc desktop ^1 -l monocle
 
 bspc rule -a Vivaldi-stable -o desktop=^1
 bspc rule -a "Code - Insiders" -o desktop=^2
+bspc rule -a "jetbrains-idea-ce" -o desktop=^2
+bspc rule -a "jetbrains-pycharm-ce" -o desktop=^2
+bspc rule -a "NetBeans IDE 8.2" -o desktop=^2
 bspc rule -a Blender -o desktop=^3
 bspc rule -a discord -o desktop=^4
 bspc rule -a Steam -o desktop=^5
