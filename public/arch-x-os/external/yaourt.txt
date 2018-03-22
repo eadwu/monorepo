@@ -8,14 +8,14 @@ i3lock-color-git
 libc++experimental
 libreoffice-extension-languagetool
 lightdm-enso-os-greeter-git
+lightdm-webkit-theme-aether
+lightdm-webkit2-greeter
 monitorix
 moonscript
 oblogout-blurlock
 papirus-icon-theme-git
 perl-file-homedir
 perl-log-dispatch
-phpstorm
-phpstorm-jre
 polybar-git
 python-pywal-git
 react-native-cli
@@ -24,4 +24,3 @@ watchman
 webstorm
 webstorm-jre
 windscribe-cli
-woff2

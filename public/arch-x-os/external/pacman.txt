@@ -36,6 +36,7 @@ docker
 dotnet-host
 dotnet-runtime
 e2fsprogs
+eclipse-java
 fakeroot
 fcron
 feh
@@ -92,12 +93,15 @@ m4
 make
 man-db
 man-pages
+maven
 mdadm
+mesa-demos
 mpd
 mplayer
 mythes-en
 nano
 ncmpcpp
+netbeans
 netctl
 network-manager-applet
 networkmanager
@@ -118,7 +122,11 @@ pciutils
 pcmciautils
 pepper-flash
 perl
+perl-eval-closure
 perl-log-log4perl
+perl-namespace-autoclean
+perl-params-validationcompiler
+perl-specio
 perl-unicode-linebreak
 perl-yaml-tiny
 php
@@ -192,6 +200,7 @@ which
 wine
 winetricks
 wireless_tools
+woff2
 wpa_supplicant
 xclip
 xf86-input-libinput

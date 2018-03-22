@@ -13,6 +13,7 @@ patrys.vscode-code-outline
 redhat.java
 robertohuertasm.vscode-icons
 searKing.preview-vscode
+shengchen.vscode-checkstyle
 shinnn.stylelint
 streetsidesoftware.code-spell-checker
 vscjava.vscode-java-debug
