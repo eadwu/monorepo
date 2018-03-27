@@ -57,7 +57,7 @@ mkdir ${ETC}/systemd
 cp /etc/oblogout.conf ${ETC}
 ###   lightdm
 cp /etc/lightdm/lightdm.conf ${ETC}/lightdm
-cp /etc/lightdm/pantheon-greeter.conf ${ETC}/lightdm
+cp /etc/lightdm/lightdm-webkit2-greeter.conf ${ETC}/lightdm
 ###   pulse
 cp /etc/pulse/client.conf ${ETC}/pulse
 cp /etc/pulse/default.pa ${ETC}/pulse
