@@ -1,4 +1,5 @@
 James-Yu.latex-workshop
+PKief.material-icon-theme
 PeterJausovec.vscode-docker
 Shan.code-settings-sync
 WakaTime.vscode-wakatime
@@ -6,6 +7,7 @@ castwide.solargraph
 christian-kohler.npm-intellisense
 christian-kohler.path-intellisense
 dbaeumer.vscode-eslint
+dnlytras.nord-wave
 donjayamanne.githistory
 eamodio.gitlens
 eg2.tslint
@@ -24,7 +26,6 @@ msjsdiag.debugger-for-chrome
 patrys.vscode-code-outline
 rebornix.Ruby
 redhat.java
-robertohuertasm.vscode-icons
 rust-lang.rust
 searKing.preview-vscode
 shengchen.vscode-checkstyle
