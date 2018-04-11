@@ -1,15 +1,17 @@
 anaconda
+atom-editor-beta-bin
 cli-visualizer
-dotnet-sdk-2.0
 epubcheck
 evelauncher
 flow-bin
+fsharp
 i3lock-color-git
 libc++experimental
 libreoffice-extension-languagetool
 lightdm-enso-os-greeter-git
 lightdm-webkit-theme-aether
 lightdm-webkit2-greeter
+masterpdfeditor
 monitorix
 moonscript
 oblogout-blurlock
@@ -18,7 +20,7 @@ perl-file-homedir
 perl-log-dispatch
 polybar-git
 python-pywal-git
-react-native-cli
+runescape-launcher
 visual-studio-code-insiders
 watchman
 webstorm

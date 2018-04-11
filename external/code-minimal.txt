@@ -1,3 +1,7 @@
+Ionide.Ionide-FAKE
+Ionide.Ionide-fsharp
+Ionide.Ionide-Paket
+James-Yu.latex-workshop
 PKief.material-icon-theme
 christian-kohler.npm-intellisense
 christian-kohler.path-intellisense
@@ -6,6 +10,7 @@ dnlytras.nord-wave
 eg2.tslint
 esbenp.prettier-vscode
 formulahendry.auto-rename-tag
+justusadam.language-haskell
 mgmcdermott.vscode-language-babel
 mkxml.vscode-filesize
 monokai.theme-monokai-pro-vscode
@@ -13,10 +18,8 @@ ms-python.python
 ms-vscode.vs-keybindings
 patrys.vscode-code-outline
 redhat.java
-searKing.preview-vscode
 shengchen.vscode-checkstyle
 shinnn.stylelint
-streetsidesoftware.code-spell-checker
 vscjava.vscode-java-debug
 vscjava.vscode-java-pack
 vscjava.vscode-java-test
