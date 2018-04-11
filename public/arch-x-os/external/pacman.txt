@@ -35,6 +35,7 @@ discord
 docker
 dotnet-host
 dotnet-runtime
+dotnet-sdk
 e2fsprogs
 eclipse-java
 fakeroot
@@ -47,14 +48,18 @@ flex
 fontforge
 gawk
 gettext
+ghc
 gimp
 git
 gitlab-runner
 glibc
 glslang
 gnome-keyring
+gnome-themes-extra
+granite
 grep
 groff
+gtk-engine-murrine
 gucharmap
 gulp
 gvfs
@@ -96,6 +101,8 @@ man-pages
 maven
 mdadm
 mesa-demos
+mono
+mono-tools
 mpd
 mplayer
 mythes-en
@@ -198,6 +205,8 @@ vivaldi-snapshot-ffmpeg-codecs
 vlc
 which
 wine
+wine-mono
+wine_gecko
 winetricks
 wireless_tools
 woff2

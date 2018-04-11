@@ -1,3 +1,6 @@
+Ionide.Ionide-FAKE
+Ionide.Ionide-fsharp
+Ionide.Ionide-Paket
 James-Yu.latex-workshop
 PKief.material-icon-theme
 PeterJausovec.vscode-docker
