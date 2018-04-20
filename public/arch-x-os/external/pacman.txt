@@ -27,8 +27,10 @@ conky
 coreutils
 cryptsetup
 cups
+cups-pdf
 deepin-gtk-theme
 device-mapper
+devtools
 dhcpcd
 diffutils
 discord
