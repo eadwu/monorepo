@@ -1,8 +1,8 @@
+Equinusocio.vsc-material-theme
 Ionide.Ionide-FAKE
 Ionide.Ionide-fsharp
 Ionide.Ionide-Paket
 James-Yu.latex-workshop
-PKief.material-icon-theme
 PeterJausovec.vscode-docker
 Shan.code-settings-sync
 WakaTime.vscode-wakatime
@@ -19,7 +19,6 @@ formulahendry.auto-rename-tag
 justusadam.language-haskell
 mgmcdermott.vscode-language-babel
 mkxml.vscode-filesize
-monokai.theme-monokai-pro-vscode
 ms-python.python
 ms-vscode.azure-account
 ms-vscode.cpptools
@@ -30,7 +29,6 @@ patrys.vscode-code-outline
 rebornix.Ruby
 redhat.java
 rust-lang.rust
-searKing.preview-vscode
 shengchen.vscode-checkstyle
 shinnn.stylelint
 streetsidesoftware.code-spell-checker
