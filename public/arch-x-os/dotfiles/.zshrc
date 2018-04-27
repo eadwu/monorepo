@@ -14,6 +14,16 @@ function docker-push-image () {
   docker push ${DOCKER_ID_USER}/$1
 }
 
+function download-audio () {
+  youtube-dl --extract-audio --audio-format mp3 $1
+}
+
+function system-upgrade {
+  yaourt -Rcns visual-studio-code-insiders
+  yaourt -Syu --aur
+  yaourt -S visual-studio-code-insiders
+}
+
 # VISUAL
 export VISUAL="vim"
 
