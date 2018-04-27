@@ -50,5 +50,5 @@ else:
         ICON = "%{T6}%{T-}"
 # print("%%{F#e06c75}%s %%{F-}%i °%s" %
     #   (ICON, TEMP, UNIT_KEY))  # Icon without description
-print("%%{F#f2eac9}%s %%{F-}%s, %i°%s" %
+print("%%{F#757575}%s %%{F-}%s, %i°%s" %
       (ICON, CURRENT, TEMP, UNIT_KEY))  # Icon with description
