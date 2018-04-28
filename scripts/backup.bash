@@ -54,7 +54,10 @@ mkdir ${ETC}/lightdm
 mkdir ${ETC}/pulse
 mkdir ${ETC}/sysctl.d
 mkdir ${ETC}/systemd
+mkdir ${ETC}/NetworkManager
+cp /etc/dhcpcd.conf ${ETC}
 cp /etc/oblogout.conf ${ETC}
+cp /etc/resolv.conf ${ETC}
 ###   lightdm
 cp /etc/lightdm/lightdm.conf ${ETC}/lightdm
 cp /etc/lightdm/lightdm-webkit2-greeter.conf ${ETC}/lightdm
@@ -69,6 +72,8 @@ cp /etc/systemd/logind.conf ${ETC}/systemd
 ####    system
 mkdir ${ETC}/systemd/system
 cp /etc/systemd/system/i3color.service ${ETC}/systemd/system
+###   NetworkManager
+cp /etc/NetworkManager/NetworkManager.conf ${ETC}/NetworkManager
 
 # package lists
 pacman -Qen | awk '{print $1}' > external/pacman.txt
