@@ -5,6 +5,7 @@ epubcheck
 evelauncher
 flow-bin
 fsharp
+google-musicmanager
 i3lock-color-git
 libc++experimental
 libreoffice-extension-languagetool
@@ -21,6 +22,7 @@ perl-log-dispatch
 polybar-git
 python-pywal-git
 runescape-launcher
+unity-editor
 visual-studio-code-insiders
 watchman
 webstorm

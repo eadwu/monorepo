@@ -12,6 +12,7 @@ christian-kohler.path-intellisense
 dbaeumer.vscode-eslint
 dnlytras.nord-wave
 donjayamanne.githistory
+donjayamanne.jupyter
 eamodio.gitlens
 eg2.tslint
 esbenp.prettier-vscode
