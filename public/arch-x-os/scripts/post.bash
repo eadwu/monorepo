@@ -14,6 +14,7 @@ perl -0777 -i -pe 's/(\[extra\]\nInclude = \/etc\/pacman.d\/mirrorlist)(.+?)#(\[
 pacman-key -r 4209170B
 pacman-key --lsign-key 4209170B
 pacman -Syy
+pacman -Syu
 # Core Packages
 curl "https://gitlab.com/eadwu/pkgbuilds/raw/master/x86_64/kcore-meta-0.1.0-1-x86_64.pkg.tar.xz" -o kcore-meta-0.1.0-1-x86_64.pkg.tar.xz
 pacman -U kcore-meta-0.1.0-1-x86_64.pkg.tar.xz
