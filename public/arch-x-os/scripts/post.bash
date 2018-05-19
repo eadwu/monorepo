@@ -34,36 +34,3 @@ vboxvideo' > /etc/modules-load.d/virtualbox.conf
   cp /etc/X11/xinit/xinitrc ~/.xinitrc
   perl -0777 -i -pe 's/(#!\/bin\/sh)/\1\n\/usr\/bin\/VBoxClient-all/' ~/.xinitrc
 fi
-# Configuration
-perl -0777 -i -pe 's/hosts: (.+)(resolve \[!UNAVAIL=return\])(.+)\n/hosts: \1mdns_minimal \[NOTFOUND=return\] \2\3\n/' /etc/nsswitch.conf
-echo '
-### Automatically switch to newly-connected devices
-load-module module-switch-on-connect' >> /etc/pulse/default.pa
-echo 'Section "InputClass"
-  Identifier "touchpad"
-  Driver "libinput"
-  MatchIsTouchpad "on"
-  Option "ClickMethod" "buttonareas"
-  Option "DisableWhileTyping" "off"
-  Option "MiddleEmulation" "on"
-EndSection' > /etc/X11/xorg.conf.d/30-touchpad.conf
-# Systemctl daemons/services
-systemctl daemon-reload
-systemctl enable fcron
-systemctl enable fstrim.timer
-systemctl enable ntpd
-systemctl enable bluetooth
-systemctl enable org.cups.cupsd.service
-systemctl enable avahi-daemon.service
-systemctl enable docker
-systemctl enable lightdm.service
-systemctl enable NetworkManager
-echo '[Unit]
-Description=Powertop tunings
-
-[Service]
-Type=oneshot
-ExecStart=/usr/bin/powertop --auto-tune
-
-[Install]
-WantedBy=multi-user.target' > /etc/systemd/system/powertop.service
