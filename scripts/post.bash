@@ -15,37 +15,14 @@ pacman-key -r 4209170B
 pacman-key --lsign-key 4209170B
 pacman -Syy
 # Core Packages
-pacman -S \
-  pulseaudio pulseaudio-alsa pulseaudio-bluetooth \
-  yaourt \
-  networkmanager network-manager-applet gnome-keyring \
-  xf86-input-libinput xorg-server xorg-xinit xorg-xwininfo \
-  ntp \
-  bluez bluez-libs bluez-utils
+curl "https://gitlab.com/eadwu/pkgbuilds/raw/master/x86_64/kcore-meta-0.1.0-1-x86_64.pkg.tar.xz" -o kcore-meta-0.1.0-1-x86_64.pkg.tar.xz
+pacman -U kcore-meta-0.1.0-1-x86_64.pkg.tar.xz
 # Graphical Environment
-pacman -S \
-  apg pass pwgen \
-  qt5-base qt5-doc \
-  lightdm lightdm-gtk-greeter \
-  haskell-xmonad haskell-xmonad-contrib xmobar haskell-hlint haskell-stack \
-  compton thunar gvfs thunar-volman nitrogen rxvt-unicode cool-retro-term \
-  xfce4-notifyd xfce4-screenshooter xfce4-taskmanager
+curl "https://gitlab.com/eadwu/pkgbuilds/raw/master/x86_64/kenv-meta-0.1.0-1-x86_64.pkg.tar.xz" -o kenv-meta-0.1.0-1-x86_64.pkg.tar.xz
+pacman -U kenv-meta-0.1.0-1-x86_64.pkg.tar.xz
 # Additional Packages
-pacman -S \
-  zsh vim \
-  ark p7zip zip unzip unrar \
-  broadcom-wl-dkms pepper-flash \
-  powertop tlp cups avahi hplip \
-  ruby cmake clang xclip openssh \
-  adapta-gtk-theme deepin-gtk-theme \
-  scrot cmatrix simplescreenrecorder \
-  git npm yarn nodejs php glslang texlive-most \
-  java-runtime-common java-environment-common jdk8-openjdk jdk9-openjdk \
-  libreoffice-fresh hunspell hyphen hunspell-en hyphen-en libmythes mythes-en \
-  luarocks lm_sensors python-pip python-pylint python2-pip python2-pylint python-fonttools lsb-release \
-  fcron conky docker openvpn redshift rofi ranger feh cmus \
-  blender vivaldi-snapshot vivaldi-snapshot-ffmpeg-codecs \
-  noto-fonts-cjk ttf-liberation
+curl "https://gitlab.com/eadwu/pkgbuilds/raw/master/x86_64/kother-meta-0.1.0-2-x86_64.pkg.tar.xz" -o kother-meta-0.1.0-2-x86_64.pkg.tar.xz
+pacman -U kother-meta-0.1.0-2-x86_64.pkg.tar.xz
 ## Virtualbox Guest Utils
 if [ "${virtualbox}" = true ]; then
   pacman -S virtualbox-guest-utils
