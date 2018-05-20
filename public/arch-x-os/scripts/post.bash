@@ -35,3 +35,14 @@ fi
 # Patches
 curl -sS "https://gitlab.com/arch-dual-boot/arch-x-os/raw/master/scripts/nsswitch.conf.patch" | patch -p1 /etc/nsswitch.conf
 curl -sS "https://gitlab.com/arch-dual-boot/arch-x-os/raw/master/scripts/default.pa.patch" | patch -p1 /etc/pulse/default.pa
+# Systemctl daemons/services
+systemctl daemon-reload
+systemctl enable fcron
+systemctl enable fstrim.timer
+systemctl enable ntpd
+systemctl enable bluetooth
+systemctl enable org.cups.cupsd.service
+systemctl enable avahi-daemon.service
+systemctl enable docker
+systemctl enable lightdm.service
+systemctl enable NetworkManager
