@@ -14,13 +14,13 @@ curl -sS "https://gitlab.com/arch-dual-boot/arch-x-os/raw/master/scripts/pacman.
 pacman -Syy
 pacman -Syu
 # Core Packages
-curl "https://gitlab.com/eadwu/pkgbuilds/raw/master/x86_64/kcore-meta-0.1.0-1-x86_64.pkg.tar.xz" -o kcore-meta.pkg.tar.xz
+curl -sS "https://gitlab.com/eadwu/pkgbuilds/raw/master/x86_64/kcore-meta-0.1.1-1-x86_64.pkg.tar.xz" -o kcore-meta.pkg.tar.xz
 pacman -U kcore-meta.pkg.tar.xz
 # Graphical Environment
-curl "https://gitlab.com/eadwu/pkgbuilds/raw/master/x86_64/kenv-meta-0.1.0-1-x86_64.pkg.tar.xz" -o kenv-meta.pkg.tar.xz
+curl -sS "https://gitlab.com/eadwu/pkgbuilds/raw/master/x86_64/kenv-meta-0.1.0-2-x86_64.pkg.tar.xz" -o kenv-meta.pkg.tar.xz
 pacman -U kenv-meta.pkg.tar.xz
 # Additional Packages
-curl "https://gitlab.com/eadwu/pkgbuilds/raw/master/x86_64/kother-meta-0.1.0-2-x86_64.pkg.tar.xz" -o kother-meta.pkg.tar.xz
+curl -sS "https://gitlab.com/eadwu/pkgbuilds/raw/master/x86_64/kother-meta-0.1.1-1-x86_64.pkg.tar.xz" -o kother-meta.pkg.tar.xz
 pacman -U kother-meta.pkg.tar.xz
 ## Virtualbox Guest Utils
 if [ "${virtualbox}" = true ]; then
@@ -46,3 +46,5 @@ systemctl enable avahi-daemon.service
 systemctl enable docker
 systemctl enable lightdm.service
 systemctl enable NetworkManager
+# Cleanup
+rm k*-meta.pkg.tar.xz
