@@ -1,0 +1,9 @@
+--- default.orig	2018-05-19 21:51:46.830977550 -0400
++++ default.new	2018-05-19 21:53:42.819518861 -0400
+@@ -138,3 +138,6 @@
+ ### Make some devices default
+ #set-default-sink output
+ #set-default-source input
++
++### Automatically switch to newly-connected devices
++load-module module-switch-on-connect

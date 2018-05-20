@@ -76,7 +76,7 @@ sed -i 's/^#\(${locale} UTF-8\)/\1/' /etc/locale.gen
 locale-gen
 echo LANG=${locale} > /etc/locale.conf
 export LANG=${locale}
-perl -0777 -i -pe 's/(MODULES=")(".+HOOKS="base udev autodetect )modconf block filesystems keyboard fsck"/\1ext4\2keyboard modconf block encrypt lvm2 filesystems fsck"/s' /etc/mkinitcpio.conf
+curl -sS "https://gitlab.com/arch-dual-boot/arch-x-os/raw/master/scripts/mkinitcpio.conf.patch" | patch -p1 /etc/mkinitcpio.conf
 mkinitcpio -p linux
 if [ "${dual_boot}" = true ]; then
   pacman -S grub < /dev/tty
