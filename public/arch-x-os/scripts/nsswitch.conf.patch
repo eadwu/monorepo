@@ -1,0 +1,11 @@
+--- nsswitch.orig	2018-05-19 21:31:56.050793488 -0400
++++ nsswitch.new	2018-05-19 21:32:23.087133927 -0400
+@@ -7,7 +7,7 @@
+
+ publickey: files
+
+-hosts: files mymachines myhostname resolve [!UNAVAIL=return] dns
++hosts: files mymachines myhostname mdns_minimal [NOTFOUND=return] resolve [!UNAVAIL=return] dns
+ networks: files
+
+ protocols: files

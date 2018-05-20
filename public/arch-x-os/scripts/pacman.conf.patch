@@ -1,0 +1,20 @@
+--- pacman.orig	2018-05-19 22:45:32.883929106 -0400
++++ pacman.new	2018-05-19 22:45:42.670468464 -0400
+@@ -90,8 +90,15 @@
+ #[multilib-testing]
+ #Include = /etc/pacman.d/mirrorlist
+
+-#[multilib]
+-#Include = /etc/pacman.d/mirrorlist
++[multilib]
++Include = /etc/pacman.d/mirrorlist
++
++[archlinuxfr]
++SigLevel = Never
++Server = http://repo.archlinux.fr/$arch
++
++[herecura]
++Server = https://repo.herecura.be/herecura/x86_64
+
+ # An example of a custom package repository.  See the pacman manpage for
+ # tips on creating your own repositories.

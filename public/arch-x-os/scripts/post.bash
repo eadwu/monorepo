@@ -10,7 +10,7 @@
 virtualbox=${1} # |true
 
 # Pacman Repositories
-perl -0777 -i -pe 's/#(\[multilib\]\n)#(Include = \/etc\/pacman.d\/mirrorlist)/\1\2\n\n\[archlinuxfr\]\nSigLevel = Never\nServer = http:\/\/repo.archlinux.fr\/\$arch\n\n\[herecura\]\nServer = https:\/\/repo.herecura.be\/herecura\/x86_64/s' /etc/pacman.conf
+curl -sS "https://gitlab.com/arch-dual-boot/arch-x-os/raw/master/scripts/pacman.conf.patch" | patch -p1 /etc/pacman.conf
 pacman -Syy
 pacman -Syu
 # Core Packages
@@ -32,5 +32,6 @@ vboxvideo' > /etc/modules-load.d/virtualbox.conf
   cp /etc/X11/xinit/xinitrc ~/.xinitrc
   perl -0777 -i -pe 's/(#!\/bin\/sh)/\1\n\/usr\/bin\/VBoxClient-all/' ~/.xinitrc
 fi
-## Cleanup
-rm k*-meta.pkg.tar.xz
+# Patches
+curl -sS "https://gitlab.com/arch-dual-boot/arch-x-os/raw/master/scripts/nsswitch.conf.patch" | patch -p1 /etc/nsswitch.conf
+curl -sS "https://gitlab.com/arch-dual-boot/arch-x-os/raw/master/scripts/default.pa.patch" | patch -p1 /etc/pulse/default.pa
