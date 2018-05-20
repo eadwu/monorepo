@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # USAGE:
-#   curl https://gitlab.com/arch-dual-boot/arch-x-os/raw/master/scripts/base_install.bash | \
+#   curl -sS https://gitlab.com/arch-dual-boot/arch-x-os/raw/master/scripts/base_install.bash | \
 #     bash -s -- boot_partition crypt_password country geographic_zone hostname root_password user password locale dual_boot
 
 # Variables
@@ -56,7 +56,7 @@ mkdir /mnt/boot
 mount /dev/sda${boot_partition} /mnt/boot
 
 # Base installation
-curl "https://www.archlinux.org/mirrorlist/?country=${country}&protocol=http&protocol=https&ip_version=4&use_mirror_status=on" > /etc/pacman.d/mirrorlist.source
+curl -sS "https://www.archlinux.org/mirrorlist/?country=${country}&protocol=http&protocol=https&ip_version=4&use_mirror_status=on" > /etc/pacman.d/mirrorlist.source
 sed -i 's/^#Server/Server/' /etc/pacman.d/mirrorlist.source
 rankmirrors -n 6 /etc/pacman.d/mirrorlist.source > /etc/pacman.d/mirrorlist
 pacstrap /mnt base base-devel
@@ -80,7 +80,7 @@ curl -sS "https://gitlab.com/arch-dual-boot/arch-x-os/raw/master/scripts/mkinitc
 mkinitcpio -p linux
 if [ "${dual_boot}" = true ]; then
   pacman -S grub < /dev/tty
-  perl -0777 -i -pe "s/(GRUB_CMDLINE_LINUX_DEFAULT=\")quiet\"\n(GRUB_CMDLINE_LINUX=\")\"/\1cryptdevice=UUID=$(blkid | grep /dev/sda${root_partition} | grep -oP '(?<= UUID=\")[^ ]+(?=\")'):volgroup0 libata.force=1:noncq\"\n\2scsi_mod.use_blk_mq=y dm_mod.use_blk_mq=y\"/" /etc/default/grub
+  perl -0777 -i -pe "s/(GRUB_CMDLINE_LINUX_DEFAULT=\")quiet\"\n(GRUB_CMDLINE_LINUX=\")\"/\1cryptdevice=UUID=$(blkid | grep /dev/sda${root_partition} | grep -Po '(?<= UUID=\")[^ ]+(?=\")'):volgroup0 libata.force=1:noncq\"\n\2scsi_mod.use_blk_mq=y dm_mod.use_blk_mq=y\"/" /etc/default/grub
   cat <<EOF >> /etc/default/grub
 
 # Fix broken grub.cfg gen
@@ -101,7 +101,7 @@ timeout 5" > /boot/loader/loader.conf
 linux /vmlinuz-linux
 initrd /intel-ucode.img
 initrd /initramfs-linux.img
-options cryptdevice=UUID=$(blkid | grep /dev/sda${root_partition} | grep -oP '(?<= UUID=\")[^ ]+(?=\")'):volgroup0:allow-discards root=/dev/mapper/volgroup0-lv_root rw" > /boot/loader/entries/arch.conf
+options cryptdevice=UUID=$(blkid | grep /dev/sda${root_partition} | grep -Po '(?<= UUID=\")[^ ]+(?=\")'):volgroup0:allow-discards root=/dev/mapper/volgroup0-lv_root rw" > /boot/loader/entries/arch.conf
 fi
 exit
 SOF
