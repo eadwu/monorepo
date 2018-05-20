@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # USAGE:
-#   curl https://gitlab.com/arch-dual-boot/arch-x-os/raw/master/scripts/post.bash > post.bash && \
+#   curl -sS https://gitlab.com/arch-dual-boot/arch-x-os/raw/master/scripts/post.bash > post.bash && \
 #     chmod +x post.bash && \
 #     sudo ./post.bash virtualbox && \
 #     rm post.bash
