@@ -10,9 +10,7 @@
 virtualbox=${1} # |true
 
 # Pacman Repositories
-perl -0777 -i -pe 's/(\[extra\]\nInclude = \/etc\/pacman.d\/mirrorlist)(.+?)#(\[multilib\]\n)#(Include = \/etc\/pacman.d\/mirrorlist)/\1\n\n\[haskell-core\]\nSigLevel = Required TrustedOnly\nServer = http:\/\/xsounds.org\/~haskell\/core\/\$arch\2\3\4\n\n\[archlinuxfr\]\nSigLevel = Never\nServer = http:\/\/repo.archlinux.fr\/\$arch\n\n\[herecura\]\nServer = https:\/\/repo.herecura.be\/herecura\/x86_64/s' /etc/pacman.conf
-pacman-key -r 4209170B
-pacman-key --lsign-key 4209170B
+perl -0777 -i -pe 's/#(\[multilib\]\n)#(Include = \/etc\/pacman.d\/mirrorlist)/\1\2\n\n\[archlinuxfr\]\nSigLevel = Never\nServer = http:\/\/repo.archlinux.fr\/\$arch\n\n\[herecura\]\nServer = https:\/\/repo.herecura.be\/herecura\/x86_64/s' /etc/pacman.conf
 pacman -Syy
 pacman -Syu
 # Core Packages
