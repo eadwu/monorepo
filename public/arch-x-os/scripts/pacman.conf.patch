@@ -1,9 +1,20 @@
---- pacman.orig	2018-05-19 22:45:32.883929106 -0400
-+++ pacman.new	2018-05-19 22:45:42.670468464 -0400
-@@ -90,8 +90,15 @@
+--- pacman.orig	2018-05-27 16:31:35.585668408 -0400
++++ pacman.new	2018-05-27 16:32:46.237920643 -0400
+@@ -72,6 +72,10 @@
+ #[testing]
+ #Include = /etc/pacman.d/mirrorlist
+ 
++[arcus]
++SigLevel = PackageOptional
++Server = https://eadwu.gitlab.io/arcus/repo/x86_64
++
+ [core]
+ Include = /etc/pacman.d/mirrorlist
+ 
+@@ -90,8 +94,15 @@
  #[multilib-testing]
  #Include = /etc/pacman.d/mirrorlist
-
+ 
 -#[multilib]
 -#Include = /etc/pacman.d/mirrorlist
 +[multilib]
@@ -15,6 +26,6 @@
 +
 +[herecura]
 +Server = https://repo.herecura.be/herecura/x86_64
-
+ 
  # An example of a custom package repository.  See the pacman manpage for
  # tips on creating your own repositories.
