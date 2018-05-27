@@ -55,11 +55,3 @@ Git Config
 
 #### Chrome Extensions in browsers built with Chromium
 Use the following link `https://clients2.google.com/service/update2/crx?response=redirect&os=mac&arch=x86-64&nacl_arch=x86-64&prod=chromiumcrx&prodchannel=unknown&prodversion=61.0.3163.79&x=id%3D${EXTENSION_ID}%26uc` and replace `${EXTENSION_ID}` with the extension id.
-
-#### VS Code
-    extensions=($(cat external/code.txt | grep -Po '^.*$'))
-
-    for extension in "${extensions[@]}"
-    do
-      code-insiders --install-extension ${extension}
-    done
