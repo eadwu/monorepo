@@ -14,14 +14,11 @@ curl -sS "https://gitlab.com/arch-dual-boot/arch-x-os/raw/master/scripts/pacman.
 pacman -Syy
 pacman -Syu
 # Core Packages
-curl -sS "https://gitlab.com/eadwu/pkgbuilds/raw/master/x86_64/kcore-meta-0.1.1-1-x86_64.pkg.tar.xz" -o kcore-meta.pkg.tar.xz
-pacman -U kcore-meta.pkg.tar.xz
+pacman -S kcore-meta
 # Graphical Environment
-curl -sS "https://gitlab.com/eadwu/pkgbuilds/raw/master/x86_64/kenv-meta-0.1.0-2-x86_64.pkg.tar.xz" -o kenv-meta.pkg.tar.xz
-pacman -U kenv-meta.pkg.tar.xz
+pacman -S kenv-meta
 # Additional Packages
-curl -sS "https://gitlab.com/eadwu/pkgbuilds/raw/master/x86_64/kother-meta-0.1.1-1-x86_64.pkg.tar.xz" -o kother-meta.pkg.tar.xz
-pacman -U kother-meta.pkg.tar.xz
+pacman -S kother-meta
 ## Virtualbox Guest Utils
 if [ "${virtualbox}" = true ]; then
   pacman -S virtualbox-guest-utils
@@ -49,5 +46,3 @@ systemctl enable ntpd
 systemctl enable org.cups.cupsd.service
 systemctl enable tlp
 systemctl enable tlp-sleep
-# Cleanup
-rm k*-meta.pkg.tar.xz
