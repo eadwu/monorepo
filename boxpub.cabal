@@ -19,7 +19,7 @@ library
   build-depends:     base ^>=4.12.0.0
   hs-source-dirs:    src
   extra-libraries:   fs
-  exposed-modules:   FileSystem
+  exposed-modules:   Boxpub.FileSystem
   other-extensions:  ForeignFunctionInterface
   default-language:  Haskell2010
 
@@ -27,7 +27,7 @@ executable boxpub
   main-is:           Main.hs
   build-depends:     base ^>=4.12.0.0
                    , optparse-applicative ^>=0.14.2.0
-  other-modules:     FileSystem
+  other-modules:     Boxpub.FileSystem
   hs-source-dirs:    src
   extra-libraries:   fs
   default-language:  Haskell2010

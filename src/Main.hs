@@ -1,5 +1,5 @@
-import Options
-import FileSystem
+import Boxpub.Options
+import Boxpub.FileSystem
 import Options.Applicative
 import Foreign.C.String (newCString)
 
