@@ -1,31 +1,33 @@
-cabal-version:      2.4
+cabal-version:       2.4
 
-name:               boxpub
-author:             Edmund Wu
-version:            0.1.0.0
-license:            BSD-3-Clause
-homepage:           https://git.sr.ht/~eadwu/boxpub
-synopsis:           boxnovel epub generator
-maintainer:         edmund.wu@protonmail.com
-license-file:       LICENSE
+name:                boxpub
+version:             0.1.0.0
+synopsis:            boxnovel epub generator
+license:             BSD-3-Clause
+license-file:        LICENSE
+author:              Edmund Wu
+maintainer:          edmund.wu@protonmail.com
+
+homepage:            https://git.sr.ht/~eadwu/boxpub
+bug-reports:         https://todo.sr.ht/~eadwu/boxpub
 
 source-repository head
-  type:     git
-  location: https://git.sr.ht/~eadwu/boxpub
+  type:      git
+  location:  https://git.sr.ht/~eadwu/boxpub
 
 library
-  build-depends:      base ^>=4.12.0.0
-  hs-source-dirs:     src
-  extra-libraries:    fs
-  exposed-modules:    FileSystem
-  other-extensions:   ForeignFunctionInterface
-  default-language:   Haskell2010
+  build-depends:     base ^>=4.12.0.0
+  hs-source-dirs:    src
+  extra-libraries:   fs
+  exposed-modules:   FileSystem
+  other-extensions:  ForeignFunctionInterface
+  default-language:  Haskell2010
 
 executable boxpub
-  main-is:            Main.hs
-  build-depends:      base ^>=4.12.0.0
-                    , optparse-applicative ^>=0.14.2.0
-  other-modules:      FileSystem
-  hs-source-dirs:     src
-  extra-libraries:    fs
-  default-language:   Haskell2010
+  main-is:           Main.hs
+  build-depends:     base ^>=4.12.0.0
+                   , optparse-applicative ^>=0.14.2.0
+  other-modules:     FileSystem
+  hs-source-dirs:    src
+  extra-libraries:   fs
+  default-language:  Haskell2010
