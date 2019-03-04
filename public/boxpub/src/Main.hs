@@ -10,7 +10,7 @@ data Options = Options
   , start :: Int
   , end :: Int
   , outputDirectory :: Maybe FilePath
-  , novel :: String }
+  , novel :: Maybe String }
 
 opts :: Parser Options
 opts = Options
@@ -42,8 +42,8 @@ opts = Options
     ( long "output-directory"
    <> metavar "DIR"
    <> help "write files to DIR" ) )
-  <*> argument str
-    ( metavar "NOVEL" )
+  <*> ( optional $ argument str
+    ( metavar "NOVEL" ) )
 
 settings :: ParserPrefs
 settings = prefs showHelpOnEmpty
