@@ -38,11 +38,11 @@ opts = Options
    <> metavar "END"
    <> help "the last chapter [number] to include in the ebook"
    <> showDefault )
-  <*> ( optional $ strOption
+  <*> optional ( strOption
     ( long "output-directory"
    <> metavar "DIR"
    <> help "write files to DIR" ) )
-  <*> ( optional $ argument str
+  <*> optional ( argument str
     ( metavar "NOVEL" ) )
 
 settings :: ParserPrefs
@@ -50,7 +50,7 @@ settings = prefs showHelpOnEmpty
 
 parser :: ParserInfo Options
 parser = info (helper <*> opts)
-  ( fullDesc )
+  fullDesc
 
 functor :: Options -> IO ()
 functor (Options version quiet verbose start end outputDirectory novel) = do
