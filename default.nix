@@ -1,4 +1,4 @@
-{ pkgs ? import <nixpkgs> { }, compiler ? "ghc863" }:
+{ pkgs ? import <nixpkgs> { }, compiler ? "ghc864" }:
 
 with pkgs;
 
