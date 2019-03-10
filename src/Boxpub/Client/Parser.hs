@@ -1,30 +1,43 @@
-module Boxpub.Client.Options ( Options(..), opts ) where
+module Boxpub.Client.Parser
+( BoxpubOptions(..)
+, getOptions
+, boxpubOptionsParser ) where
   import Options.Applicative
   import Data.Semigroup ( (<>) )
 
-  data Options = Options
+  data BoxpubOptions = BoxpubOptions
     { version :: Bool
-    , quiet :: Bool
     , verbose :: Bool
     , start :: Int
     , end :: Int
     , outputDirectory :: Maybe FilePath
     , novel :: Maybe String }
 
-  opts :: Parser Options
-  opts = Options
+  settings :: ParserPrefs
+  settings = prefs showHelpOnEmpty
+
+  description :: InfoMod a
+  description = fullDesc
+
+  infoH :: Parser a -> InfoMod a -> ParserInfo a
+  infoH a = info (helper <*> a)
+
+  parser :: ParserInfo BoxpubOptions
+  parser = infoH boxpubOptionsParser description
+
+  getOptions :: IO (BoxpubOptions)
+  getOptions = customExecParser settings parser
+
+  boxpubOptionsParser :: Parser BoxpubOptions
+  boxpubOptionsParser = BoxpubOptions
     <$> switch
       ( long "version"
      <> short 'V'
      <> help "display the version" )
     <*> switch
-      ( long "quiet"
-     <> short 'q'
-     <> help "be quiet (no [unecessary] output)" )
-    <*> switch
       ( long "verbose"
      <> short 'v'
-     <> help "be verbose (this is the default)" )
+     <> help "be verbose" )
     <*> option auto
       ( long "start"
      <> value (-1)

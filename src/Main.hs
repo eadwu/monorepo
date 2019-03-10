@@ -1,15 +1,16 @@
-module Main where
-  import Boxpub.Client.Options
-  import Boxpub.Client.Handler
-
-  import Options.Applicative
-
-  settings :: ParserPrefs
-  settings = prefs showHelpOnEmpty
-
-  parser :: ParserInfo Options
-  parser = info (helper <*> opts)
-    fullDesc
+module Main
+( main ) where
+  import Boxpub.Client.Env ( mkEnv, boxpubVersion )
+  import Boxpub.Client.FileSystem ( printString )
+  import Boxpub.Client.Parser ( BoxpubOptions(..), getOptions )
+  import Foreign.C.String ( newCString )
 
   main :: IO ()
-  main = exec =<< customExecParser settings parser
+  main = do
+    rawOptions <- getOptions
+    case (version rawOptions) of
+      True -> putStrLn boxpubVersion
+      _ -> do
+        env <- mkEnv rawOptions
+        str <- newCString "Hello World\0"
+        printString str
