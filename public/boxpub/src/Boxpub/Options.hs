@@ -1,6 +1,6 @@
-module Boxpub.Options where
+module Boxpub.Options ( Options(..), opts ) where
   import Options.Applicative
-  import Data.Semigroup ((<>))
+  import Data.Semigroup ( (<>) )
 
   data Options = Options
     { version :: Bool

@@ -1,4 +1,4 @@
-module Boxpub.Handler (exec) where
+module Boxpub.Handler ( exec ) where
   import Boxpub.Options
   import Boxpub.FileSystem
   import Foreign.C.String (newCString)
