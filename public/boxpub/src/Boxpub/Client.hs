@@ -8,9 +8,9 @@ module Boxpub.Client
   main :: IO ()
   main = do
     rawOptions <- getOptions
-    case (version rawOptions) of
-      True -> putStrLn boxpubVersion
-      _ -> do
+    if version rawOptions
+      then putStrLn boxpubVersion
+      else do
         env <- mkEnv rawOptions
         str <- newCString "Hello World\0"
         printString str
