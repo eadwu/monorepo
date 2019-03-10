@@ -31,7 +31,8 @@ executable boxpub
   other-modules:     Paths_boxpub
   hs-source-dirs:    src
   extra-lib-dirs:    target/release
-  exposed-modules:   Boxpub.Client.Env
+  exposed-modules:   Boxpub.Client
+                   , Boxpub.Client.Env
                    , Boxpub.Client.FileSystem
                    , Boxpub.Client.Parser
   extra-libraries:   fs
