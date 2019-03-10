@@ -1,14 +1,15 @@
-import Boxpub.Options
-import Boxpub.Handler
+module Main where
+  import Boxpub.Options
+  import Boxpub.Handler
 
-import Options.Applicative
+  import Options.Applicative
 
-settings :: ParserPrefs
-settings = prefs showHelpOnEmpty
+  settings :: ParserPrefs
+  settings = prefs showHelpOnEmpty
 
-parser :: ParserInfo Options
-parser = info (helper <*> opts)
-  fullDesc
+  parser :: ParserInfo Options
+  parser = info (helper <*> opts)
+    fullDesc
 
-main :: IO ()
-main = exec =<< customExecParser settings parser
+  main :: IO ()
+  main = exec =<< customExecParser settings parser
