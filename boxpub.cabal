@@ -20,7 +20,7 @@ library
   hs-source-dirs:    src
   extra-lib-dirs:    target/release
   extra-libraries:   fs
-  exposed-modules:   Boxpub.FileSystem
+  exposed-modules:   Boxpub.Client.FileSystem
   other-extensions:  ForeignFunctionInterface
   default-language:  Haskell2010
 
@@ -30,8 +30,8 @@ executable boxpub
                    , optparse-applicative ^>=0.14.2.0
   hs-source-dirs:    src
   extra-lib-dirs:    target/release
-  exposed-modules:   Boxpub.FileSystem
-                   , Boxpub.Handler
-                   , Boxpub.Options
+  exposed-modules:   Boxpub.Client.FileSystem
+                   , Boxpub.Client.Handler
+                   , Boxpub.Client.Options
   extra-libraries:   fs
   default-language:  Haskell2010

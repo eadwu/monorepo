@@ -1,6 +1,6 @@
 module Main where
-  import Boxpub.Options
-  import Boxpub.Handler
+  import Boxpub.Client.Options
+  import Boxpub.Client.Handler
 
   import Options.Applicative
 
