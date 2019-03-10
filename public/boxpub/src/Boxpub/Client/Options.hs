@@ -1,4 +1,4 @@
-module Boxpub.Options ( Options(..), opts ) where
+module Boxpub.Client.Options ( Options(..), opts ) where
   import Options.Applicative
   import Data.Semigroup ( (<>) )
 

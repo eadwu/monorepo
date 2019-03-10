@@ -1,7 +1,7 @@
-module Boxpub.Handler ( exec ) where
-  import Boxpub.Options
-  import Boxpub.FileSystem
-  import Foreign.C.String (newCString)
+module Boxpub.Client.Handler ( exec ) where
+  import Boxpub.Client.Options
+  import Boxpub.Client.FileSystem
+  import Foreign.C.String ( newCString )
 
   exec :: Options -> IO ()
   exec (Options version quiet verbose start end outputDirectory novel) = do
