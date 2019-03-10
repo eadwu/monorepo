@@ -25,7 +25,7 @@ module Boxpub.Client.Parser
   parser :: ParserInfo BoxpubOptions
   parser = infoH boxpubOptionsParser description
 
-  getOptions :: IO (BoxpubOptions)
+  getOptions :: IO BoxpubOptions
   getOptions = customExecParser settings parser
 
   boxpubOptionsParser :: Parser BoxpubOptions
