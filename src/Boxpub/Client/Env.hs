@@ -1,5 +1,6 @@
 module Boxpub.Client.Env
-( mkEnv
+( Env(..)
+, mkEnv
 , boxpubVersion ) where
   import Data.Version ( showVersion )
   import Boxpub.Client.Parser ( BoxpubOptions(..) )
