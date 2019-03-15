@@ -7,7 +7,6 @@ module Boxpub.Client.Parser
 
   data BoxpubOptions = BoxpubOptions
     { version :: Bool
-    , verbose :: Bool
     , start :: Int
     , end :: Int
     , outputDirectory :: Maybe FilePath
@@ -34,10 +33,6 @@ module Boxpub.Client.Parser
       ( long "version"
      <> short 'V'
      <> help "display the version" )
-    <*> switch
-      ( long "verbose"
-     <> short 'v'
-     <> help "be verbose" )
     <*> option auto
       ( long "start"
      <> value (-1)
