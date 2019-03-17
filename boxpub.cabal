@@ -12,8 +12,8 @@ homepage:            https://git.sr.ht/~eadwu/boxpub
 bug-reports:         https://todo.sr.ht/~eadwu/boxpub
 
 source-repository head
-  type:      git
-  location:  https://git.sr.ht/~eadwu/boxpub
+  type:              git
+  location:          https://git.sr.ht/~eadwu/boxpub
 
 library
   build-depends:     base ^>=4.12.0.0
