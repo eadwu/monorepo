@@ -36,6 +36,7 @@ executable boxpub
                    , Boxpub.Client.Env
                    , Boxpub.Client.FileSystem
                    , Boxpub.Client.Parser
+                   , Boxpub.Client.Provider
   hs-source-dirs:    src
   extra-lib-dirs:    target/release
   extra-libraries:   fs
