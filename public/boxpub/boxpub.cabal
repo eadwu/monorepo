@@ -32,11 +32,11 @@ executable boxpub
                    , http-client-tls ^>=0.3.5.3
                    , optparse-applicative ^>=0.14.2.0
   other-modules:     Paths_boxpub
-  hs-source-dirs:    src
-  extra-lib-dirs:    target/release
-  exposed-modules:   Boxpub.Client
+                   , Boxpub.Client
                    , Boxpub.Client.Env
                    , Boxpub.Client.FileSystem
                    , Boxpub.Client.Parser
+  hs-source-dirs:    src
+  extra-lib-dirs:    target/release
   extra-libraries:   fs
   default-language:  Haskell2010
