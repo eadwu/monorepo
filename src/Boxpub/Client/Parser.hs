@@ -47,6 +47,6 @@ module Boxpub.Client.Parser
     <*> optional ( strOption
       ( long "output-directory"
      <> metavar "DIR"
-     <> help "write files to DIR" ) )
+     <> help "write files to DIR (currently ignored)" ) )
     <*> optional ( argument str
       ( metavar "NOVEL" ) )
