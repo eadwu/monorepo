@@ -1,5 +1,5 @@
 {-# LANGUAGE ForeignFunctionInterface #-}
-module Boxpub.Client.FileSystem
+module Boxpub.EPUB.FileSystem
 ( printString ) where
   import Foreign.C.String
 
