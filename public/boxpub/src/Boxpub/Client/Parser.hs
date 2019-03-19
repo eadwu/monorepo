@@ -1,7 +1,6 @@
 module Boxpub.Client.Parser
 ( BoxpubOptions(..)
-, getOptions
-, boxpubOptionsParser ) where
+, getOptions, boxpubOptionsParser ) where
   import Options.Applicative
   import Data.Semigroup ( (<>) )
 

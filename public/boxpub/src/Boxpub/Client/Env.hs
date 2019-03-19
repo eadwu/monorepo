@@ -1,7 +1,6 @@
 module Boxpub.Client.Env
 ( Env(..)
-, mkEnv
-, boxpubVersion ) where
+, mkEnv, boxpubVersion ) where
   import Data.Version ( showVersion )
   import Boxpub.Client.Parser ( BoxpubOptions(..) )
   import qualified Paths_boxpub as Boxpub
