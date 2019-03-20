@@ -1,4 +1,4 @@
-{ mkDerivation, base, directory, fs, http-client, http-client-tls
+{ mkDerivation, base, directory, http-client, http-client-tls
 , optparse-applicative, scalpel, stdenv
 }:
 mkDerivation {
@@ -7,13 +7,12 @@ mkDerivation {
   src = ./.;
   isLibrary = true;
   isExecutable = true;
-  libraryHaskellDepends = [ base ];
-  librarySystemDepends = [ fs ];
+  libraryHaskellDepends = [ base directory ];
   executableHaskellDepends = [
     base directory http-client http-client-tls optparse-applicative
     scalpel
   ];
-  executableSystemDepends = [ fs ];
+  doHaddock = false;
   homepage = "https://git.sr.ht/~eadwu/boxpub";
   description = "boxnovel epub generator";
   license = stdenv.lib.licenses.bsd3;
