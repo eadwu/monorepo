@@ -28,7 +28,7 @@ module Boxpub.Client.Provider.BoxNovel
       paths = Paths
         { root = protocol ++ "://" ++ domain
         , novel = novel
-        , chapter = novel ++ "/chapter-%s" }
+        , chapter = novel ++ "/chapter-%d" }
 
   getRootPath :: BoxNovelEnv -> String
   getRootPath = root . paths
