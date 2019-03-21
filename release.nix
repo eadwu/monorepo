@@ -1,5 +1,5 @@
-{ mkDerivation, base, directory, http-client, http-client-tls
-, optparse-applicative, scalpel, stdenv
+{ mkDerivation, base, http-client, http-client-tls
+, optparse-applicative, pandoc, scalpel, stdenv
 }:
 mkDerivation {
   pname = "boxpub";
@@ -8,7 +8,7 @@ mkDerivation {
   isLibrary = false;
   isExecutable = true;
   executableHaskellDepends = [
-    base directory http-client http-client-tls optparse-applicative
+    base http-client http-client-tls optparse-applicative pandoc
     scalpel
   ];
   homepage = "https://git.sr.ht/~eadwu/boxpub";
