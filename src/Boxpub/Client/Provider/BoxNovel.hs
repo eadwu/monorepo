@@ -43,10 +43,10 @@ module Boxpub.Client.Provider.BoxNovel
   novelTitle = text $ tagSelector "title"
 
   coverImage :: Scraper String String
-  coverImage = chroot ((TagString "div") @: [ hasClass "summary_image" ]) $ attr "src" (tagSelector "img")
+  coverImage = chroot (TagString "div" @: [ hasClass "summary_image" ]) $ attr "src" (tagSelector "img")
 
   chapterName :: Scraper String String
-  chapterName = text $ (TagString "li") @: [ hasClass "active" ]
+  chapterName = text $ TagString "li" @: [ hasClass "active" ]
 
   chapterContents :: Scraper String String
-  chapterContents = innerHTML $ (TagString "div") @: [ hasClass "text-left" ]
+  chapterContents = innerHTML $ TagString "div" @: [ hasClass "text-left" ]
