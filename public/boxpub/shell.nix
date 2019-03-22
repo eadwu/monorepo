@@ -13,9 +13,6 @@ in stdenv.mkDerivation {
   name = "boxpub";
 
   buildInputs = [
-    cargo
-    rustc
-
     ghc
     hies
     cabal2nix
