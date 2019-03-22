@@ -30,6 +30,7 @@ executable boxpub
                    , Boxpub.Client.Parser
                    , Boxpub.Client.Provider
                    , Boxpub.Client.Provider.BoxNovel
+                   , Boxpub.EPUB.Metadata
                    , Boxpub.Internal.FileSystem
                    , Boxpub.Internal.Helpers
   hs-source-dirs:    src
