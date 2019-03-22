@@ -8,7 +8,7 @@ let
   }) { }).hies;
 
   boxpub = (import ./default.nix { }).boxpub;
-  ghc = haskell.packages."${compiler}".ghcWithPackages (ps: boxpub.propagatedBuildInputs);
+  ghc = haskell.packages."${compiler}".ghcWithPackages (ps: boxpub.buildInputs);
 in stdenv.mkDerivation {
   name = "boxpub";
 

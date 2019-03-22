@@ -3,9 +3,11 @@
 with pkgs;
 
 {
-  boxpub = with haskell.packages."${compiler}"; callPackage ./release.nix {
-    scalpel = scalpel_0_6_0.override {
-      scalpel-core = scalpel-core_0_6_0;
+  boxpub = haskell.packages."${compiler}".developPackage {
+    root = ./.;
+    source-overrides = {
+      scalpel = "0.6.0";
+      scalpel-core = "0.6.0";
     };
   };
 }
