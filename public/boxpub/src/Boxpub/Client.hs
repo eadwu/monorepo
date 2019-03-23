@@ -15,4 +15,4 @@ module Boxpub.Client
         then die "Invalid argument for <NOVEL> receieved"
         else do
           env <- mkEnv rawOptions
-          BP.main env
+          putStrLn "Hello World"
