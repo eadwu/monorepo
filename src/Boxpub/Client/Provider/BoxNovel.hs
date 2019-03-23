@@ -3,22 +3,21 @@ module Boxpub.Client.Provider.BoxNovel
 , mkEnv
 , getRootPath, getNovelPath, getChapterPath
 , novelTitle, novelAuthor, coverImage, chapterName, chapterContents ) where
-  import Prelude hiding ( concat )
-  import Data.Text as Text ( Text, concat )
-  import Text.HTML.Scalpel as Scalpel ( Scraper, TagName(..), (@:), attr, text, chroot, hasClass, innerHTML, tagSelector )
+  import Data.Text ( Text )
+  import Text.HTML.Scalpel ( Scraper, TagName(..), (@:), attr, text, chroot, hasClass, innerHTML, tagSelector )
 
   data Paths = Paths
-    { root :: Text
-    , novel :: Text
-    , chapter :: Text }
+    { root :: String
+    , novel :: String
+    , chapter :: String }
 
   data BoxNovelEnv = BoxNovelEnv
     { paths :: Paths }
 
-  protocol :: Text
+  protocol :: String
   protocol = "https"
 
-  domain :: Text
+  domain :: String
   domain = "boxnovel.com"
 
   mkEnv :: IO BoxNovelEnv
@@ -27,17 +26,17 @@ module Boxpub.Client.Provider.BoxNovel
     where
       novel = "/novel/%s"
       paths = Paths
-        { root = concat [ protocol, "://", domain ]
+        { root = protocol ++ "://" ++ domain
         , novel = novel
-        , chapter = concat [ novel, "/chapter-%d" ] }
+        , chapter = novel ++ "/chapter-%d" }
 
-  getRootPath :: BoxNovelEnv -> Text
+  getRootPath :: BoxNovelEnv -> String
   getRootPath = root . paths
 
-  getNovelPath :: BoxNovelEnv -> Text
+  getNovelPath :: BoxNovelEnv -> String
   getNovelPath = novel . paths
 
-  getChapterPath :: BoxNovelEnv -> Text
+  getChapterPath :: BoxNovelEnv -> String
   getChapterPath = chapter . paths
 
   novelTitle :: Scraper Text Text

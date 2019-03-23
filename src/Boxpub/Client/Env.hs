@@ -3,7 +3,6 @@ module Boxpub.Client.Env
 , mkEnv, boxpubVersion ) where
   import Prelude hiding ( concat )
   import Data.Version ( showVersion )
-  import Data.Text ( Text, pack, concat )
   import Boxpub.Client.Parser ( BoxpubOptions(..) )
   import qualified Paths_boxpub as Boxpub
 
@@ -14,7 +13,5 @@ module Boxpub.Client.Env
   mkEnv options = return Env
     { options = options }
 
-  boxpubVersion :: Text
-  boxpubVersion = concat
-    [ "boxpub "
-    , pack $ showVersion Boxpub.version ]
+  boxpubVersion :: String
+  boxpubVersion = "boxpub " ++ showVersion Boxpub.version

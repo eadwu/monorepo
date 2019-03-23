@@ -56,7 +56,7 @@ module Boxpub.Client.Provider
       { name = strip $ fromJust chapterName
       , content = strip $ fromJust chapterContents }
     where
-      createChapterURL env = printf (unpack $ concat [ BoxNovel.getRootPath env, BoxNovel.getChapterPath env ])
+      createChapterURL env = printf (BoxNovel.getRootPath env ++ BoxNovel.getChapterPath env)
       reqChapter = req (createChapterURL pEnv (fromJust $ (novel . options) env) chapterN)
 
   mkEnv :: Env -> Provider -> IO ProviderEnv
@@ -68,4 +68,4 @@ module Boxpub.Client.Provider
       BoxNovel.novelTitle BoxNovel.coverImage BoxNovel.novelAuthor
     return ProviderEnv
       { metadata = metadata }
-    where createNovelURL env = printf (unpack $ concat [ BoxNovel.getRootPath env, BoxNovel.getNovelPath env ])
+    where createNovelURL env = printf (BoxNovel.getRootPath env ++ BoxNovel.getNovelPath env)
