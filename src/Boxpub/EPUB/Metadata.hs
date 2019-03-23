@@ -1,6 +1,5 @@
 module Boxpub.EPUB.Metadata
 ( generate ) where
-  import Boxpub.Client.Provider ( Metadata(..) )
   import Text.Printf ( printf )
 
   metadata :: String
@@ -13,5 +12,5 @@ module Boxpub.EPUB.Metadata
     \<dc:date>2019</dc:date>\
     \<dc:rights>Copyright ©2019</dc:right"
 
-  generate :: String -> Metadata -> String
-  generate tmpDir novelEnv = printf metadata (title novelEnv) (author novelEnv)
+  generate :: String
+  generate = printf metadata
