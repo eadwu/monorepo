@@ -1,5 +1,5 @@
 module Boxpub.Client.Provider
-( Metadata(..), ProviderEnv(..)
+( Provider, Metadata(..), ProviderEnv(..)
 , mkEnv ) where
   import Boxpub.Client.Env ( Env(..) )
   import Boxpub.Client.Parser ( BoxpubOptions(..) )
@@ -10,6 +10,8 @@ module Boxpub.Client.Provider
   import Text.HTML.Scalpel ( URL, Scraper, Config(..), scrapeURLWithConfig )
   import Text.Printf ( printf )
   import qualified Boxpub.Client.Provider.BoxNovel as BoxNovel
+
+  type Provider = BoxNovel.BoxNovelEnv
 
   data Chapter = Chapter
     { name :: String
@@ -44,7 +46,7 @@ module Boxpub.Client.Provider
       , author = fromJust author }
 
   -- https://www.fpcomplete.com/blog/2013/06/haskell-from-c
-  fetchChapter :: Env -> BoxNovel.BoxNovelEnv -> Integer -> IO Chapter
+  fetchChapter :: Env -> Provider -> Integer -> IO Chapter
   fetchChapter env pEnv chapterN = do
     chapterName <- reqChapter BoxNovel.chapterName
     chapterContents <- reqChapter BoxNovel.chapterContents
@@ -55,7 +57,7 @@ module Boxpub.Client.Provider
       createChapterURL env = printf (BoxNovel.getRootPath env ++ BoxNovel.getChapterPath env)
       reqChapter = req (createChapterURL pEnv (fromJust $ (novel . options) env) chapterN)
 
-  mkEnv :: Env -> BoxNovel.BoxNovelEnv -> IO ProviderEnv
+  mkEnv :: Env -> Provider -> IO ProviderEnv
   mkEnv env pEnv = do
     -- We want the value if its given, which in Haskell is `Just` not `Maybe`
     -- This also does some neat things with partial functions
