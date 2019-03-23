@@ -1,6 +1,6 @@
 module Boxpub.Client.Provider
-( Metadata(..)
-, main ) where
+( Metadata(..), ProviderEnv(..)
+, mkEnv ) where
   import Boxpub.Client.Env ( Env(..) )
   import Boxpub.Client.Parser ( BoxpubOptions(..) )
   import Data.Default ( def )
@@ -19,6 +19,9 @@ module Boxpub.Client.Provider
     { title :: String
     , cover :: String
     , author :: String }
+
+  data ProviderEnv = ProviderEnv
+    { metadata :: Metadata }
 
   customManagerSettings :: ManagerSettings
   customManagerSettings = tlsManagerSettings
@@ -52,5 +55,13 @@ module Boxpub.Client.Provider
       createChapterURL env = printf (BoxNovel.getRootPath env ++ BoxNovel.getChapterPath env)
       reqChapter = req (createChapterURL pEnv (fromJust $ (novel . options) env) chapterN)
 
-  main :: Env -> IO ()
-  main env = putStrLn "Hello World"
+  mkEnv :: Env -> BoxNovel.BoxNovelEnv -> IO ProviderEnv
+  mkEnv env pEnv = do
+    -- We want the value if its given, which in Haskell is `Just` not `Maybe`
+    -- This also does some neat things with partial functions
+    -- fetchMetadata(printf(createNovelURL(ProviderEnv), []), Scraper, Scraper)
+    metadata <- fetchMetadata (createNovelURL pEnv (fromJust $ (novel . options) env))
+      BoxNovel.novelTitle BoxNovel.coverImage BoxNovel.novelAuthor
+    return ProviderEnv
+      { metadata = metadata }
+    where createNovelURL env = printf (BoxNovel.getRootPath env ++ BoxNovel.getNovelPath env)
