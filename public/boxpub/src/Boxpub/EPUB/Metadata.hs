@@ -1,5 +1,6 @@
 module Boxpub.EPUB.Metadata
 ( generate ) where
+  import Data.Text as T ( Text, pack )
   import Text.Printf ( printf )
 
   metadata :: String
@@ -12,5 +13,5 @@ module Boxpub.EPUB.Metadata
     \<dc:date>2019</dc:date>\
     \<dc:rights>Copyright ©2019</dc:right"
 
-  generate :: String -> String -> String
+  generate :: Text -> Text -> String
   generate = printf metadata
