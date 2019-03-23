@@ -24,6 +24,7 @@ executable boxpub
                    , scalpel ^>=0.6.0
                    , directory ^>=1.3.3.0
                    , http-client ^>=0.5.14
+                   , data-default ^>=0.7.1.1
                    , http-client-tls ^>=0.3.5.3
                    , optparse-applicative ^>=0.14.2.0
   other-modules:     Paths_boxpub
