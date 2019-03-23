@@ -1,6 +1,6 @@
 module Boxpub.Client.Provider
-( Provider, Metadata(..), ProviderEnv(..)
-, mkEnv ) where
+( Provider, Chapter(..), Metadata(..), ProviderEnv(..)
+, mkEnv, fetchChapter ) where
   import Boxpub.Client.Env ( Env(..) )
   import Boxpub.Client.Parser ( BoxpubOptions(..) )
   import Data.Default ( def )
