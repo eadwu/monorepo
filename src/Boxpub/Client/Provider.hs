@@ -47,7 +47,7 @@ module Boxpub.Client.Provider
       , author = T.strip $ fromJust author }
 
   -- https://www.fpcomplete.com/blog/2013/06/haskell-from-c
-  fetchChapter :: Env -> Provider -> Integer -> IO Chapter
+  fetchChapter :: Env -> Provider -> Int -> IO Chapter
   fetchChapter env pEnv chapterN = do
     chapterName <- reqChapter BoxNovel.chapterName
     chapterContents <- reqChapter BoxNovel.chapterContents
