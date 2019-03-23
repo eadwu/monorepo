@@ -1,11 +1,11 @@
 module Boxpub.Client.Provider.BoxNovel
-( Paths(..)
-, BoxNovelEnv(..)
+( Paths(..), BoxNovelEnv(..)
 , mkEnv
 , getRootPath, getNovelPath, getChapterPath
 , novelTitle, novelAuthor, coverImage, chapterName, chapterContents ) where
-  import Data.Text as T ( Text, concat )
-  import Text.HTML.Scalpel ( Scraper, TagName(..), (@:), attr, text, chroot, hasClass, innerHTML, tagSelector )
+  import Prelude hiding ( concat )
+  import Data.Text as Text ( Text, concat )
+  import Text.HTML.Scalpel as Scalpel ( Scraper, TagName(..), (@:), attr, text, chroot, hasClass, innerHTML, tagSelector )
 
   data Paths = Paths
     { root :: Text
@@ -27,9 +27,9 @@ module Boxpub.Client.Provider.BoxNovel
     where
       novel = "/novel/%s"
       paths = Paths
-        { root = T.concat [ protocol, "://", domain ]
+        { root = concat [ protocol, "://", domain ]
         , novel = novel
-        , chapter = T.concat [ novel, "/chapter-%d" ] }
+        , chapter = concat [ novel, "/chapter-%d" ] }
 
   getRootPath :: BoxNovelEnv -> Text
   getRootPath = root . paths

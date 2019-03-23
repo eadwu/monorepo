@@ -1,6 +1,6 @@
 module Boxpub.EPUB.Metadata
 ( generate ) where
-  import Data.Text as T ( Text, pack )
+  import Data.Text ( Text )
   import Text.Printf ( printf )
 
   metadata :: String
