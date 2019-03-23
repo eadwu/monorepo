@@ -3,6 +3,7 @@ module Boxpub.Client
   import Boxpub.Client.Env ( mkEnv, boxpubVersion )
   import Boxpub.Client.Parser ( BoxpubOptions(..), getOptions )
   import Data.Maybe ( isNothing )
+  import Data.Text.IO as T ( putStrLn )
   import System.Exit ( die )
   import qualified Boxpub.Client.Provider as BP
 
@@ -10,7 +11,7 @@ module Boxpub.Client
   main = do
     rawOptions <- getOptions
     if version rawOptions
-      then putStrLn boxpubVersion
+      then T.putStrLn boxpubVersion
       else if isNothing $ novel rawOptions
         then die "Invalid argument for <NOVEL> receieved"
         else do

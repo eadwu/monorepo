@@ -5,6 +5,7 @@ module Boxpub.Client.Provider
   import Boxpub.Client.Parser ( BoxpubOptions(..) )
   import Data.Default ( def )
   import Data.Maybe ( fromJust ) -- fromJust errors with an Exception when value is `Nothing`
+  import Data.Text as T ( Text, strip, concat, unpack )
   import Network.HTTP.Client ( Manager, ManagerSettings )
   import Network.HTTP.Client.TLS ( newTlsManagerWith, tlsManagerSettings )
   import Text.HTML.Scalpel ( URL, Scraper, Config(..), scrapeURLWithConfig )
@@ -14,13 +15,13 @@ module Boxpub.Client.Provider
   type Provider = BoxNovel.BoxNovelEnv
 
   data Chapter = Chapter
-    { name :: String
-    , content :: String }
+    { name :: Text
+    , content :: Text }
 
   data Metadata = Metadata
-    { title :: String
-    , cover :: String
-    , author :: String }
+    { title :: Text
+    , cover :: Text
+    , author :: Text }
 
   data ProviderEnv = ProviderEnv
     { metadata :: Metadata }
@@ -29,21 +30,21 @@ module Boxpub.Client.Provider
   customManagerSettings = tlsManagerSettings
 
   -- In theory, this should be
-  -- URL -> Scraper String a -> IO (Maybe a)
-  req :: URL -> Scraper String String -> IO (Maybe String)
+  -- URL -> Scraper Text a -> IO (Maybe a)
+  req :: URL -> Scraper Text Text -> IO (Maybe Text)
   req url scraper = do
     manager <- Just <$> newTlsManagerWith customManagerSettings
     scrapeURLWithConfig (def { manager = manager }) url scraper
 
-  fetchMetadata :: URL -> Scraper String String -> Scraper String String -> Scraper String String -> IO Metadata
+  fetchMetadata :: URL -> Scraper Text Text -> Scraper Text Text -> Scraper Text Text -> IO Metadata
   fetchMetadata url titleLayout coverLayout authorLayout = do
     title <- req url titleLayout
     cover <- req url coverLayout
     author <- req url authorLayout
     return Metadata
-      { title = fromJust title
-      , cover = fromJust cover
-      , author = fromJust author }
+      { title = T.strip $ fromJust title
+      , cover = T.strip $ fromJust cover
+      , author = T.strip $ fromJust author }
 
   -- https://www.fpcomplete.com/blog/2013/06/haskell-from-c
   fetchChapter :: Env -> Provider -> Integer -> IO Chapter
@@ -51,10 +52,10 @@ module Boxpub.Client.Provider
     chapterName <- reqChapter BoxNovel.chapterName
     chapterContents <- reqChapter BoxNovel.chapterContents
     return Chapter
-      { name = fromJust chapterName
-      , content = fromJust chapterContents }
+      { name = T.strip $ fromJust chapterName
+      , content = T.strip $ fromJust chapterContents }
     where
-      createChapterURL env = printf (BoxNovel.getRootPath env ++ BoxNovel.getChapterPath env)
+      createChapterURL env = printf (T.unpack $ T.concat [ BoxNovel.getRootPath env, BoxNovel.getChapterPath env ])
       reqChapter = req (createChapterURL pEnv (fromJust $ (novel . options) env) chapterN)
 
   mkEnv :: Env -> Provider -> IO ProviderEnv
@@ -66,4 +67,4 @@ module Boxpub.Client.Provider
       BoxNovel.novelTitle BoxNovel.coverImage BoxNovel.novelAuthor
     return ProviderEnv
       { metadata = metadata }
-    where createNovelURL env = printf (BoxNovel.getRootPath env ++ BoxNovel.getNovelPath env)
+    where createNovelURL env = printf (T.unpack $ T.concat [ BoxNovel.getRootPath env, BoxNovel.getNovelPath env ])

@@ -1,6 +1,7 @@
 module Boxpub.Client.Parser
 ( BoxpubOptions(..)
 , getOptions, boxpubOptionsParser ) where
+  import Data.Text ( Text )
   import Options.Applicative
   import Data.Semigroup ( (<>) )
 
@@ -9,7 +10,7 @@ module Boxpub.Client.Parser
     , start :: Int
     , end :: Int
     , outputDirectory :: Maybe FilePath
-    , novel :: Maybe String }
+    , novel :: Maybe Text }
 
   settings :: ParserPrefs
   settings = prefs showHelpOnEmpty

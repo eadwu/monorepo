@@ -1,5 +1,5 @@
 { mkDerivation, base, directory, http-client, http-client-tls
-, optparse-applicative, pandoc, scalpel, stdenv
+, optparse-applicative, pandoc, scalpel, stdenv, text
 }:
 mkDerivation {
   pname = "boxpub";
@@ -9,7 +9,7 @@ mkDerivation {
   isExecutable = true;
   executableHaskellDepends = [
     base directory http-client http-client-tls optparse-applicative
-    pandoc scalpel
+    pandoc scalpel text
   ];
   homepage = "https://git.sr.ht/~eadwu/boxpub";
   description = "boxnovel epub generator";

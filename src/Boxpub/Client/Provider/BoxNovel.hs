@@ -4,20 +4,21 @@ module Boxpub.Client.Provider.BoxNovel
 , mkEnv
 , getRootPath, getNovelPath, getChapterPath
 , novelTitle, novelAuthor, coverImage, chapterName, chapterContents ) where
+  import Data.Text as T ( Text, concat )
   import Text.HTML.Scalpel ( Scraper, TagName(..), (@:), attr, text, chroot, hasClass, innerHTML, tagSelector )
 
   data Paths = Paths
-    { root :: String
-    , novel :: String
-    , chapter :: String }
+    { root :: Text
+    , novel :: Text
+    , chapter :: Text }
 
   data BoxNovelEnv = BoxNovelEnv
     { paths :: Paths }
 
-  protocol :: String
+  protocol :: Text
   protocol = "https"
 
-  domain :: String
+  domain :: Text
   domain = "boxnovel.com"
 
   mkEnv :: IO BoxNovelEnv
@@ -26,33 +27,33 @@ module Boxpub.Client.Provider.BoxNovel
     where
       novel = "/novel/%s"
       paths = Paths
-        { root = protocol ++ "://" ++ domain
+        { root = T.concat [ protocol, "://", domain ]
         , novel = novel
-        , chapter = novel ++ "/chapter-%d" }
+        , chapter = T.concat [ novel, "/chapter-%d" ] }
 
-  getRootPath :: BoxNovelEnv -> String
+  getRootPath :: BoxNovelEnv -> Text
   getRootPath = root . paths
 
-  getNovelPath :: BoxNovelEnv -> String
+  getNovelPath :: BoxNovelEnv -> Text
   getNovelPath = novel . paths
 
-  getChapterPath :: BoxNovelEnv -> String
+  getChapterPath :: BoxNovelEnv -> Text
   getChapterPath = chapter . paths
 
-  novelTitle :: Scraper String String
+  novelTitle :: Scraper Text Text
   novelTitle = text $ tagSelector "title"
 
-  novelAuthor :: Scraper String String
+  novelAuthor :: Scraper Text Text
   novelAuthor = text $ TagString "div" @: [ hasClass "author-content" ]
 
-  coverImage :: Scraper String String
+  coverImage :: Scraper Text Text
   coverImage = chroot (TagString "div" @: [ hasClass "summary_image" ]) $ attr "src" (tagSelector "img")
 
-  chapterName :: Scraper String String
+  chapterName :: Scraper Text Text
   chapterName = text $ TagString "li" @: [ hasClass "active" ]
 
-  chapterContents :: Scraper String String
+  chapterContents :: Scraper Text Text
   chapterContents = innerHTML $ TagString "div" @: [ hasClass "text-left" ]
 
-  sanitize :: String -> String
+  sanitize :: Text -> Text
   sanitize str = str
