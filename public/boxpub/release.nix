@@ -4,10 +4,11 @@
 }:
 mkDerivation {
   pname = "boxpub";
-  version = "0.1.0.0";
+  version = "1.0.0.0";
   src = ./.;
   isLibrary = false;
   isExecutable = true;
+  enableSeparateDataOutput = true;
   executableHaskellDepends = [
     base bytestring data-default directory filepath http-client
     http-client-tls optparse-applicative pandoc scalpel text
