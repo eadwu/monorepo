@@ -4,12 +4,11 @@ module Boxpub.Client.Provider
   import Prelude hiding ( concat )
   import Boxpub.Client.Env ( Env(..) )
   import Boxpub.Client.Parser ( BoxpubOptions(..) )
-  import Data.Default ( def )
   import Data.Maybe ( fromJust ) -- fromJust errors with an Exception when value is `Nothing`
   import Data.Text ( Text, strip, concat, unpack )
   import Network.HTTP.Client ( ManagerSettings )
   import Network.HTTP.Client.TLS ( newTlsManagerWith, tlsManagerSettings )
-  import Text.HTML.Scalpel ( URL, Scraper, Config(..), scrapeURLWithConfig )
+  import Text.HTML.Scalpel ( URL, Scraper, Config(..), utf8Decoder, scrapeURLWithConfig )
   import Text.Printf ( printf )
   import qualified Boxpub.Client.Provider.BoxNovel as BoxNovel
 
@@ -35,7 +34,7 @@ module Boxpub.Client.Provider
   req :: URL -> Scraper Text Text -> IO (Maybe Text)
   req url scraper = do
     manager <- Just <$> newTlsManagerWith customManagerSettings
-    scrapeURLWithConfig (def { manager = manager }) url scraper
+    scrapeURLWithConfig (Config { decoder = utf8Decoder, manager = manager }) url scraper
 
   fetchMetadata :: URL -> Scraper Text Text -> Scraper Text Text -> Scraper Text Text -> IO Metadata
   fetchMetadata url titleLayout coverLayout authorLayout = do
