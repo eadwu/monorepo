@@ -11,6 +11,9 @@ maintainer:          edmund.wu@protonmail.com
 homepage:            https://git.sr.ht/~eadwu/boxpub
 bug-reports:         https://todo.sr.ht/~eadwu/boxpub
 
+data-dir:            data
+data-files:          strip-attrs.lua
+
 source-repository head
   type:              git
   location:          https://git.sr.ht/~eadwu/boxpub
@@ -36,6 +39,7 @@ executable boxpub
                    , Boxpub.Client.Provider
                    , Boxpub.Client.Provider.BoxNovel
                    , Boxpub.EPUB
+                   , Boxpub.EPUB.Filters
                    , Boxpub.EPUB.Metadata
                    , Boxpub.Internal.FileSystem
   hs-source-dirs:    src
