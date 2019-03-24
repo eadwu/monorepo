@@ -4,6 +4,7 @@ module Boxpub.Client
   import Boxpub.Client.Parser ( BoxpubOptions(..), getOptions )
   import Data.Maybe ( isNothing )
   import System.Exit ( die )
+  import qualified Boxpub.EPUB as E
 
   main :: IO ()
   main = do
@@ -14,4 +15,4 @@ module Boxpub.Client
         then die "Invalid argument for <NOVEL> receieved"
         else do
           env <- mkEnv rawOptions
-          putStrLn "Hello World"
+          E.main env
