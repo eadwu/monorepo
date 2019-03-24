@@ -1,38 +1,38 @@
 /* custom font */
 @font-face {
-  font-family: Lato;
+  font-family: Arvo;
   font-style: normal;
   font-weight: normal;
-  src: url('Lato-Regular.ttf') format('truetype')
-    url('../fonts/Lato-Regular.ttf')
+  src: url('Arvo-Regular.ttf') format('truetype')
+    url('../fonts/Arvo-Regular.ttf')
 }
 
 @font-face {
-  font-family: Lato;
+  font-family: Arvo;
   font-style: normal;
   font-weight: bold;
-  src: url('Lato-Bold.ttf') format('truetype')
-    url('../fonts/Lato-Bold.ttf')
+  src: url('Arvo-Bold.ttf') format('truetype')
+    url('../fonts/Arvo-Bold.ttf')
 }
 
 @font-face {
-  font-family: Lato;
+  font-family: Arvo;
   font-style: italic;
   font-weight: normal;
-  src: url('Lato-Italic.ttf') format('truetype')
-    url('../fonts/Lato-Italic.ttf')
+  src: url('Arvo-Italic.ttf') format('truetype')
+    url('../fonts/Arvo-Italic.ttf')
 }
 
 @font-face {
-  font-family: Lato;
+  font-family: Arvo;
   font-style: italic;
   font-weight: bold;
-  src: url('Lato-BoldItalic') format('truetype')
-    url('../fonts/Lato-BoldItalic.ttf')
+  src: url('Arvo-BoldItalic') format('truetype')
+    url('../fonts/Arvo-BoldItalic.ttf')
 }
 
 body {
-  font-family: 'Lato', sans-serif;
+  font-family: 'Arvo', sans-serif;
 }
 
 /* hiding workaround */
