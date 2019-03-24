@@ -63,7 +63,7 @@ module Boxpub.EPUB
     | n <= final = do
       chapter <- fetchChapter env pEnv n
       -- ANSI codes aren't supported pre-Windows 10 so good old carriage return
-      printf "\r[%d/%d/%d built] building %s.epub: downloading chapter %d" (1 :: Int) n final name n
+      printf "\r[%d/%d/%d built] building %s.epub: downloading chapter %d" (0 :: Int) (n - first) (final - first) name n
       hFlush stdout
       -- workaround for table of contents
       -- encapsulates chapter with a <div> and prepends a <h1>
@@ -79,6 +79,7 @@ module Boxpub.EPUB
       return initial
     where
       opts = options env
+      first = start opts
       final = end opts
       name = fromJust $ novel opts
 
