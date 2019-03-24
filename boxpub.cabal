@@ -13,6 +13,9 @@ bug-reports:         https://todo.sr.ht/~eadwu/boxpub
 
 data-dir:            data
 data-files:          strip-attrs.lua
+                   , stylesheet.css
+                   , Lato/*.ttf
+                   , Lato/OFL.txt
 
 source-repository head
   type:              git
