@@ -8,4 +8,4 @@ module Boxpub.EPUB.Filters
   getFilters = do
     attrFilter <- getDataFileName "strip-attrs.lua"
     return
-      [ LuaFilter $ attrFilter ]
+      [ LuaFilter attrFilter ]
