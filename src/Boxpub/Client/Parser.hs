@@ -35,7 +35,7 @@ module Boxpub.Client.Parser
      <> help "display the version" )
     <*> option auto
       ( long "start"
-     <> value (-1)
+     <> value 1
      <> metavar "START"
      <> help "the first chapter [number] to include in the ebook"
      <> showDefault )
