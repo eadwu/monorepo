@@ -1,6 +1,6 @@
-{ pkgs ? import <nixpkgs> { }, compiler ? "ghc864" }:
+{ nixpkgs ? import <nixpkgs> { }, compiler ? "ghc864" }:
 
-with pkgs;
+with nixpkgs.pkgs;
 
 let
   hies = (import (builtins.fetchTarball {
