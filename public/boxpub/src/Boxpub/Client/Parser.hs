@@ -1,9 +1,9 @@
 module Boxpub.Client.Parser
 ( BoxpubOptions(..)
 , getOptions, boxpubOptionsParser ) where
+  import Data.Text
   import Options.Applicative
   import Data.Semigroup ( (<>) )
-  import Data.Text ( Text )
 
   data BoxpubOptions = BoxpubOptions
     { version :: Bool
