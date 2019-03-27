@@ -1,11 +1,10 @@
 module Boxpub.Client.Provider
 ( Provider, Chapter(..), Metadata(..), ProviderEnv(..)
 , mkEnv, fetchChapter ) where
-  import Prelude hiding ( concat )
+  import Data.Text as T
   import Boxpub.Client.Env ( Env(..) )
   import Boxpub.Client.Parser ( BoxpubOptions(..) )
   import Data.Maybe ( fromJust ) -- fromJust errors with an Exception when value is `Nothing`
-  import Data.Text ( Text, strip, concat, unpack )
   import Network.HTTP.Client ( ManagerSettings )
   import Network.HTTP.Client.TLS ( newTlsManagerWith, tlsManagerSettings )
   import Text.HTML.Scalpel ( URL, Scraper, Config(..), utf8Decoder, scrapeURLWithConfig )
@@ -55,7 +54,7 @@ module Boxpub.Client.Provider
       { name = strip $ fromJust chapterName
       , content = strip $ fromJust chapterContents }
     where
-      createChapterURL env = printf (BoxNovel.getRootPath env ++ BoxNovel.getChapterPath env)
+      createChapterURL env = printf (unpack $ T.concat [ BoxNovel.getRootPath env, BoxNovel.getChapterPath env ])
       reqChapter = req (createChapterURL pEnv (fromJust $ (novel . options) env) chapterN)
 
   mkEnv :: Env -> Provider -> IO ProviderEnv
@@ -67,4 +66,4 @@ module Boxpub.Client.Provider
       BoxNovel.novelTitle BoxNovel.coverImage BoxNovel.novelAuthor
     return ProviderEnv
       { metadata = metadata }
-    where createNovelURL env = printf (BoxNovel.getRootPath env ++ BoxNovel.getNovelPath env)
+    where createNovelURL env = printf (unpack $ T.concat [ BoxNovel.getRootPath env, BoxNovel.getNovelPath env ])

@@ -1,5 +1,6 @@
 module Boxpub.Client
 ( main ) where
+  import Data.Text.IO as T
   import Boxpub.Client.Env ( mkEnv, boxpubVersion )
   import Boxpub.Client.Parser ( BoxpubOptions(..), getOptions )
   import Data.Maybe ( isNothing )
@@ -10,7 +11,7 @@ module Boxpub.Client
   main = do
     rawOptions <- getOptions
     if version rawOptions
-      then putStrLn boxpubVersion
+      then T.putStrLn boxpubVersion
       else if isNothing $ novel rawOptions
         then die "Invalid argument for <NOVEL> receieved"
         else do
