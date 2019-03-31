@@ -15,7 +15,6 @@ in stdenv.mkDerivation {
   buildInputs = [
     ghc
     hies
-    cabal2nix
     haskell.packages."${compiler}".hlint
     haskell.packages."${compiler}".cabal-install
   ];
