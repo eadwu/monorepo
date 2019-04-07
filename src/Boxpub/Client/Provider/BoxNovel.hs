@@ -3,8 +3,9 @@ module Boxpub.Client.Provider.BoxNovel
 , mkEnv
 , getRootPath, getNovelPath, getChapterPath
 , novelTitle, novelAuthor, coverImage, chapterName, chapterContents ) where
-  import Data.Text ( Text )
-  import Text.HTML.Scalpel ( Scraper, TagName(..), (@:), attr, text, chroot, hasClass, innerHTML, tagSelector )
+  import Data.Text as T
+  import Text.HTML.Scalpel
+  import Text.HTML.TagSoup
 
   data Paths = Paths
     { root :: String

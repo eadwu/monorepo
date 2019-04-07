@@ -1,5 +1,6 @@
 module Boxpub.EPUB
 ( main ) where
+  import Control.Concurrent
   import Boxpub.Client.Env ( Env(..) )
   import Boxpub.Client.Parser ( BoxpubOptions(..) )
   import Data.Maybe ( fromJust )
@@ -12,5 +13,7 @@ module Boxpub.EPUB
     bnEnv <- PB.mkEnv
     pEnv <- P.mkEnv env bnEnv
     putStrLn filename
+    test <- getNumCapabilities
+    print test
     where
       filename = printf "%s.epub" (fromJust $ (novel . options) env)
