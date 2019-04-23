@@ -6,6 +6,6 @@ module Boxpub.EPUB.Filters
 
   getFilters :: IO [ Filter ]
   getFilters = do
-    attrFilter <- getDataFileName "strip-attrs.lua"
+    attrFilter <- getDataFileName "sanitize.lua"
     return
       [ LuaFilter attrFilter ]
