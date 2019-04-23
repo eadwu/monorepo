@@ -12,7 +12,7 @@ homepage:             https://git.sr.ht/~eadwu/boxpub
 bug-reports:          https://todo.sr.ht/~eadwu/boxpub
 
 data-dir:             data
-data-files:           strip-attrs.lua
+data-files:           sanitize.lua
                     , stylesheet.css
                     , Arvo/*.ttf
                     , Arvo/OFL.txt
