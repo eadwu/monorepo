@@ -1,7 +1,7 @@
 module Boxpub.EPUB
 ( main
 , getReaderOptions, getWriterOptions ) where
-  import Prelude hiding ( concat )
+  import Prelude hiding ( concat, readFile, appendFile )
   import Paths_boxpub ( getDataDir )
   import Boxpub.Client.Env ( Env(..) )
   import Boxpub.Client.Parser ( BoxpubOptions(..) )
@@ -10,9 +10,11 @@ module Boxpub.EPUB
   import Data.Default ( def )
   import Data.Maybe ( fromJust, fromMaybe )
   import Data.Text ( Text, append, concat, unpack )
+  import Data.Text.IO ( readFile, appendFile )
   import System.Directory ( makeAbsolute, getCurrentDirectory )
-  import System.FilePath ( (</>) )
+  import System.FilePath ( (<.>), (</>) )
   import System.IO ( hFlush, stdout )
+  import System.IO.Temp ( withSystemTempDirectory )
   import Text.Pandoc.Class ( runIO )
   import Text.Pandoc.Extensions ( Extensions, Extension(..), extensionsFromList )
   import Text.Pandoc.Error ( handleError )
@@ -58,25 +60,26 @@ module Boxpub.EPUB
     , writerEpubChapterLevel = 1
     , writerTOCDepth = 1 }
 
-  generateXHTMLBody :: Env -> Provider -> Int -> Text -> IO Text
-  generateXHTMLBody env pEnv n initial
+  getContentFile :: Env -> Provider -> Int -> FilePath -> IO FilePath
+  getContentFile env pEnv n destination
     | n <= final = do
       chapter <- fetchChapter env pEnv n
       -- ANSI codes aren't supported pre-Windows 10 so good old carriage return
-      printf "\r[%d/%d/%d built] building %s.epub: downloading chapter %d" (0 :: Int) (n - first) (final - first) name n
+      printf "\r[0/%d/%d built] building %s.epub: downloading chapter %d" (n - first) (final - first) name n
       hFlush stdout
       -- workaround for table of contents
       -- encapsulates chapter with a <div> and prepends a <h1>
-      generateXHTMLBody env pEnv (n + 1) (append initial (concat
+      appendFile destination (concat
         [ "<h1>"
         , P.name chapter
         , "</h1>"
         , "<div>"
         , content chapter
-        , "</div>" ]))
+        , "</div>" ])
+      getContentFile env pEnv (n + 1) destination
     | otherwise = do
       putStrLn ""
-      return initial
+      return destination
     where
       opts = options env
       first = start opts
@@ -89,17 +92,19 @@ module Boxpub.EPUB
     pEnv <- P.mkEnv env bnEnv
     filters <- getFilters
     dataDir <- getDataDir
-    xhtmlBody <- generateXHTMLBody env bnEnv ((start . options) env) ""
-    result <- runIO $ do
-      raw <- readHtml getReaderOptions xhtmlBody
-      src <- applyFilters getReaderOptions filters [ "html" ] raw
-      template <- Just <$> getDefaultTemplate "epub"
-      writeEPUB3 (getWriterOptions template dataDir (metadata pEnv)) src
-    epub <- handleError result
     -- default to cwd if --output-directory is undefined
     cwd <- getCurrentDirectory
     prefix <- makeAbsolute $ fromMaybe cwd ((outputDirectory . options) env)
     mkdirp prefix
-    C8.writeFile (prefix </> filename) epub
+    withSystemTempDirectory "boxpub" $ \tmp -> do
+      file <- getContentFile env bnEnv ((start . options) env) (tmp </> "content" <.> "html")
+      fileContents <- readFile file
+      pandocResult <- runIO $ do
+        raw <- readHtml getReaderOptions fileContents
+        src <- applyFilters getReaderOptions filters [ "html" ] raw
+        template <- Just <$> getDefaultTemplate "epub"
+        writeEPUB3 (getWriterOptions template dataDir (metadata pEnv)) src
+      epub <- handleError pandocResult
+      C8.writeFile (prefix </> filename) epub
     where
       filename = printf "%s.epub" (fromJust $ (novel . options) env)
