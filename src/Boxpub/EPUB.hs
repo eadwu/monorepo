@@ -53,10 +53,10 @@ module Boxpub.EPUB
     , writerSectionDivs = True
     , writerEpubMetadata = Just $ M.generate (title metadata) (author metadata)
     , writerEpubFonts =
-      [ dataDir </> "Lato" </> "Lato-Bold.ttf"
-      , dataDir </> "Lato" </> "Lato-BoldItalic.ttf"
-      , dataDir </> "Lato" </> "Lato-Italic.ttf"
-      , dataDir </> "Lato" </> "Lato-Regular.ttf" ]
+      [ dataDir </> "Arvo" </> "Arvo-Bold.ttf"
+      , dataDir </> "Arvo" </> "Arvo-BoldItalic.ttf"
+      , dataDir </> "Arvo" </> "Arvo-Italic.ttf"
+      , dataDir </> "Arvo" </> "Arvo-Regular.ttf" ]
     , writerEpubChapterLevel = 1
     , writerTOCDepth = 1 }
 
