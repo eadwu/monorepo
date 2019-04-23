@@ -53,6 +53,3 @@ module Boxpub.Client.Provider.BoxNovel
 
   chapterContents :: Scraper Text Text
   chapterContents = innerHTML $ TagString "div" @: [ hasClass "text-left" ]
-
-  sanitize :: Text -> Text
-  sanitize str = str
