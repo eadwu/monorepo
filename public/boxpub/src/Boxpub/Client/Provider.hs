@@ -4,7 +4,7 @@ module Boxpub.Client.Provider
   import Data.Text as T
   import Boxpub.Client.Env ( Env(..) )
   import Boxpub.Client.Parser ( BoxpubOptions(..) )
-  import Data.Maybe ( fromJust ) -- fromJust errors with an Exception when value is `Nothing`
+  import Data.Maybe ( fromJust, fromMaybe )
   import Network.HTTP.Client ( ManagerSettings )
   import Network.HTTP.Client.TLS ( newTlsManagerWith, tlsManagerSettings )
   import Text.HTML.Scalpel ( URL, Scraper, Config(..), utf8Decoder, scrapeURLWithConfig )
@@ -51,8 +51,8 @@ module Boxpub.Client.Provider
     chapterName <- reqChapter BoxNovel.chapterName
     chapterContents <- reqChapter BoxNovel.chapterContents
     return Chapter
-      { name = strip $ fromJust chapterName
-      , content = strip $ fromJust chapterContents }
+      { name = strip $ fromMaybe "INVALID_CHAPTER" chapterName
+      , content = strip $ fromMaybe "INVALID_CHAPTER" chapterContents }
     where
       createChapterURL env = printf (unpack $ T.concat [ BoxNovel.getRootPath env, BoxNovel.getChapterPath env ])
       reqChapter = req (createChapterURL pEnv (fromJust $ (novel . options) env) chapterN)
