@@ -13,8 +13,8 @@ with nixpkgs.pkgs;
 
   boxpub-1_x = with haskell.packages."${compiler}"; callCabal2nix "boxpub-1_x" (fetchgit {
     url = ./.;
-    rev = "1.1.2.0";
-    sha256 = "0cfyrnqff50s2w5s6b4fqaf3hlh94npxyndc776j72wk1d4spc8q";
+    rev = "1.2.0.0";
+    sha256 = "0k2zxhljhf51wgxgqicb210ngpwn3qmsfma7mb3irhd7bmk8nsxi";
   }) {
     scalpel = scalpel_0_6_0.override {
       scalpel-core = scalpel-core_0_6_0;
