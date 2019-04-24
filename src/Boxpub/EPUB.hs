@@ -1,7 +1,6 @@
 module Boxpub.EPUB
 ( main
 , getReaderOptions, getWriterOptions ) where
-  import Prelude hiding ( concat, readFile, appendFile )
   import Paths_boxpub ( getDataDir )
   import Boxpub.Client.Env ( Env(..) )
   import Boxpub.Client.Parser ( BoxpubOptions(..) )
@@ -9,8 +8,8 @@ module Boxpub.EPUB
   import Boxpub.Internal.FileSystem ( mkdirp )
   import Data.Default ( def )
   import Data.Maybe ( fromJust, fromMaybe )
-  import Data.Text ( Text, append, concat, unpack )
-  import Data.Text.IO ( readFile, appendFile )
+  import Data.Text as T ( Text, append, concat, unpack )
+  import Data.Text.IO as T ( readFile, appendFile )
   import System.Directory ( makeAbsolute, getCurrentDirectory )
   import System.FilePath ( (<.>), (</>) )
   import System.IO ( hFlush, stdout )
@@ -69,7 +68,7 @@ module Boxpub.EPUB
       hFlush stdout
       -- workaround for table of contents
       -- encapsulates chapter with a <div> and prepends a <h1>
-      appendFile destination (concat
+      T.appendFile destination (T.concat
         [ "<h1>"
         , P.name chapter
         , "</h1>"
@@ -98,7 +97,7 @@ module Boxpub.EPUB
     mkdirp prefix
     withSystemTempDirectory "boxpub" $ \tmp -> do
       file <- getContentFile env bnEnv ((start . options) env) (tmp </> "content" <.> "html")
-      fileContents <- readFile file
+      fileContents <- T.readFile file
       pandocResult <- runIO $ do
         raw <- readHtml getReaderOptions fileContents
         src <- applyFilters getReaderOptions filters [ "html" ] raw
