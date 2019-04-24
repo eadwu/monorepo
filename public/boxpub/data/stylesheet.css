@@ -3,32 +3,28 @@
   font-family: Arvo;
   font-style: normal;
   font-weight: normal;
-  src: url('Arvo-Regular.ttf') format('truetype')
-    url('../fonts/Arvo-Regular.ttf')
+  src: url('../fonts/Arvo-Regular.ttf') format('truetype')
 }
 
 @font-face {
   font-family: Arvo;
   font-style: normal;
   font-weight: bold;
-  src: url('Arvo-Bold.ttf') format('truetype')
-    url('../fonts/Arvo-Bold.ttf')
+  src: url('../fonts/Arvo-Bold.ttf') format('truetype')
 }
 
 @font-face {
   font-family: Arvo;
   font-style: italic;
   font-weight: normal;
-  src: url('Arvo-Italic.ttf') format('truetype')
-    url('../fonts/Arvo-Italic.ttf')
+  src: url('../fonts/Arvo-Italic.ttf') format('truetype')
 }
 
 @font-face {
   font-family: Arvo;
   font-style: italic;
   font-weight: bold;
-  src: url('Arvo-BoldItalic') format('truetype')
-    url('../fonts/Arvo-BoldItalic.ttf')
+  src: url('../fonts/Arvo-BoldItalic.ttf') format('truetype')
 }
 
 body {
