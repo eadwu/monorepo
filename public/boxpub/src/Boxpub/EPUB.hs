@@ -6,12 +6,15 @@ module Boxpub.EPUB
   import Boxpub.Client.Parser ( BoxpubOptions(..) )
   import Boxpub.EPUB.Filters ( getFilters )
   import Boxpub.Internal.FileSystem ( mkdirp )
+  import Control.Concurrent ( getNumCapabilities )
+  import Control.Concurrent.MVar ( MVar(..), newMVar, readMVar, modifyMVar_)
+  import Control.Concurrent.Spawn ( pool, parMapIO_ )
   import Control.Monad.IO.Class ( liftIO )
   import Data.ByteString.Lazy as BL ( writeFile )
   import Data.Default ( def )
   import Data.Maybe ( fromJust, fromMaybe )
-  import Data.Text as T ( Text, append, concat, unpack )
-  import Data.Text.IO as T ( readFile, appendFile )
+  import Data.Text as T ( Text, foldl', append, concat, unpack )
+  import Data.Text.IO as T ( readFile, writeFile )
   import System.Directory ( makeAbsolute, getCurrentDirectory )
   import System.FilePath ( (<.>), (</>) )
   import System.IO ( hFlush, stdout )
@@ -62,31 +65,49 @@ module Boxpub.EPUB
     , writerEpubChapterLevel = 1
     , writerTOCDepth = 1 }
 
-  getContentFile :: Env -> Provider -> Int -> FilePath -> IO FilePath
-  getContentFile env pEnv n destination
-    | n <= final = do
-      chapter <- fetchChapter env pEnv n
-      -- workaround for table of contents
-      -- encapsulates chapter with a <div> and prepends a <h1>
-      T.appendFile destination (T.concat
-        [ "<h1>"
-        , P.name chapter
-        , "</h1>"
-        , "<div>"
-        , content chapter
-        , "</div>" ])
-      -- ANSI codes aren't supported pre-Windows 10 so good old carriage return
-      printf "\r[0/%d/%d built] building %s.epub: downloaded chapter %d" (n - first + 1) (final - first + 1) name n
-      hFlush stdout
-      getContentFile env pEnv (n + 1) destination
-    | otherwise = do
-      putStrLn ""
-      return destination
+  getContent :: Env -> Provider -> FilePath -> MVar Int -> Int -> IO ()
+  getContent env pEnv outDir mVar n = do
+    maxConcurrentThreads <- getNumCapabilities
+    -- Display initial status output
+    nDownloaded <- readMVar mVar
+    statusDisplay maxConcurrentThreads nDownloaded ("ing" :: Text)
+    -- Fetch the chapter
+    chapter <- fetchChapter env pEnv n
+    -- workaround for table of contents
+    -- encapsulates chapter with a <div> and prepends a <h1>
+    T.writeFile (outDir </> filename) (T.concat
+      [ "<h1>"
+      , P.name chapter
+      , "</h1>"
+      , "<div>"
+      , content chapter
+      , "</div>" ])
+    -- Update the counter and respective MVar fetched
+    modifyMVar_ mVar (\old -> return (old + 1))
+    newNDownloaded <- readMVar mVar
+    -- Update status output
+    statusDisplay maxConcurrentThreads newNDownloaded ("ed" :: Text)
     where
       opts = options env
       first = start opts
       final = end opts
       name = fromJust $ novel opts
+      filename = printf "%s-%d.html" name n
+      statusDisplay nConcur nDone gramFix = liftIO $ do
+        -- ANSI codes aren't supported pre-Windows 10, though the carriage return should work fine...
+        printf "\x1b[2K\r[%d/%d/%d built] building %s.epub: download%s chapter %d" nConcur nDone (final - first + 1) name gramFix n
+        hFlush stdout
+
+  mergeFiles :: FilePath -> [FilePath] -> IO (Text)
+  mergeFiles dir [] = return ""
+  mergeFiles dir (x:xs) = do
+    -- Fetch the current file contents
+    fileContents <- T.readFile (dir </> x)
+    -- Fetch the rest of the file recursively
+    restOfFile <- mergeFiles dir xs
+    return $ T.concat
+      [ fileContents
+      , restOfFile ]
 
   main :: Env -> IO ()
   main env = do
@@ -94,21 +115,36 @@ module Boxpub.EPUB
     pEnv <- P.mkEnv env bnEnv
     filters <- getFilters
     dataDir <- getDataDir
-    -- default to cwd if --output-directory is undefined
+    -- Determine the output directory
+    -- NOTE: default to cwd if --output-directory is undefined
     cwd <- getCurrentDirectory
     prefix <- makeAbsolute $ fromMaybe cwd ((outputDirectory . options) env)
     mkdirp prefix
     withSystemTempDirectory "boxpub" $ \tmp -> do
-      file <- getContentFile env bnEnv ((start . options) env) (tmp </> "content" <.> "html")
-      fileContents <- T.readFile file
+      -- Generate the actual chapter in "chunks"
+      maxConcurrentThreads <- getNumCapabilities
+      limiter <- pool maxConcurrentThreads
+      counter <- newMVar 0
+      parMapIO_ (limiter . getContent env bnEnv tmp counter) chapterRange
+      putStrLn "" -- "Flush" to next line
+      -- Merge the files and store in memory
+      fileContents <- mergeFiles tmp (map (\n -> template n) chapterRange)
+      -- Perform conversion
       pandocResult <- runIO $ do
+        -- Fetch the cover image, ignoring the MimeType
         (fp, _, bs) <- fetchMediaResource $ unpack $ (cover . metadata) pEnv
         liftIO $ BL.writeFile (tmp </> fp) bs
+        -- Sanitize contents before generate epub
         raw <- readHtml getReaderOptions fileContents
         src <- applyFilters getReaderOptions filters [ "html" ] raw
         template <- Just <$> getDefaultTemplate "epub"
         writeEPUB3 (getWriterOptions template dataDir (metadata pEnv) (tmp </> fp)) src
+      -- Handle errors and write to output directory
       epub <- handleError pandocResult
       C8.writeFile (prefix </> filename) epub
-    where
-      filename = printf "%s.epub" (fromJust $ (novel . options) env)
+      where
+        opts = options env
+        name = fromJust $ novel opts
+        filename = printf "%s.epub" name
+        template = printf "%s-%d.html" name
+        chapterRange = [(start opts)..(end opts)]
