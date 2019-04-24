@@ -40,7 +40,7 @@ module Boxpub.Client.Provider.BoxNovel
   getChapterPath = chapter . paths
 
   novelTitle :: Scraper Text Text
-  novelTitle = text $ tagSelector "title"
+  novelTitle = text $ TagString "div" @: [ hasClass "post-title" ]
 
   novelAuthor :: Scraper Text Text
   novelAuthor = text $ TagString "div" @: [ hasClass "author-content" ]
