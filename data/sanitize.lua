@@ -1,10 +1,8 @@
 local List = require 'pandoc.List'
 
 function sanitizeBoxNovel (elem)
-  if elem.classes then
-    if elem.classes:includes("code-block", 0) then
-      return pandoc.Null()
-    end
+  if elem.classes and elem.classes:includes("code-block", 0) then
+    return pandoc.Null()
   end
 
   return elem
@@ -15,6 +13,10 @@ function sanitize (elem)
 
   if elem.attr then
     elem.attr = pandoc.Attr()
+  end
+
+  if elem.text and elem.text == "INVALID_CHAPTER" then
+    elem = pandoc.Null()
   end
 
   return elem
