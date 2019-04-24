@@ -6,6 +6,8 @@ module Boxpub.EPUB
   import Boxpub.Client.Parser ( BoxpubOptions(..) )
   import Boxpub.EPUB.Filters ( getFilters )
   import Boxpub.Internal.FileSystem ( mkdirp )
+  import Control.Monad.IO.Class ( liftIO )
+  import Data.ByteString.Lazy as BL ( writeFile )
   import Data.Default ( def )
   import Data.Maybe ( fromJust, fromMaybe )
   import Data.Text as T ( Text, append, concat, unpack )
@@ -14,7 +16,7 @@ module Boxpub.EPUB
   import System.FilePath ( (<.>), (</>) )
   import System.IO ( hFlush, stdout )
   import System.IO.Temp ( withSystemTempDirectory )
-  import Text.Pandoc.Class ( runIO )
+  import Text.Pandoc.Class ( runIO, fetchMediaResource )
   import Text.Pandoc.Extensions ( Extensions, Extension(..), extensionsFromList )
   import Text.Pandoc.Error ( handleError )
   import Text.Pandoc.Filter ( applyFilters )
@@ -42,12 +44,13 @@ module Boxpub.EPUB
     { readerExtensions = getExtensions
     , readerStripComments = True }
 
-  getWriterOptions :: Maybe String -> FilePath -> Metadata -> WriterOptions
-  getWriterOptions template dataDir metadata = def
+  getWriterOptions :: Maybe String -> FilePath -> Metadata -> FilePath -> WriterOptions
+  getWriterOptions template dataDir metadata coverImage = def
     { writerTemplate = template
     , writerVariables =
       [ ("css", dataDir </> "stylesheet.css")
-      , ("pagetitle", unpack $ title metadata) ]
+      , ("pagetitle", unpack $ title metadata)
+      , ("epub-cover-image", coverImage) ]
     , writerTableOfContents = True
     , writerSectionDivs = True
     , writerEpubMetadata = Just $ M.generate (title metadata) (author metadata)
@@ -99,10 +102,12 @@ module Boxpub.EPUB
       file <- getContentFile env bnEnv ((start . options) env) (tmp </> "content" <.> "html")
       fileContents <- T.readFile file
       pandocResult <- runIO $ do
+        (fp, _, bs) <- fetchMediaResource $ unpack $ (cover . metadata) pEnv
+        liftIO $ BL.writeFile (tmp </> fp) bs
         raw <- readHtml getReaderOptions fileContents
         src <- applyFilters getReaderOptions filters [ "html" ] raw
         template <- Just <$> getDefaultTemplate "epub"
-        writeEPUB3 (getWriterOptions template dataDir (metadata pEnv)) src
+        writeEPUB3 (getWriterOptions template dataDir (metadata pEnv) (tmp </> fp)) src
       epub <- handleError pandocResult
       C8.writeFile (prefix </> filename) epub
     where
