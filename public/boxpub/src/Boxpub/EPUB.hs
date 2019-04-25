@@ -28,8 +28,7 @@ module Boxpub.EPUB
   import Text.Pandoc.Templates ( getDefaultTemplate )
   import Text.Pandoc.Writers ( writeEPUB3 )
   import Text.Printf ( printf )
-  import Boxpub.Client.Provider as P ( Provider, Chapter(..), Metadata(..), ProviderEnv(..), mkEnv, fetchChapter )
-  import qualified Boxpub.Client.Provider.BoxNovel as PB ( mkEnv )
+  import Boxpub.Client.Provider as P ( Chapter(..), Metadata(..), ProviderEnv(..), mkEnv, fetchChapter )
   import qualified Boxpub.EPUB.Metadata as M ( generate )
   import qualified Data.ByteString.Lazy.Char8 as C8 ( writeFile )
 
@@ -111,8 +110,7 @@ module Boxpub.EPUB
 
   main :: Env -> IO ()
   main env = do
-    bnEnv <- PB.mkEnv
-    pEnv <- P.mkEnv env bnEnv
+    pEnv <- P.mkEnv env
     filters <- getFilters
     dataDir <- getDataDir
     -- Determine the output directory

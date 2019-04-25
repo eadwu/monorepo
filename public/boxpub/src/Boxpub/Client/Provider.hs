@@ -1,5 +1,5 @@
 module Boxpub.Client.Provider
-( Provider, Chapter(..), Metadata(..), ProviderEnv(..)
+( Chapter(..), Metadata(..), ProviderEnv(..)
 , mkEnv, fetchChapter ) where
   import Data.Text as T
   import Boxpub.Client.Env ( Env(..) )
@@ -21,8 +21,6 @@ module Boxpub.Client.Provider
   -- [a] !! n
   (x:_) !!! 0 = Just x
   (_:xs) !!! n = xs !!! (n - 1)
-
-  type Provider = BoxNovel.BoxNovelEnv
 
   data Chapter = Chapter
     { name :: Text
@@ -69,8 +67,8 @@ module Boxpub.Client.Provider
       chapterURL = unpack $ fromJust $ (chapterList pEnv) !!! (chapterN - 1)
       reqChapter = req chapterURL
 
-  mkEnv :: Env -> Provider -> IO ProviderEnv
-  mkEnv env pEnv = do
+  mkEnv :: Env -> IO ProviderEnv
+  mkEnv env = do
     metadata <- fetchMetadata novelURL BoxNovel.novelTitle BoxNovel.coverImage BoxNovel.novelAuthor
     chapterList <- req novelURL BoxNovel.chapterList
     return ProviderEnv
@@ -80,4 +78,4 @@ module Boxpub.Client.Provider
       , chapterList = Prelude.reverse $ fromJust chapterList }
     where
       novel = fromJust $ (B.novel . options) env
-      novelURL = printf (unpack $ T.concat [ BoxNovel.getRootPath pEnv, BoxNovel.getNovelPath pEnv ]) novel
+      novelURL = printf (unpack $ BoxNovel.novelPath) novel
