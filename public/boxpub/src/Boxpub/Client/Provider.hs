@@ -3,7 +3,7 @@ module Boxpub.Client.Provider
 , mkEnv, fetchChapter ) where
   import Data.Text as T
   import Boxpub.Client.Env ( Env(..) )
-  import Boxpub.Client.Parser ( BoxpubOptions(..) )
+  import Boxpub.Client.Parser as B ( BoxpubOptions(..) )
   import Data.Maybe ( fromJust, fromMaybe )
   import Network.HTTP.Client ( ManagerSettings )
   import Network.HTTP.Client.TLS ( newTlsManagerWith, tlsManagerSettings )
@@ -45,17 +45,18 @@ module Boxpub.Client.Provider
       , cover = strip $ fromJust cover
       , author = strip $ fromJust author }
 
-  -- https://www.fpcomplete.com/blog/2013/06/haskell-from-c
   fetchChapter :: Env -> Provider -> Int -> IO Chapter
   fetchChapter env pEnv chapterN = do
     chapterName <- reqChapter BoxNovel.chapterName
     chapterContents <- reqChapter BoxNovel.chapterContents
+    -- fromMaybe shouldn't be required here anymore but the overhead isn't much anyway
     return Chapter
       { name = strip $ fromMaybe "INVALID_CHAPTER" chapterName
       , content = strip $ fromMaybe "INVALID_CHAPTER" chapterContents }
     where
-      createChapterURL env = printf (unpack $ T.concat [ BoxNovel.getRootPath env, BoxNovel.getChapterPath env ])
-      reqChapter = req (createChapterURL pEnv (fromJust $ (novel . options) env) chapterN)
+      novel = fromJust $ (B.novel . options) env
+      chapterURL = printf (unpack $ T.concat [ BoxNovel.getRootPath pEnv, BoxNovel.getChapterPath pEnv ]) novel chapterN
+      reqChapter = req chapterURL
 
   mkEnv :: Env -> Provider -> IO ProviderEnv
   mkEnv env pEnv = do
