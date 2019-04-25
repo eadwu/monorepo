@@ -3,7 +3,7 @@ module Boxpub.EPUB
 , getReaderOptions, getWriterOptions ) where
   import Paths_boxpub ( getDataDir )
   import Boxpub.Client.Env ( Env(..) )
-  import Boxpub.Client.Parser ( BoxpubOptions(..) )
+  import Boxpub.Client.Parser as B ( BoxpubOptions(..) )
   import Boxpub.EPUB.Filters ( getFilters )
   import Boxpub.Internal.FileSystem ( mkdirp )
   import Control.Concurrent ( getNumCapabilities )
@@ -64,8 +64,8 @@ module Boxpub.EPUB
     , writerEpubChapterLevel = 1
     , writerTOCDepth = 1 }
 
-  getContent :: Env -> ProviderEnv -> FilePath -> MVar Int -> Int -> IO ()
-  getContent env pEnv outDir mVar n = do
+  getContent :: Env -> ProviderEnv -> Int -> FilePath -> MVar Int -> Int -> IO ()
+  getContent env pEnv total outDir mVar n = do
     maxConcurrentThreads <- getNumCapabilities
     -- Display initial status output
     nDownloaded <- readMVar mVar
@@ -88,13 +88,11 @@ module Boxpub.EPUB
     statusDisplay maxConcurrentThreads newNDownloaded ("ed" :: Text)
     where
       opts = options env
-      first = start opts
-      final = end opts
       name = fromJust $ novel opts
       filename = printf "%s-%d.html" name n
       statusDisplay nConcur nDone gramFix = liftIO $ do
         -- ANSI codes aren't supported pre-Windows 10, though the carriage return should work fine...
-        printf "\x1b[2K\r[%d/%d/%d built] building %s.epub: download%s chapter %d" nConcur nDone (final - first + 1) name gramFix n
+        printf "\x1b[2K\r[%d/%d/%d built] building %s.epub: download%s chapter %d" nConcur nDone total name gramFix n
         hFlush stdout
 
   mergeFiles :: FilePath -> [FilePath] -> IO (Text)
@@ -119,14 +117,19 @@ module Boxpub.EPUB
     prefix <- makeAbsolute $ fromMaybe cwd ((outputDirectory . options) env)
     mkdirp prefix
     withSystemTempDirectory "boxpub" $ \tmp -> do
+      -- Use "generated" defaults if needed
+      -- TODO: Find consistency between
+      let start = fromMaybe 1 (B.start opts)
+      let end = fromMaybe (length $ P.chapterList pEnv) (B.end opts)
+      let chapterIndexRange = [start..end]
       -- Generate the actual chapter in "chunks"
       maxConcurrentThreads <- getNumCapabilities
       limiter <- pool maxConcurrentThreads
       counter <- newMVar 0
-      parMapIO_ (limiter . getContent env pEnv tmp counter) chapterRange
+      parMapIO_ (limiter . getContent env pEnv (end - start + 1) tmp counter) chapterIndexRange
       putStrLn "" -- "Flush" to next line
       -- Merge the files and store in memory
-      fileContents <- mergeFiles tmp (map (\n -> template n) chapterRange)
+      fileContents <- mergeFiles tmp (map (\n -> template n) chapterIndexRange)
       -- Perform conversion
       pandocResult <- runIO $ do
         -- Fetch the cover image, ignoring the MimeType
@@ -145,4 +148,3 @@ module Boxpub.EPUB
         name = fromJust $ novel opts
         filename = printf "%s.epub" name
         template = printf "%s-%d.html" name
-        chapterRange = [(start opts)..(end opts)]
