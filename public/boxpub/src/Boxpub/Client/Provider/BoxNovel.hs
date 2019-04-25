@@ -40,16 +40,16 @@ module Boxpub.Client.Provider.BoxNovel
   getChapterPath = chapter . paths
 
   novelTitle :: Scraper Text Text
-  novelTitle = text $ TagString "div" @: [ hasClass "post-title" ]
+  novelTitle = text $ "div" @: [ hasClass "post-title" ]
 
   novelAuthor :: Scraper Text Text
-  novelAuthor = text $ TagString "div" @: [ hasClass "author-content" ]
+  novelAuthor = text $ "div" @: [ hasClass "author-content" ]
 
   coverImage :: Scraper Text Text
-  coverImage = chroot (TagString "div" @: [ hasClass "summary_image" ]) $ attr "src" (tagSelector "img")
+  coverImage = chroot ("div" @: [ hasClass "summary_image" ]) $ attr "src" "img"
 
   chapterName :: Scraper Text Text
-  chapterName = text $ TagString "li" @: [ hasClass "active" ]
+  chapterName = text $ "li" @: [ hasClass "active" ]
 
   chapterContents :: Scraper Text Text
-  chapterContents = innerHTML $ TagString "div" @: [ hasClass "text-left" ]
+  chapterContents = innerHTML $ "div" @: [ hasClass "text-left" ]
