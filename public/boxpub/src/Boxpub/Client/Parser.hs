@@ -7,8 +7,8 @@ module Boxpub.Client.Parser
 
   data BoxpubOptions = BoxpubOptions
     { version :: Bool
-    , start :: Int
-    , end :: Int
+    , start :: Maybe Int
+    , end :: Maybe Int
     , outputDirectory :: Maybe FilePath
     , novel :: Maybe Text }
 
@@ -33,18 +33,16 @@ module Boxpub.Client.Parser
       ( long "version"
      <> short 'V'
      <> help "display the version" )
-    <*> option auto
+    <*> optional ( option auto
       ( long "start"
-     <> value 1
      <> metavar "START"
-     <> help "the first chapter [number] to include in the ebook"
-     <> showDefault )
-    <*> option auto
+     <> help "the first chapter [index] to include in the ebook"
+     <> showDefault ) )
+    <*> optional ( option auto
       ( long "end"
-     <> value (-1)
      <> metavar "END"
-     <> help "the last chapter [number] to include in the ebook"
-     <> showDefault )
+     <> help "the last chapter [index] to include in the ebook"
+     <> showDefault ) )
     <*> optional ( strOption
       ( long "output-directory"
      <> metavar "DIR"
