@@ -2,7 +2,7 @@ module Boxpub.Client.Provider.BoxNovel
 ( Paths(..), BoxNovelEnv(..)
 , mkEnv
 , getRootPath, getNovelPath, getChapterPath
-, novelTitle, novelAuthor, coverImage, chapterName, chapterContents ) where
+, novelTitle, novelAuthor, coverImage, chapterList, chapterName, chapterContents ) where
   import Data.Text as T
   import Text.HTML.Scalpel
 
@@ -47,6 +47,9 @@ module Boxpub.Client.Provider.BoxNovel
 
   coverImage :: Scraper Text Text
   coverImage = chroot ("div" @: [ hasClass "summary_image" ]) $ attr "src" "img"
+
+  chapterList :: Scraper Text [Text]
+  chapterList = chroot ("ul" @: [ hasClass "version-chap" ]) $ attrs "href" "a"
 
   chapterName :: Scraper Text Text
   chapterName = text $ "li" @: [ hasClass "active" ]

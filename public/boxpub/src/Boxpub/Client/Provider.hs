@@ -11,6 +11,17 @@ module Boxpub.Client.Provider
   import Text.Printf ( printf )
   import qualified Boxpub.Client.Provider.BoxNovel as BoxNovel
 
+  -- "Safe" variant of !! by @missingfaktor
+  -- https://stackoverflow.com/questions/8861101/haskell-how-to-create-a-function-that-returns-the-fifth-element-from-a-list
+  (!!!) :: [a] -> Int -> Maybe a
+  -- n > [a].length
+  xs !!! n | n < 0 = Nothing
+  -- [a] == []
+  [] !!! _ = Nothing
+  -- [a] !! n
+  (x:_) !!! 0 = Just x
+  (_:xs) !!! n = xs !!! (n - 1)
+
   type Provider = BoxNovel.BoxNovelEnv
 
   data Chapter = Chapter
@@ -23,14 +34,13 @@ module Boxpub.Client.Provider
     , author :: Text }
 
   data ProviderEnv = ProviderEnv
-    { metadata :: Metadata }
+    { metadata :: Metadata
+    , chapterList :: [Text] }
 
   customManagerSettings :: ManagerSettings
   customManagerSettings = tlsManagerSettings
 
-  -- In theory, this should be
-  -- URL -> Scraper Text a -> IO (Maybe a)
-  req :: URL -> Scraper Text Text -> IO (Maybe Text)
+  req :: URL -> Scraper Text a -> IO (Maybe a)
   req url scraper = do
     manager <- Just <$> newTlsManagerWith customManagerSettings
     scrapeURLWithConfig (Config { decoder = utf8Decoder, manager = manager }) url scraper
@@ -45,7 +55,7 @@ module Boxpub.Client.Provider
       , cover = strip $ fromJust cover
       , author = strip $ fromJust author }
 
-  fetchChapter :: Env -> Provider -> Int -> IO Chapter
+  fetchChapter :: Env -> ProviderEnv -> Int -> IO Chapter
   fetchChapter env pEnv chapterN = do
     chapterName <- reqChapter BoxNovel.chapterName
     chapterContents <- reqChapter BoxNovel.chapterContents
@@ -54,17 +64,20 @@ module Boxpub.Client.Provider
       { name = strip $ fromMaybe "INVALID_CHAPTER" chapterName
       , content = strip $ fromMaybe "INVALID_CHAPTER" chapterContents }
     where
-      novel = fromJust $ (B.novel . options) env
-      chapterURL = printf (unpack $ T.concat [ BoxNovel.getRootPath pEnv, BoxNovel.getChapterPath pEnv ]) novel chapterN
+      -- If fromJust errors out, it means that the chapter [`number`] requested
+      -- Otherwise adjust for 0-based indexes
+      chapterURL = unpack $ fromJust $ (chapterList pEnv) !!! (chapterN - 1)
       reqChapter = req chapterURL
 
   mkEnv :: Env -> Provider -> IO ProviderEnv
   mkEnv env pEnv = do
-    -- We want the value if its given, which in Haskell is `Just` not `Maybe`
-    -- This also does some neat things with partial functions
-    -- fetchMetadata(printf(createNovelURL(ProviderEnv), []), Scraper, Scraper)
-    metadata <- fetchMetadata (createNovelURL pEnv (fromJust $ (novel . options) env))
-      BoxNovel.novelTitle BoxNovel.coverImage BoxNovel.novelAuthor
+    metadata <- fetchMetadata novelURL BoxNovel.novelTitle BoxNovel.coverImage BoxNovel.novelAuthor
+    chapterList <- req novelURL BoxNovel.chapterList
     return ProviderEnv
-      { metadata = metadata }
-    where createNovelURL env = printf (unpack $ T.concat [ BoxNovel.getRootPath env, BoxNovel.getNovelPath env ])
+      { metadata = metadata
+      -- Might as well just quit if Nothing is returned, no chapters are found anyway
+      -- TODO: Fix this hard coded workaround explicitly for BoxNovel (`reverse`)
+      , chapterList = Prelude.reverse $ fromJust chapterList }
+    where
+      novel = fromJust $ (B.novel . options) env
+      novelURL = printf (unpack $ T.concat [ BoxNovel.getRootPath pEnv, BoxNovel.getNovelPath pEnv ]) novel

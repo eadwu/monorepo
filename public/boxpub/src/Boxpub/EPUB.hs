@@ -65,7 +65,7 @@ module Boxpub.EPUB
     , writerEpubChapterLevel = 1
     , writerTOCDepth = 1 }
 
-  getContent :: Env -> Provider -> FilePath -> MVar Int -> Int -> IO ()
+  getContent :: Env -> ProviderEnv -> FilePath -> MVar Int -> Int -> IO ()
   getContent env pEnv outDir mVar n = do
     maxConcurrentThreads <- getNumCapabilities
     -- Display initial status output
@@ -125,7 +125,7 @@ module Boxpub.EPUB
       maxConcurrentThreads <- getNumCapabilities
       limiter <- pool maxConcurrentThreads
       counter <- newMVar 0
-      parMapIO_ (limiter . getContent env bnEnv tmp counter) chapterRange
+      parMapIO_ (limiter . getContent env pEnv tmp counter) chapterRange
       putStrLn "" -- "Flush" to next line
       -- Merge the files and store in memory
       fileContents <- mergeFiles tmp (map (\n -> template n) chapterRange)
