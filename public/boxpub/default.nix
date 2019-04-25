@@ -25,8 +25,8 @@ in with ghcPackages; {
 
   boxpub-1_x = callCabal2nix "boxpub-1_x" (fetchgit {
     url = ./.;
-    rev = "1.2.1.0";
-    sha256 = "1x6379s2cd8crgibwhybf17j3i47h9lvmp62zh91ginw6661q68i";
+    rev = "1.2.2.0";
+    sha256 = "0qflibwbzav7r19n51vya1zi238jz5xr0zf3pz1hhkl7bapw7cvi";
   }) {
     scalpel = scalpel_0_6_0.override {
       scalpel-core = scalpel-core_0_6_0;
