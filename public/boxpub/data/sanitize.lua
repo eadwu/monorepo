@@ -15,6 +15,10 @@ function sanitize (elem)
     elem.attr = pandoc.Attr()
   end
 
+  if elem.tag and elem.tag == "Image" then
+    elem = pandoc.Null()
+  end
+
   if elem.text and elem.text == "INVALID_CHAPTER" then
     elem = pandoc.Null()
   end
