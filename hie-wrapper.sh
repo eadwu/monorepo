@@ -1,4 +1,4 @@
 #! /usr/bin/env nix-shell
-#! nix-shell -i bash
+#! nix-shell --pure -i bash
 
 hie-wrapper --lsp "$@"
