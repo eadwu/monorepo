@@ -23,7 +23,7 @@ module Boxpub.Client.Provider.BoxNovel
   coverImage = chroot ("div" @: [ hasClass "summary_image" ]) $ attr "src" "img"
 
   chapterList :: Scraper Text [Text]
-  chapterList = chroot ("ul" @: [ hasClass "version-chap" ]) $ attrs "href" "a"
+  chapterList = chroots ("ul" @: [ hasClass "version-chap" ] // "li" @: [ hasClass "wp-manga-chapter" ]) $ attr "href" "a"
 
   chapterName :: Scraper Text Text
   chapterName = text $ "li" @: [ hasClass "active" ]
