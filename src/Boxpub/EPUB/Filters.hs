@@ -4,6 +4,7 @@ module Boxpub.EPUB.Filters
   import System.FilePath ( (</>) )
   import Text.Pandoc.Filter ( Filter(..) )
 
+  -- | Retrieves the filters used for sanitizing the output HTML.
   getFilters :: IO [ Filter ]
   getFilters = do
     attrFilter <- getDataFileName "sanitize.lua"
