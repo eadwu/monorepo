@@ -14,10 +14,10 @@ module Boxpub.Client.Provider
   -- "Safe" variant of !! by @missingfaktor
   -- https://stackoverflow.com/questions/8861101/haskell-how-to-create-a-function-that-returns-the-fifth-element-from-a-list
   (!!!) :: [a] -> Int -> Maybe a
-  -- n > [a].length
-  xs !!! n | n < 0 = Nothing
   -- [a] == []
   [] !!! _ = Nothing
+  -- n > [a].length
+  xs !!! n | n < 0 = Nothing
   -- [a] !! n
   (x:_) !!! 0 = Just x
   (_:xs) !!! n = xs !!! (n - 1)
