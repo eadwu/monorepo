@@ -2,9 +2,9 @@
 
 let
   parsedMetaData = builtins.fromJSON (builtins.readFile ./nixpkgs.json);
-  nixpkgs = bootstrap.fetchFromGitHub {
-    owner = "NixOS";
-    repo = "nixpkgs-channels";
-    inherit (parsedMetaData) rev sha256;
+  nixpkgs = builtins.fetchGit {
+    inherit (parsedMetaData) rev;
+    ref = "nixos-19.03";
+    url = "https://github.com/NixOS/nixpkgs-channels";
   };
 in import nixpkgs { }
