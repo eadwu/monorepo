@@ -95,7 +95,7 @@ module Boxpub.EPUB
         printf "\x1b[2K\r[%d/%d/%d built] building %s.epub: download%s chapter %d" nConcur nDone total name gramFix n
         hFlush stdout
 
-  mergeFiles :: FilePath -> [FilePath] -> IO (Text)
+  mergeFiles :: FilePath -> [FilePath] -> IO Text
   mergeFiles dir [] = return ""
   mergeFiles dir (x:xs) = do
     -- Fetch the current file contents
@@ -129,7 +129,7 @@ module Boxpub.EPUB
       parMapIO_ (limiter . getContent env pEnv (end - start + 1) tmp counter) chapterIndexRange
       putStrLn "" -- "Flush" to next line
       -- Merge the files and store in memory
-      fileContents <- mergeFiles tmp (map (\n -> template n) chapterIndexRange)
+      fileContents <- mergeFiles tmp (map applyTemplate chapterIndexRange)
       -- Perform conversion
       pandocResult <- runIO $ do
         -- Fetch the cover image, ignoring the MimeType
@@ -147,4 +147,4 @@ module Boxpub.EPUB
         opts = options env
         name = fromJust $ novel opts
         filename = printf "%s.epub" name
-        template = printf "%s-%d.html" name
+        applyTemplate = printf "%s-%d.html" name

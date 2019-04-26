@@ -64,7 +64,7 @@ module Boxpub.Client.Provider
     where
       -- If fromJust errors out, it means that the chapter [`number`] requested
       -- Otherwise adjust for 0-based indexes
-      chapterURL = unpack $ fromJust $ (chapterList pEnv) !!! (chapterN - 1)
+      chapterURL = unpack $ fromJust $ chapterList pEnv !!! (chapterN - 1)
       reqChapter = req chapterURL
 
   mkEnv :: Env -> IO ProviderEnv
@@ -78,4 +78,4 @@ module Boxpub.Client.Provider
       , chapterList = Prelude.reverse $ fromJust chapterList }
     where
       novel = fromJust $ (B.novel . options) env
-      novelURL = printf (unpack $ BoxNovel.novelPath) novel
+      novelURL = printf (unpack BoxNovel.novelPath) novel
