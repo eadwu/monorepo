@@ -3,9 +3,9 @@
 with nixpkgs.pkgs;
 
 let
-  hies = (import (builtins.fetchTarball {
-    url = "https://github.com/domenkozar/hie-nix/tarball/master";
-  }) { }).hies;
+  hie = (import (builtins.fetchTarball {
+    url = "https://github.com/infinisil/all-hies/tarball/master";
+  }) { }).versions."${compiler}";
 
   boxpub = (import ./default.nix { }).boxpub;
   ghc = haskell.packages."${compiler}".ghcWithPackages (ps: boxpub.buildInputs);
@@ -14,7 +14,7 @@ in stdenv.mkDerivation {
 
   buildInputs = [
     ghc
-    hies
+    hie
     haskell.packages."${compiler}".hlint
     haskell.packages."${compiler}".cabal-install
   ];
