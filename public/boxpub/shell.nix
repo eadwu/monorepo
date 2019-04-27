@@ -1,6 +1,7 @@
 { nixpkgs ? import ./nixpkgs.nix { }, compiler ? "ghc864" }:
 
 with nixpkgs.pkgs;
+with haskell.packages."${compiler}";
 
 let
   hie = (import (builtins.fetchTarball {
@@ -8,14 +9,13 @@ let
   }) { }).versions."${compiler}";
 
   boxpub = (import ./default.nix { }).boxpub;
-  ghc = haskell.packages."${compiler}".ghcWithPackages (ps: boxpub.buildInputs);
-in stdenv.mkDerivation {
-  name = "boxpub";
+in shellFor {
+  withHoogle = true;
+  packages = ps: [ hie boxpub ];
+  nativeBuildInputs = [ hie cabal-install ];
 
-  buildInputs = [
-    ghc
-    hie
-    haskell.packages."${compiler}".hlint
-    haskell.packages."${compiler}".cabal-install
-  ];
+  shellHook = ''
+    # Ensure HIE can find the hoogle database
+    export HIE_HOOGLE_DATABASE="$NIX_GHC_LIBDIR/../../share/doc/hoogle/default.hoo";
+  '';
 }
