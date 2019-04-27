@@ -1,7 +1,6 @@
 module Boxpub.EPUB.Filters
 ( getFilters ) where
   import Paths_boxpub ( getDataFileName )
-  import System.FilePath ( (</>) )
   import Text.Pandoc.Filter ( Filter(..) )
 
   -- | Retrieves the filters used for sanitizing the output HTML.
