@@ -20,12 +20,16 @@ let
 in with ghc; {
   boxpub = developPackage {
     root = ./.;
-    source-overrides = { };
+    modifier = drv: with haskell.lib; generateOptparseApplicativeCompletion
+      "boxpub"
+      (doCoverage (doHaddock (doBenchmark drv)));
   };
 
-  boxpub-1_x = callCabal2nix "boxpub-1_x" (fetchgit {
-    url = ./.;
-    rev = "1.2.2.0";
-    sha256 = "0qflibwbzav7r19n51vya1zi238jz5xr0zf3pz1hhkl7bapw7cvi";
-  }) { };
+  boxpub-1_x = haskell.lib.generateOptparseApplicativeCompletion
+    "boxpub"
+    (callCabal2nix "boxpub-1_x" (fetchgit {
+      url = ./.;
+      rev = "1.2.2.0";
+      sha256 = "0qflibwbzav7r19n51vya1zi238jz5xr0zf3pz1hhkl7bapw7cvi";
+    }) { });
 }
