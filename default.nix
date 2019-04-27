@@ -23,6 +23,9 @@ in with ghc; {
     modifier = drv: with haskell.lib; generateOptparseApplicativeCompletion
       "boxpub"
       (doCoverage (doHaddock (doBenchmark drv)));
+
+    # Interferes too much in nix-shell, if the environment is needed manually do {{drv}}.env
+    returnShellEnv = false;
   };
 
   boxpub-1_x = haskell.lib.generateOptparseApplicativeCompletion
