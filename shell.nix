@@ -8,11 +8,15 @@ let
     url = "https://github.com/infinisil/all-hies/tarball/master";
   }) { }).versions."${compiler}";
 
+  nix-tools = (import (builtins.fetchTarball {
+    url = "https://github.com/input-output-hk/haskell.nix/tarball/master";
+  }) { }).nix-tools;
+
   boxpub = (import ./default.nix { }).boxpub;
 in shellFor {
   withHoogle = true;
   packages = ps: [ hie boxpub ];
-  nativeBuildInputs = [ hie cabal-install ];
+  nativeBuildInputs = [ hie nix-tools cabal-install ];
 
   shellHook = ''
     # Ensure HIE can find the hoogle database
