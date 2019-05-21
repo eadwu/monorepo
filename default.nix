@@ -3,9 +3,10 @@
 with nixpkgs.pkgs;
 
 let
-  boxpub = (import ./nix { }).boxpub.components.exes.boxpub;
+  pkgSet = import ./nix { };
+  boxpub = pkgSet.boxpub.components.exes.boxpub;
 in with ghc; {
-  inherit boxpub;
+  inherit boxpub pkgSet;
   boxpub-1_x = boxpub.overrideAttrs (oldAttrs: rec {
     name = "${oldAttrs.pname}-${version}";
     version = "1.2.2.0";
