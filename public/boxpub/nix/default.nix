@@ -1,4 +1,4 @@
-{ pkgs ? import ../nixpkgs.nix { } }:
+{ pkgs ? import ./nixpkgs.nix { } }:
 
 let
   haskell_nix = pkgs.stdenv.mkDerivation {
