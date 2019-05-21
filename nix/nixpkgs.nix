@@ -1,7 +1,7 @@
 { bootstrap ? import <nixpkgs> { } }:
 
 let
-  parsedMetaData = builtins.fromJSON (builtins.readFile ./nixpkgs.json);
+  parsedMetaData = builtins.fromJSON (builtins.readFile ./spec/nixpkgs.json);
   nixpkgs = builtins.fetchGit {
     inherit (parsedMetaData) rev;
     ref = "nixos-19.03";
