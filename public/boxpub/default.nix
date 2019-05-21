@@ -4,9 +4,12 @@ with nixpkgs.pkgs;
 
 let
   pkgSet = import ./nix { };
-  boxpub = pkgSet.boxpub.components.exes.boxpub;
+  boxpub = pkgSet.boxpub.components.exes.boxpub.overrideAttrs (oldAttrs: {
+    src = gitignoreSource ./.;
+  });
 in with ghc; {
   inherit boxpub pkgSet;
+
   boxpub-1_x = boxpub.overrideAttrs (oldAttrs: rec {
     name = "${oldAttrs.pname}-${version}";
     version = "1.2.2.0";
