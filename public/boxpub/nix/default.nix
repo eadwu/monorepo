@@ -60,4 +60,4 @@ let
     ];
   };
 in
-  pkgSet.config.hsPkgs
+  pkgSet.config.hsPkgs // { iohaskell = haskell_nix; }
