@@ -7,4 +7,7 @@ let
     ref = "nixos-19.03";
     url = "https://github.com/NixOS/nixpkgs-channels";
   };
-in import nixpkgs { }
+in (import nixpkgs { }) // {
+  inherit nixpkgs;
+  inherit (import ./gitignore.nix { }) gitignoreSource;
+}
