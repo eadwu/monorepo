@@ -25,7 +25,7 @@ let
 
   haskell = import haskell_nix {
     inherit pkgs;
-    nixpkgs = "<nixpkgs>";
+    nixpkgs = pkgs.nixpkgs.outPath;
   };
 
   pkgSet = haskell.mkCabalProjectPkgSet {
