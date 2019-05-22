@@ -1,28 +1,7 @@
 { pkgs ? import ./nixpkgs.nix { } }:
 
 let
-  haskell_nix = pkgs.stdenv.mkDerivation {
-    name = "haskell_nix";
-
-    src = pkgs.fetchFromGitHub {
-      owner = "input-output-hk";
-      repo = "haskell.nix";
-      rev = "ff3b3162df1b957a1866af1bbd6d98eb36da0afa";
-      sha256 = "1fcqkw82x9xfhr66ac30fb7r1n4v80xpq4jfs3f800sy4fmpmq9b";
-    };
-
-    patches = [
-      ./expand-derivation-attrs.patch
-    ];
-
-    dontBuild = true;
-
-    installPhase = ''
-      mkdir -p $out
-      cp -r . $out
-    '';
-  };
-
+  haskell_nix = import ./haskell.nix { };
   haskell = import haskell_nix {
     inherit pkgs;
     nixpkgs = pkgs.nixpkgs.outPath;
