@@ -2,15 +2,15 @@
 
 let
   parsedMetaData = builtins.fromJSON (builtins.readFile ./spec/haskell.json);
-  haskell_nix = builtins.fetchGit {
+  haskellNix = builtins.fetchGit {
     inherit (parsedMetaData) rev;
     ref = "master";
     url = "https://github.com/input-output-hk/haskell.nix";
   };
 in bootstrap.stdenv.mkDerivation {
-  name = "haskell_nix";
+  name = "haskell-nix";
 
-  src = haskell_nix;
+  src = haskellNix;
 
   patches = [
     ./expand-derivation-attrs.patch

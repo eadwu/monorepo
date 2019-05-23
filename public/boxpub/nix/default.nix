@@ -1,8 +1,8 @@
 { pkgs ? import ./nixpkgs.nix { } }:
 
 let
-  haskell_nix = import ./haskell.nix { };
-  haskell = import haskell_nix {
+  haskellNix = import ./haskell.nix { };
+  haskell = import haskellNix {
     inherit pkgs;
     nixpkgs = pkgs.nixpkgs.outPath;
   };
@@ -39,4 +39,4 @@ let
     ];
   };
 in
-  pkgSet.config.hsPkgs // { iohaskell = haskell_nix; }
+  pkgSet.config.hsPkgs // { iohaskell = haskellNix; }
