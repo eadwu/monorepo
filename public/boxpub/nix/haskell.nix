@@ -1,4 +1,4 @@
-{ bootstrap ? import <nixpkgs> { } }:
+{ nixpkgs ? import ./nixpkgs.nix { } }:
 
 let
   parsedMetaData = builtins.fromJSON (builtins.readFile ./spec/haskell.json);
@@ -7,7 +7,7 @@ let
     ref = "master";
     url = "https://github.com/input-output-hk/haskell.nix";
   };
-in bootstrap.stdenv.mkDerivation {
+in nixpkgs.stdenv.mkDerivation {
   name = "haskell-nix";
 
   src = haskellNix;
