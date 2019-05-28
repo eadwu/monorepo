@@ -1,7 +1,7 @@
 {
   "url": "https://github.com/hercules-ci/gitignore",
-  "rev": "a829865d6cf35655790c152a12e75484687d2317",
-  "date": "2019-05-16T11:18:48+02:00",
-  "sha256": "0dj9yi201pr6dn0bfaipff72s8q19abxxwl0vxphaas9fnbk7l46",
+  "rev": "ec5dd0536a5e4c3a99c797b86180f7261197c124",
+  "date": "2019-05-22T16:51:26+02:00",
+  "sha256": "0k2r8y21rn4kr5dmddd3906x0733fs3bb8hzfpabkdav3wcy3klv",
   "fetchSubmodules": false
 }
