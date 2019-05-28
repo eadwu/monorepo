@@ -3,7 +3,7 @@
     flags = {};
     package = {
       specVersion = "2.4";
-      identifier = { name = "boxpub"; version = "1.2.2.0"; };
+      identifier = { name = "boxpub"; version = "1.2.3.0"; };
       license = "BSD-3-Clause";
       copyright = "";
       maintainer = "edmund.wu@protonmail.com";
