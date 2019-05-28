@@ -12,12 +12,12 @@ in with ghc; {
 
   boxpub-1_x = boxpub.overrideAttrs (oldAttrs: rec {
     name = "${oldAttrs.pname}-${version}";
-    version = "1.2.2.0";
+    version = "1.2.3.0";
 
     src = fetchgit {
       url = ./.;
       rev = version;
-      sha256 = "0qflibwbzav7r19n51vya1zi238jz5xr0zf3pz1hhkl7bapw7cvi";
+      sha256 = "07qqrzdvm665p4s1r3mpw617rk9k1vvirzr4k7djmm2py7kcg0lz";
     };
   });
 }
