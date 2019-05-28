@@ -5,7 +5,7 @@ with nixpkgs.pkgs;
 let
   pkgSet = import ./nix { };
   boxpub = pkgSet.boxpub.components.exes.boxpub.overrideAttrs (oldAttrs: {
-    src = gitignoreSource ./.;
+    src = nixpkgs.gitignoreSource ./.;
   });
 in with ghc; {
   inherit boxpub pkgSet;
