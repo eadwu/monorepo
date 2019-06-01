@@ -32,20 +32,20 @@ module Boxpub.Client.Parser
     <$> switch
       ( long "version"
      <> short 'V'
-     <> help "display the version" )
+     <> help "Display the version" )
     <*> optional ( option auto
       ( long "start"
      <> metavar "START"
-     <> help "the first chapter [index] to include in the ebook"
+     <> help "The first chapter [index] to include in the ebook"
      <> showDefault ) )
     <*> optional ( option auto
       ( long "end"
      <> metavar "END"
-     <> help "the last chapter [index] to include in the ebook"
+     <> help "The last chapter [index] to include in the ebook"
      <> showDefault ) )
     <*> optional ( strOption
       ( long "output-directory"
      <> metavar "DIR"
-     <> help "write files to DIR" ) )
+     <> help "Write files to DIR" ) )
     <*> optional ( argument str
       ( metavar "NOVEL" ) )
