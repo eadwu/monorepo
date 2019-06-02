@@ -1,11 +1,18 @@
 module Boxpub.Client
 ( main ) where
+  import Data.Text as T
   import Data.Text.IO as T
-  import Boxpub.Client.Env ( mkEnv, boxpubVersion )
   import Boxpub.Client.Parser ( BoxpubOptions(..), getOptions )
   import Data.Maybe ( isNothing )
+  import Data.Version ( showVersion )
   import System.Exit ( die )
   import qualified Boxpub.EPUB as E
+  import qualified Paths_boxpub as Boxpub
+
+  boxpubVersion :: Text
+  boxpubVersion = T.concat
+    [ "boxpub "
+    , pack $ showVersion Boxpub.version ]
 
   main :: IO ()
   main = do
@@ -19,6 +26,4 @@ module Boxpub.Client
         -- Exit with an error and nonzero exit code
         then die "Invalid argument for <NOVEL> receieved"
         -- Proceed with the intended operation of the program
-        else do
-          env <- mkEnv rawOptions
-          E.main env
+        else E.main rawOptions

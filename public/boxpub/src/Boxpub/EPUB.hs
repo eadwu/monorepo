@@ -2,7 +2,6 @@ module Boxpub.EPUB
 ( main
 , getReaderOptions, getWriterOptions ) where
   import Paths_boxpub ( getDataDir )
-  import Boxpub.Client.Env ( Env(..) )
   import Boxpub.Client.Parser as B ( BoxpubOptions(..) )
   import Boxpub.EPUB.Filters ( getFilters )
   import Boxpub.Internal.FileSystem ( mkdirp )
@@ -64,14 +63,14 @@ module Boxpub.EPUB
     , writerEpubChapterLevel = 1
     , writerTOCDepth = 1 }
 
-  getContent :: Env -> ProviderEnv -> Int -> FilePath -> MVar Int -> Int -> IO ()
-  getContent env pEnv total outDir mVar n = do
+  getContent :: BoxpubOptions -> ProviderEnv -> Int -> FilePath -> MVar Int -> Int -> IO ()
+  getContent args pEnv total outDir mVar n = do
     maxConcurrentThreads <- getNumCapabilities
     -- Display initial status output
     nDownloaded <- readMVar mVar
     statusDisplay maxConcurrentThreads nDownloaded ("ing" :: Text)
     -- Fetch the chapter
-    chapter <- fetchChapter env pEnv n
+    chapter <- fetchChapter pEnv n
     -- workaround for table of contents
     -- encapsulates chapter with a <div> and prepends a <h1>
     T.writeFile (outDir </> filename) (T.concat
@@ -87,8 +86,7 @@ module Boxpub.EPUB
     -- Update status output
     statusDisplay maxConcurrentThreads newNDownloaded ("ed" :: Text)
     where
-      opts = options env
-      name = fromJust $ novel opts
+      name = fromJust $ novel args
       filename = printf "%s-%d.html" name n
       statusDisplay nConcur nDone gramFix = liftIO $ do
         -- ANSI codes aren't supported pre-Windows 10, though the carriage return should work fine...
@@ -106,27 +104,27 @@ module Boxpub.EPUB
       [ fileContents
       , restOfFile ]
 
-  main :: Env -> IO ()
-  main env = do
-    pEnv <- P.mkEnv env
+  main :: BoxpubOptions -> IO ()
+  main args = do
+    pEnv <- P.mkEnv args
     filters <- getFilters
     dataDir <- getDataDir
     -- Determine the output directory
     -- NOTE: default to cwd if --output-directory is undefined
     cwd <- getCurrentDirectory
-    prefix <- makeAbsolute $ fromMaybe cwd ((outputDirectory . options) env)
+    prefix <- makeAbsolute $ fromMaybe cwd (outputDirectory args)
     mkdirp prefix
     withSystemTempDirectory "boxpub" $ \tmp -> do
       -- Use "generated" defaults if needed
       -- TODO: Find consistency between
-      let start = fromMaybe 1 (B.start opts)
-      let end = fromMaybe (length $ P.chapterList pEnv) (B.end opts)
+      let start = fromMaybe 1 (B.start args)
+      let end = fromMaybe (length $ P.chapterList pEnv) (B.end args)
       let chapterIndexRange = [start..end]
       -- Generate the actual chapter in "chunks"
       maxConcurrentThreads <- getNumCapabilities
       limiter <- pool maxConcurrentThreads
       counter <- newMVar 0
-      parMapIO_ (limiter . getContent env pEnv (end - start + 1) tmp counter) chapterIndexRange
+      parMapIO_ (limiter . getContent args pEnv (end - start + 1) tmp counter) chapterIndexRange
       putStrLn "" -- "Flush" to next line
       -- Merge the files and store in memory
       fileContents <- mergeFiles tmp (map applyTemplate chapterIndexRange)
@@ -144,7 +142,6 @@ module Boxpub.EPUB
       epub <- handleError pandocResult
       C8.writeFile (prefix </> filename) epub
       where
-        opts = options env
-        name = fromJust $ novel opts
+        name = fromJust $ novel args
         filename = printf "%s.epub" name
         applyTemplate = printf "%s-%d.html" name

@@ -41,7 +41,6 @@ executable boxpub
                     , optparse-applicative
   other-modules:      Paths_boxpub
                     , Boxpub.Client
-                    , Boxpub.Client.Env
                     , Boxpub.Client.Parser
                     , Boxpub.Client.Provider
                     , Boxpub.Client.Provider.BoxNovel
