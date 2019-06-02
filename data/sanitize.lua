@@ -1,7 +1,8 @@
 local List = require 'pandoc.List'
 
 function sanitizeBoxNovel (elem)
-  if elem.classes and elem.classes:includes("code-block", 0) then
+  if elem.classes and
+    (elem.classes:includes("code-block", 0) or elem.classes:includes("btn-group", 0)) then
     return pandoc.Null()
   end
 
