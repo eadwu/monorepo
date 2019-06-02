@@ -2,7 +2,6 @@ module Boxpub.Client.Provider
 ( Chapter(..), Metadata(..), ProviderEnv(..)
 , mkEnv, fetchChapter ) where
   import Data.Text as T
-  import Boxpub.Client.Env ( Env(..) )
   import Boxpub.Client.Parser as B ( BoxpubOptions(..) )
   import Data.Maybe ( fromJust, fromMaybe )
   import Network.HTTP.Client ( ManagerSettings )
@@ -53,8 +52,8 @@ module Boxpub.Client.Provider
       , cover = strip $ fromJust cover
       , author = strip $ fromJust author }
 
-  fetchChapter :: Env -> ProviderEnv -> Int -> IO Chapter
-  fetchChapter env pEnv chapterN = do
+  fetchChapter :: ProviderEnv -> Int -> IO Chapter
+  fetchChapter pEnv chapterN = do
     chapterName <- reqChapter BoxNovel.chapterName
     chapterContents <- reqChapter BoxNovel.chapterContents
     -- fromMaybe shouldn't be required here anymore but the overhead isn't much anyway
@@ -67,8 +66,8 @@ module Boxpub.Client.Provider
       chapterURL = unpack $ fromJust $ chapterList pEnv !!! (chapterN - 1)
       reqChapter = req chapterURL
 
-  mkEnv :: Env -> IO ProviderEnv
-  mkEnv env = do
+  mkEnv :: BoxpubOptions -> IO ProviderEnv
+  mkEnv args = do
     metadata <- fetchMetadata novelURL BoxNovel.novelTitle BoxNovel.coverImage BoxNovel.novelAuthor
     chapterList <- req novelURL BoxNovel.chapterList
     return ProviderEnv
@@ -77,5 +76,5 @@ module Boxpub.Client.Provider
       -- TODO: Fix this hard coded workaround explicitly for BoxNovel (`reverse`)
       , chapterList = Prelude.reverse $ fromJust chapterList }
     where
-      novel = fromJust $ (B.novel . options) env
+      novel = fromJust $ B.novel args
       novelURL = printf (unpack BoxNovel.novelPath) novel
