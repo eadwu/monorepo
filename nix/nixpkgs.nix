@@ -1,4 +1,4 @@
-{ bootstrap ? import <nixpkgs> { } }:
+{ bootstrap ? import <nixpkgs> { config = { }; } }:
 
 let
   parsedMetaData = builtins.fromJSON (builtins.readFile ./spec/nixpkgs.json);
@@ -7,7 +7,9 @@ let
     ref = "nixos-19.03";
     url = "https://github.com/NixOS/nixpkgs-channels";
   };
-in (import nixpkgs { }) // {
+in (import nixpkgs {
+  config = { };
+}) // {
   inherit nixpkgs;
   inherit (import ./gitignore.nix { }) gitignoreSource;
 }
