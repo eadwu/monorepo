@@ -1,0 +1,18 @@
+image: nixos/19.03
+packages:
+  - nixpkgs.nix
+  - nixpkgs.git
+repositories:
+  nixpkgs: https://nixos.org/channels/nixos-19.03
+sources:
+  - https://git.sr.ht/~eadwu/boxpub
+secrets:
+  - e10dff8c-e095-457a-a450-2083b20dafa4
+tasks:
+  - setup: |
+      nix-env -iA cachix -f https://cachix.org/api/v1/install
+      cachix use boxpub
+  - build: |
+      cd boxpub
+      nix-build -A boxpub | cachix push boxpub
+      nix-build -A boxpub-1_x | cachix push boxpub
