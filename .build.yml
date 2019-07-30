@@ -10,10 +10,11 @@ secrets:
   - e10dff8c-e095-457a-a450-2083b20dafa4
 tasks:
   - setup: |
-      fallocate -l 4G swapfile
-      chmod 600 swapfile
-      mkswap swapfile
-      swapon swapfile
+      sudo fallocate -l 4G swapfile
+      sudo chmod 600 swapfile
+      sudo mkswap swapfile
+      sudo swapon swapfile
+  - configure: |
       nix-env -iA cachix -f https://cachix.org/api/v1/install
       cachix use boxpub
   - build: |
