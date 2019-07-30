@@ -23,18 +23,27 @@ let
           sed -i 's@\(("ttf","\)application/x-font-truetype\(")\)@\1application/font-sfnt\2@' src/Text/Pandoc/MIME.hs
         '';
 
-        # Adjust env to correct paths since cabal `nix-style` installation isn't used
-        # See https://github.com/haskell/cabal/issues/5543
-        packages.boxpub.postInstall = ''
-          . ${pkgs.makeWrapper}/nix-support/setup-hook
-          ghc_name="ghc-$(ghc --numeric-version)"
-          pkg_name="$pname-$version"
-          install_suffix="${builtins.currentSystem}-$ghc_name/$pkg_name"
+        packages.boxpub = {
+          # Perform linking using gold instead of ld for performance boosts (faster, less memory)
+          configureFlags = [
+            "--ghc-option=-optl-fuse-ld=gold"
+            "--ld-option=-fuse-ld=gold"
+            "--with-ld=ld.gold"
+          ];
 
-          wrapProgram $out/bin/boxpub \
-            --set boxpub_libdir $out/lib/$install_suffix \
-            --set boxpub_datadir $out/share/$install_suffix
-        '';
+          # Adjust env to correct paths since cabal `nix-style` installation isn't used
+          # See https://github.com/haskell/cabal/issues/5543
+          postInstall = ''
+            . ${pkgs.makeWrapper}/nix-support/setup-hook
+            ghc_name="ghc-$(ghc --numeric-version)"
+            pkg_name="$pname-$version"
+            install_suffix="${builtins.currentSystem}-$ghc_name/$pkg_name"
+
+            wrapProgram $out/bin/boxpub \
+              --set boxpub_libdir $out/lib/$install_suffix \
+              --set boxpub_datadir $out/share/$install_suffix
+          '';
+        };
       }
     ];
   };
