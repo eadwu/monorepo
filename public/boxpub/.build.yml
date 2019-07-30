@@ -1,7 +1,7 @@
 image: nixos/19.03
 packages:
-  - nixpkgs.nix
   - nixpkgs.git
+  - nixpkgs.nix
 repositories:
   nixpkgs: https://nixos.org/channels/nixos-19.03
 sources:
@@ -10,11 +10,12 @@ secrets:
   - e10dff8c-e095-457a-a450-2083b20dafa4
 tasks:
   - setup: |
+      fallocate -l 4G swapfile
+      chmod 600 swapfile
+      mkswap swapfile
+      swapon swapfile
       nix-env -iA cachix -f https://cachix.org/api/v1/install
       cachix use boxpub
   - build: |
       cd boxpub
-      {
-        nix-build --no-out-link -A boxpub;
-        nix-build --no-out-link -A boxpub-1_x;
-      } | cachix push boxpub
+      nix-build --no-out-link --max-jobs 1 -A boxpub -A boxpub-1_x | cachix push boxpub
