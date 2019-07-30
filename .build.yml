@@ -14,5 +14,7 @@ tasks:
       cachix use boxpub
   - build: |
       cd boxpub
-      nix-build -A boxpub | cachix push boxpub
-      nix-build -A boxpub-1_x | cachix push boxpub
+      {
+        nix-build --no-out-link -A boxpub;
+        nix-build --no-out-link -A boxpub-1_x;
+      } | cachix push boxpub
