@@ -1,0 +1,8 @@
+{
+  "name": "HTTPS",
+  "description": "Unbloated HTTPS requests.",
+  "version": "1.0.0",
+  "author": null,
+  "main": "https.js",
+  "files": [ "https.js" ]
+}

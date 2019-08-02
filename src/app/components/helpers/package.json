@@ -1,0 +1,8 @@
+{
+  "name": "helpers",
+  "description": "Helper functions for the modules.",
+  "version": "1.0.0",
+  "author": null,
+  "main": "helpers.js",
+  "files": [ "helpers.js" ]
+}

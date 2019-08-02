@@ -1,0 +1,37 @@
+doctype html
+
+html
+  head
+    meta(name="viewport" content="width=device-width, initial-scale=1")
+    link(rel="stylesheet" href="vendors/material.min.css")
+    link(rel="stylesheet" href="vendors/material-icons.css")
+    script(type="text/javascript" src="vendors/material.min.js")
+    style.
+      .sub-container {
+        height: 50%;
+        max-height: 50%;
+        overflow-y: auto;
+      }
+      .sub-title {
+        display: inline-block;
+        height: 100%;
+      }
+  body
+    .mdl-layout.mdl-js-layout.mdl-layout--fixed-header.mdl-color--primary(style="width: 500px; height: 500px;")
+      header.mdl-layout__header
+        .mdl-layout__header-row(style="padding: 0px 10px 0px 10px;")
+          button#cancel.mdl-button.mdl-js-button.mdl-button--raised.mdl-js-ripple-effect.mdl-button--colored Cancel
+          .mdl-layout-spacer
+          span.mdl-layout-title Summary
+          .mdl-layout-spacer
+          button#commit.mdl-button.mdl-js-button.mdl-button--raised.mdl-js-ripple-effect.mdl-button--colored Commit
+      main.mdl-layout__content.mdl-color--primary-dark(style="display: flex; flex-flow: row;")
+        .container(style="flex: 1;")
+          #top-container.sub-container
+            .sub-title
+              span To set active
+            .actions(style="display: inline; margin-left: 10px; overflow: hidden;")
+              span a
+          #bottom-container.sub-container
+            .sub-title
+              span To set inactive

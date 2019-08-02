@@ -1,0 +1,55 @@
+doctype html
+
+html
+  head
+    meta(name="viewport" content="width=device-width, initial-scale=1")
+    link(rel="stylesheet" href="vendors/material.min.css")
+    link(rel="stylesheet" href="vendors/material-icons.min.css")
+    link(rel="stylesheet" href="css/mpm.css")
+    link(rel="stylesheet" href="css/material-extend.css")
+    script(type="text/javascript" src="vendors/material.min.js")
+    script(type="text/javascript" src="js/mpm.js")
+  body
+    .mdl-layout.mdl-js-layout.mdl-layout--fixed-header.mdl-color--primary
+      // header
+      header.mdl-layout__header
+        .mdl-layout__header-row
+          span.mdl-layout-title Molecule Package Manager
+          .mdl-layout-spacer
+          button#dropdown.mdl-button.mdl-js-button.mdl-button--icon.mdl-js-ripple-effect
+            i.material-icons more_vert      
+        .mdl-layout__tab-bar.mdl-js-ripple-effect
+          a#menu-search.mdl-layout__tab.is-active(href='#holder') Search
+          a#menu-installed.mdl-layout__tab(href='#holder') Installed
+      // header content
+      ul.mdl-menu.mdl-menu--bottom-right.mdl-js-menu.mdl-js-ripple-effect(for="dropdown")
+        li#dropdown-about.mdl-menu__item(disabled) About
+        li#dropdown-preferences.mdl-menu__item(disabled) Preferences
+      .mdl-tooltip(for="dropdown-about") Information about #[br] Molecule
+      .mdl-tooltip(for="dropdown-preferences") Edit settings for #[br] Molecule
+      // page content
+      main.mdl-layout__content.mdl-color--primary-dark
+        #holder.mdl-layout__tab-panel.is-active
+          .mdl-textfield.mdl-js-textfield.mdl-textfield--expandable.mdl-textfield--floating-label.mdl-textfield--align-right
+            label.mdl-button.mdl-js-button.mdl-button--icon(for='package-search')
+              i.material-icons search
+            .mdl-textfield__expandable-holder
+              input#package-search.mdl-textfield__input(type='text', name='sample')
+          #loading-spinner.mdl-spinner.mdl-spinner--single-color.mdl-js-spinner(style="left: 15px; vertical-align: middle;")
+        #results.mdl-grid.mdl-grid--no-spacing.mdl-color--primary-dark
+          .results-child.results-general.mdl-text--left.mdl-margin--none.mdl-cell.mdl-cell--1-col.mdl-layout__tab State
+            .subject-separator--left.mdl-separator--left
+            .subject-separator--right.mdl-separator--right
+          .results-child.results-general.mdl-text--left.mdl-margin--none.mdl-cell.mdl-cell--6-col.mdl-cell--3-col-tablet.mdl-layout__tab Name
+            .subject-separator--right.mdl-separator--right
+          .results-child.results-general.mdl-text--left.mdl-margin--none.mdl-cell.mdl-cell--3-col.mdl-cell--2-col-tablet.mdl-layout__tab Author
+            .subject-separator--right.mdl-separator--right
+          .results-child.results-general.mdl-text--left.mdl-margin--none.mdl-cell.mdl-cell--2-col.mdl-cell--2-col-tablet.mdl-layout__tab Score
+      // footer
+      footer#executables.mdl-mini-footer.mdl-color--primary(style="display: none;")
+        .mdl-mini-footer__left-section(style="vertical-align: middle;")
+          #pend-opts.mdl-logo(style="width: 100%; text-align: right;") 0 PENDING OPERATIONS
+        .mdl-mini-footer__right-section(style="vertical-align: middle;")
+          button#opt-commit.pseudo-separator--margin.mdl-shadow--2dp.mdl-color--primary-dark.mdl-button.mdl-js-button.mdl-js-ripple-effect.mdl-button--primary COMMIT
+          button#opt-cancel.mdl-shadow--2dp.mdl-color--primary-dark.mdl-button.mdl-js-button.mdl-js-ripple-effect.mdl-button--primary CANCEL
+      .mdl-layout__obfuscator
