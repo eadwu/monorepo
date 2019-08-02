@@ -1,0 +1,36 @@
+doctype html
+
+html
+  head
+    meta(charset="utf-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1")
+    link(rel="stylesheet" href="vendors/css/material-icons.min.css")
+    link(rel="stylesheet" type="text/css" href="vendors/css/materialize.min.css" media="screen,projection")
+    script(type="text/javascript" src="vendors/js/jquery-3.2.1.min.js" onload="if (!window.$) { window.$ = window.jQuery = module.exports }")
+    script(type="text/javascript" src="vendors/js/hammer.min.js" onload="if (!window.Hammer) { window.Hammer = module.exports }")
+    script(type="text/javascript" src="vendors/js/materialize.min.js")
+    script(type="text/javascript" src="vendors/js/react.min.js")
+    script(type="text/javascript" src="vendors/js/react-dom.min.js")
+    link(rel="stylesheet" type="text/css" href="resources/css/index.css")
+    script(type="text/javascript" src="resources/jsx/index.jsx")
+  body
+    .container
+      .flex-descendant.header
+        .template.margin--right.z-depth-2.red.lighten-2
+          span.white-text Fin
+        .template.margin--right.z-depth-2.blue.lighten-2
+          span.white-text Air
+        .flex-descendant.abstract.margin--right.z-depth-2(style="width: 108px; height: 36px;")
+          button.template--button.z-depth-0.btn.waves-light.waves-effect.grey.darken-2(style="border-radius: 3px 0 0 3px;")
+            i.material-icons keyboard_arrow_left
+          .template.z-depth-0.grey.darken-2(style="border-radius: 0;")
+            span.white-text 2017
+          button.template--button.z-depth-0.btn.waves-light.waves-effect.grey.darken-2(style="border-radius: 0 3px 3px 0;")
+            i.material-icons keyboard_arrow_right
+        .template.margin--right.z-depth-2.grey.darken-2(style="width: 50px;")
+          span.white-text 12-31
+        button.template--button.margin--right.z-depth-2.btn.waves-light.waves-effect.grey.darken-2
+          i.material-icons info_outline
+        button.template--button.z-depth-2.btn.waves-light.waves-effect.grey.darken-2
+          i.material-icons refresh
+      .content

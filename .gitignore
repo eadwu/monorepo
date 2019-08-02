@@ -1,0 +1,17 @@
+build/*
+!build/vendors
+
+build/vendors/*
+!build/vendors/js
+!build/vendors/css
+!build/vendors/fonts
+
+build/vendors/js/*
+!build/vendors/js/*.min.js
+
+build/vendors/css/*
+!build/vendors/css/*.min.css
+
+.DS_Store
+node_modules
+npm-debug.log

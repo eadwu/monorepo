@@ -1,0 +1,67 @@
+span, .white-text {
+  line-height: 36px;
+}
+
+.container {
+  display: flex;
+  position: absolute;
+  margin: 0;
+  flex-direction: column;
+  left: 50px;
+  bottom: 50%;
+  min-width: 342px;
+  max-width: 342px;
+  min-height: 36px;
+}
+
+.header, .content {
+  width: 100%;
+  height: 36px;
+}
+
+.flex-descendant {
+  display: flex;
+  flex-direction: row;
+}
+
+.margin--right {
+  margin-right: 8px;
+}
+
+.margin--top {
+  margin-top: 8px;
+}
+
+.abstract {
+  border-radius: 3px;
+}
+
+.template {
+  .abstract();
+  width: 36px;
+  height: 36px;
+  text-align: center;
+}
+
+.template--time {
+  .template();
+  flex: 1 1 auto;
+}
+
+.template--title {
+  .template();
+  flex: 5 1 auto;
+  > span {
+    display: block;
+    position: relative;
+    left: 20px;
+    width: calc(100% - 20px);
+    height: 100%;
+    text-align: left;
+  }
+}
+
+.template--button {
+  .template();
+  padding: 0px;
+}
