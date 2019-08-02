@@ -1,0 +1,8 @@
+{
+  "name": "webgl",
+  "description": "Helper module for developing with webGL.",
+  "version": "1.0.0",
+  "author": null,
+  "main": "webgl.js",
+  "files": [ "webgl.js", "formats/" ]
+}

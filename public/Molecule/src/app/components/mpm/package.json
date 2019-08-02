@@ -1,0 +1,8 @@
+{
+  "name": "MPM",
+  "description": "Interface for package management for Molecule.",
+  "version": "1.0.0",
+  "author": null,
+  "main": "package-manage.js",
+  "files": [ "package-manage.js", "github.js" ]
+}

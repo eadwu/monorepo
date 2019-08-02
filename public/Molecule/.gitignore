@@ -1,0 +1,13 @@
+build/*
+typings/*
+
+!build/vendors
+!typings/misc.d.ts
+
+flow-typed
+node_modules
+flow-coverage
+
+.DS_Store
+.gitmodules
+npm-debug.log
