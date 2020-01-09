@@ -2,18 +2,15 @@
 
 let
   parsedMetaData = builtins.fromJSON (builtins.readFile ./spec/haskell.json);
-  haskellNix = nixpkgs.fetchgit {
-    inherit (parsedMetaData) rev sha256;
-    url = "https://github.com/input-output-hk/haskell.nix";
-  };
 in nixpkgs.stdenv.mkDerivation {
   name = "haskell-nix";
 
-  src = haskellNix;
+  src = nixpkgs.fetchgit {
+    inherit (parsedMetaData) rev sha256;
+    url = "https://github.com/input-output-hk/haskell.nix";
+  };
 
-  patches = [
-    ./expand-derivation-attrs.patch
-  ];
+  patches = [ ./patches/expand-derivation-attrs.patch ];
 
   dontBuild = true;
 
