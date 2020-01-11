@@ -1,9 +1,9 @@
-image: nixos/19.03
+image: nixos/latest
 packages:
   - nixpkgs.git
   - nixpkgs.nix
 repositories:
-  nixpkgs: https://nixos.org/channels/nixos-19.03
+  nixpkgs: https://nixos.org/channels/nixos-19.09
 sources:
   - https://git.sr.ht/~eadwu/boxpub
 secrets:
