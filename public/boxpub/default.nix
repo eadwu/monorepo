@@ -4,8 +4,8 @@ let
   hsPkgs = import ./nix { };
   inherit (hsPkgs) nixpkgs iohaskell;
 
-  boxpub = hsPkgs.boxpub.components.exes.boxpub.overrideAttrs (oldAttrs: {
-    src = iohaskell.haskellLib.cleanGit { src = ./.; };
+  boxpub = hsPkgs.boxpub.components.all.overrideAttrs (oldAttrs: {
+    src = iohaskell.cleanSourceHaskell { src = ./.; };
   });
 in {
   inherit boxpub hsPkgs;
