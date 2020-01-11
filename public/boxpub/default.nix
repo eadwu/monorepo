@@ -1,21 +1,21 @@
-{ nixpkgs ? import ./nix/nixpkgs.nix { }, compiler ? "ghc864" }:
-
-with nixpkgs.pkgs;
+{ compiler ? "ghc865" }:
 
 let
-  pkgSet = import ./nix { };
-  boxpub = pkgSet.boxpub.components.exes.boxpub.overrideAttrs (oldAttrs: {
-    src = nixpkgs.gitignoreSource ./.;
+  hsPkgs = import ./nix { };
+  inherit (hsPkgs) nixpkgs iohaskell;
+
+  boxpub = hsPkgs.boxpub.components.exes.boxpub.overrideAttrs (oldAttrs: {
+    src = iohaskell.haskellLib.cleanGit { src = ./.; };
   });
-in with ghc; {
-  inherit boxpub pkgSet;
+in {
+  inherit boxpub hsPkgs;
 
   boxpub-1_x = boxpub.overrideAttrs (oldAttrs: rec {
     name = "${oldAttrs.pname}-${version}";
     version = "1.2.3.0";
 
-    src = fetchgit {
-      url = ./.;
+    src = nixpkgs.fetchgit {
+      url = "https://git.sr.ht/~eadwu/boxpub";
       rev = version;
       sha256 = "07qqrzdvm665p4s1r3mpw617rk9k1vvirzr4k7djmm2py7kcg0lz";
     };

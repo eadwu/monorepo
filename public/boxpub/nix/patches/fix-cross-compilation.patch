@@ -1,0 +1,14 @@
+diff --git a/overlays/ghc.nix b/overlays/ghc.nix
+index c0814f1..87c4cfc 100644
+--- a/overlays/ghc.nix
++++ b/overlays/ghc.nix
+@@ -2,7 +2,8 @@ self: super: with super;
+   # sadly we need to patch GHC a bit.
+    let
+     ghcPkgOverrides = {
+-        enableShared = super.stdenv.targetPlatform == super.stdenv.hostPlatform;
++        # https://github.com/input-output-hk/haskell.nix/issues/378
++        enableShared = pkgs.stdenv.hostPlatform == pkgs.stdenv.buildPlatform;
+         enableIntegerSimple = false;
+       };
+     ghcDrvOverrides = drv: {
