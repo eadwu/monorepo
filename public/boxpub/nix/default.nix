@@ -5,8 +5,13 @@ let
   nixpkgs = (import pkgs.nixpkgs (import haskellNix));
   haskell = nixpkgs.pkgsCross.musl64.haskell-nix;
 
-  pkgSet = haskell.mkCabalProjectPkgSet {
-    plan-pkgs = import ./pkgs.nix;
+  pkgSet = with haskell; mkCabalProjectPkgSet {
+    plan-pkgs = (importAndFilterProject (callCabalProjectToNix {
+      src = cleanSourceHaskell { src = ./..; name = "boxpub-src"; };
+      index-state = "2020-01-11T00:00:00Z";
+      index-sha256 = "0vabvmgpz9p7i7fipkfdap7ird9mw285k10wd3mzkrlss7x2dlcn";
+      plan-sha256 = "07swzw56g6n4il1q4cq7b842xchpd736vf8jyl247km1943wzv6m";
+    })).pkgs;
     pkg-def-extras = [ ];
     modules = [
       {
