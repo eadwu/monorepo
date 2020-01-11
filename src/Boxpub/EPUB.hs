@@ -12,7 +12,7 @@ module Boxpub.EPUB
   import Data.ByteString.Lazy as BL ( writeFile )
   import Data.Default ( def )
   import Data.Maybe ( fromJust, fromMaybe )
-  import Data.Text as T ( Text, foldl', append, concat, unpack )
+  import Data.Text as T ( Text, pack, foldl', append, concat )
   import Data.Text.IO as T ( readFile, writeFile )
   import System.Directory ( makeAbsolute, getCurrentDirectory )
   import System.FilePath ( (<.>), (</>) )
@@ -24,7 +24,7 @@ module Boxpub.EPUB
   import Text.Pandoc.Filter ( applyFilters )
   import Text.Pandoc.Options ( ReaderOptions(..), WriterOptions(..) )
   import Text.Pandoc.Readers ( readHtml )
-  import Text.Pandoc.Templates ( getDefaultTemplate )
+  import Text.Pandoc.Templates ( Template, compileDefaultTemplate )
   import Text.Pandoc.Writers ( writeEPUB3 )
   import Text.Printf ( printf )
   import Boxpub.Client.Provider as P ( Chapter(..), Metadata(..), ProviderEnv(..), mkEnv, fetchChapter )
@@ -45,7 +45,7 @@ module Boxpub.EPUB
     { readerExtensions = getExtensions
     , readerStripComments = True }
 
-  getWriterOptions :: Maybe String -> FilePath -> Metadata -> FilePath -> WriterOptions
+  getWriterOptions :: Maybe (Template Text) -> FilePath -> Metadata -> FilePath -> WriterOptions
   getWriterOptions template dataDir metadata coverImage = def
     { writerTemplate = template
     , writerVariables =
@@ -54,7 +54,7 @@ module Boxpub.EPUB
       , ("epub-cover-image", coverImage) ]
     , writerTableOfContents = True
     , writerSectionDivs = True
-    , writerEpubMetadata = Just $ M.generate (title metadata) (author metadata)
+    , writerEpubMetadata = Just $ pack $ M.generate (title metadata) (author metadata)
     , writerEpubFonts =
       [ dataDir </> "Arvo" </> "Arvo-Bold.ttf"
       , dataDir </> "Arvo" </> "Arvo-BoldItalic.ttf"
@@ -131,12 +131,12 @@ module Boxpub.EPUB
       -- Perform conversion
       pandocResult <- runIO $ do
         -- Fetch the cover image, ignoring the MimeType
-        (fp, _, bs) <- fetchMediaResource $ unpack $ (cover . metadata) pEnv
+        (fp, _, bs) <- fetchMediaResource $ (cover . metadata) pEnv
         liftIO $ BL.writeFile (tmp </> fp) bs
         -- Sanitize contents before generate epub
         raw <- readHtml getReaderOptions fileContents
         src <- applyFilters getReaderOptions filters [ "html" ] raw
-        template <- Just <$> getDefaultTemplate "epub"
+        template <- Just <$> compileDefaultTemplate "epub"
         writeEPUB3 (getWriterOptions template dataDir (metadata pEnv) (tmp </> fp)) src
       -- Handle errors and write to output directory
       epub <- handleError pandocResult
