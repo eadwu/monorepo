@@ -8,7 +8,7 @@ let
   };
 in (import nixpkgs {
   config = { };
-}) // {
-  inherit nixpkgs;
-  inherit (import ./gitignore.nix { }) gitignoreSource;
-}
+  overlays = [
+    (_: super: { inherit nixpkgs; })
+  ];
+})

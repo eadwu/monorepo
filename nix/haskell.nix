@@ -10,7 +10,7 @@ in nixpkgs.stdenv.mkDerivation {
     url = "https://github.com/input-output-hk/haskell.nix";
   };
 
-  patches = [ ./patches/expand-derivation-attrs.patch ];
+  patches = [ ./patches/fix-cross-compilation.patch ./patches/expand-derivation-attrs.patch ];
 
   dontBuild = true;
 
