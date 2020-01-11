@@ -11,6 +11,7 @@ module Boxpub.EPUB
   import Control.Monad.IO.Class ( liftIO )
   import Data.ByteString.Lazy as BL ( writeFile )
   import Data.Default ( def )
+  import Data.Map as M ( fromList )
   import Data.Maybe ( fromJust, fromMaybe )
   import Data.Text as T ( Text, pack, foldl', append, concat )
   import Data.Text.IO as T ( readFile, writeFile )
@@ -18,6 +19,7 @@ module Boxpub.EPUB
   import System.FilePath ( (<.>), (</>) )
   import System.IO ( hFlush, stdout )
   import System.IO.Temp ( withSystemTempDirectory )
+  import Text.DocTemplates ( ToContext(..), Context(..) )
   import Text.Pandoc.Class ( runIO, fetchMediaResource )
   import Text.Pandoc.Extensions ( Extensions, Extension(..), extensionsFromList )
   import Text.Pandoc.Error ( handleError )
@@ -48,10 +50,10 @@ module Boxpub.EPUB
   getWriterOptions :: Maybe (Template Text) -> FilePath -> Metadata -> FilePath -> WriterOptions
   getWriterOptions template dataDir metadata coverImage = def
     { writerTemplate = template
-    , writerVariables =
-      [ ("css", dataDir </> "stylesheet.css")
-      , ("pagetitle", unpack $ title metadata)
-      , ("epub-cover-image", coverImage) ]
+    , writerVariables = Context $ M.fromList
+      [ ("css", toVal $ pack $ dataDir </> "stylesheet.css")
+      , ("pagetitle", toVal $ title metadata)
+      , ("epub-cover-image", toVal $ pack $ coverImage) ]
     , writerTableOfContents = True
     , writerSectionDivs = True
     , writerEpubMetadata = Just $ pack $ M.generate (title metadata) (author metadata)

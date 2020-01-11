@@ -35,8 +35,10 @@ executable boxpub
                     , directory
                     , temporary
                     , bytestring
+                    , containers
                     , http-client
                     , data-default
+                    , doctemplates
                     , http-client-tls
                     , optparse-applicative
   other-modules:      Paths_boxpub

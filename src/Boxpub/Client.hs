@@ -12,7 +12,7 @@ module Boxpub.Client
   boxpubVersion :: Text
   boxpubVersion = T.concat
     [ "boxpub "
-    , pack $ showVersion Boxpub.version ]
+    , T.pack $ showVersion Boxpub.version ]
 
   main :: IO ()
   main = do
