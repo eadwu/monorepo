@@ -9,6 +9,7 @@ module Boxpub.Client.Parser
     { version :: Bool
     , start :: Maybe Int
     , end :: Maybe Int
+    , source :: Maybe Text
     , outputDirectory :: Maybe FilePath
     , novel :: Maybe Text }
 
@@ -43,6 +44,10 @@ module Boxpub.Client.Parser
      <> metavar "END"
      <> help "The last chapter [index] to include in the ebook"
      <> showDefault ) )
+    <*> optional ( strOption
+      ( long "source"
+     <> metavar "SOURCE"
+     <> help "Aggregator source to extract NOVEL from" ))
     <*> optional ( strOption
       ( long "output-directory"
      <> metavar "DIR"
