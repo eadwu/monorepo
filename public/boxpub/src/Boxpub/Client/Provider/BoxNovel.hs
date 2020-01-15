@@ -1,17 +1,12 @@
 module Boxpub.Client.Provider.BoxNovel
-( novelPath
-, novelTitle, novelAuthor, coverImage, chapterList, chapterName, chapterContents ) where
+( config ) where
   import Data.Text as T
   import Text.HTML.Scalpel
+  import Boxpub.Client.ProviderType ( ProviderConfig(..) )
+  import qualified Boxpub.Client.ProviderType as B
 
-  protocol :: Text
-  protocol = "https"
-
-  domain :: Text
-  domain = "boxnovel.com"
-
-  novelPath :: Text
-  novelPath = T.concat [ protocol, "://", domain, "/novel/%s" ]
+  novelBaseURL :: Text
+  novelBaseURL = "https://boxnovel.com/novel/%s"
 
   novelTitle :: Scraper Text Text
   novelTitle = text $ "div" @: [ hasClass "post-title" ]
@@ -30,3 +25,12 @@ module Boxpub.Client.Provider.BoxNovel
 
   chapterContents :: Scraper Text Text
   chapterContents = innerHTML $ "div" @: [ hasClass "text-left" ]
+
+  config :: ProviderConfig
+  config = ProviderConfig
+    { novelPath = novelBaseURL
+    , fetchMetadata = B.defaultFetchMetadata novelTitle coverImage novelAuthor
+    , fetchChapter = B.defaultFetchChapter chapterName chapterContents
+    , fetchChapterList = \url -> do
+      cL <- B.defaultFetchChapterList chapterList url
+      return $ Prelude.reverse cL }

@@ -45,6 +45,7 @@ executable boxpub
                     , Boxpub.Client
                     , Boxpub.Client.Parser
                     , Boxpub.Client.Provider
+                    , Boxpub.Client.ProviderType
                     , Boxpub.Client.Provider.BoxNovel
                     , Boxpub.EPUB
                     , Boxpub.EPUB.Filters

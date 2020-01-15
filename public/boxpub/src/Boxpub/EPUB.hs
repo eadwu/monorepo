@@ -13,7 +13,7 @@ module Boxpub.EPUB
   import Data.Default ( def )
   import Data.Map as M ( fromList )
   import Data.Maybe ( fromJust, fromMaybe )
-  import Data.Text as T ( Text, pack, foldl', append, concat )
+  import Data.Text as T ( Text, pack, foldl', append, unpack, concat )
   import Data.Text.IO as T ( readFile, writeFile )
   import System.Directory ( makeAbsolute, getCurrentDirectory )
   import System.FilePath ( (<.>), (</>) )
@@ -29,9 +29,21 @@ module Boxpub.EPUB
   import Text.Pandoc.Templates ( Template, compileDefaultTemplate )
   import Text.Pandoc.Writers ( writeEPUB3 )
   import Text.Printf ( printf )
-  import Boxpub.Client.Provider as P ( Chapter(..), Metadata(..), ProviderEnv(..), mkEnv, fetchChapter )
+  import Boxpub.Client.Provider as B
+  import Boxpub.Client.ProviderType as B ( Chapter(..), Metadata(..), ProviderEnv(..), ProviderConfig(..) )
   import qualified Boxpub.EPUB.Metadata as M ( generate )
   import qualified Data.ByteString.Lazy.Char8 as C8 ( writeFile )
+
+  -- "Safe" variant of !! by @missingfaktor
+  -- https://stackoverflow.com/questions/8861101/haskell-how-to-create-a-function-that-returns-the-fifth-element-from-a-list
+  (!!!) :: [a] -> Int -> Maybe a
+  -- [a] == []
+  [] !!! _ = Nothing
+  -- n > [a].length
+  xs !!! n | n < 0 = Nothing
+  -- [a] !! n
+  (x:_) !!! 0 = Just x
+  (_:xs) !!! n = xs !!! (n - 1)
 
   -- extensions don't really seem to work or at least does nothing much here
   getExtensions :: Extensions
@@ -65,22 +77,22 @@ module Boxpub.EPUB
     , writerEpubChapterLevel = 1
     , writerTOCDepth = 1 }
 
-  getContent :: BoxpubOptions -> ProviderEnv -> Int -> FilePath -> MVar Int -> Int -> IO ()
-  getContent args pEnv total outDir mVar n = do
+  getContent :: Text -> ProviderEnv -> Int -> FilePath -> MVar Int -> Int -> IO ()
+  getContent novel pEnv total outDir mVar n = do
     maxConcurrentThreads <- getNumCapabilities
     -- Display initial status output
     nDownloaded <- readMVar mVar
     statusDisplay maxConcurrentThreads nDownloaded ("ing" :: Text)
     -- Fetch the chapter
-    chapter <- fetchChapter pEnv n
+    chapter <- (B.fetchChapter (B.provider pEnv)) chapterURL
     -- workaround for table of contents
     -- encapsulates chapter with a <div> and prepends a <h1>
     T.writeFile (outDir </> filename) (T.concat
       [ "<h1>"
-      , P.name chapter
+      , B.name chapter
       , "</h1>"
       , "<div>"
-      , content chapter
+      , B.content chapter
       , "</div>" ])
     -- Update the counter and respective MVar fetched
     modifyMVar_ mVar (\old -> return (old + 1))
@@ -88,11 +100,11 @@ module Boxpub.EPUB
     -- Update status output
     statusDisplay maxConcurrentThreads newNDownloaded ("ed" :: Text)
     where
-      name = fromJust $ novel args
-      filename = printf "%s-%d.html" name n
+      chapterURL = unpack $ fromJust $ B.chapterList pEnv !!! (n - 1)
+      filename = printf "%s-%d.html" novel n
       statusDisplay nConcur nDone gramFix = liftIO $ do
         -- ANSI codes aren't supported pre-Windows 10, though the carriage return should work fine...
-        printf "\x1b[2K\r[%d/%d/%d built] building %s.epub: download%s chapter %d" nConcur nDone total name gramFix n
+        printf "\x1b[2K\r[%d/%d/%d built] building %s.epub: download%s chapter %d" nConcur nDone total novel gramFix n
         hFlush stdout
 
   mergeFiles :: FilePath -> [FilePath] -> IO Text
@@ -100,7 +112,7 @@ module Boxpub.EPUB
   mergeFiles dir (x:xs) = do
     -- Fetch the current file contents
     fileContents <- T.readFile (dir </> x)
-    -- Fetch the rest of the file recursively
+    -- Fetch the rest of the files recursively
     restOfFile <- mergeFiles dir xs
     return $ T.concat
       [ fileContents
@@ -108,7 +120,7 @@ module Boxpub.EPUB
 
   main :: BoxpubOptions -> IO ()
   main args = do
-    pEnv <- P.mkEnv args
+    pEnv <- B.mkEnv args
     filters <- getFilters
     dataDir <- getDataDir
     -- Determine the output directory
@@ -116,30 +128,30 @@ module Boxpub.EPUB
     cwd <- getCurrentDirectory
     prefix <- makeAbsolute $ fromMaybe cwd (outputDirectory args)
     mkdirp prefix
-    withSystemTempDirectory "boxpub" $ \tmp -> do
+    withSystemTempDirectory "boxpub" $ \tmpDir -> do
       -- Use "generated" defaults if needed
       -- TODO: Find consistency between
       let start = fromMaybe 1 (B.start args)
-      let end = fromMaybe (length $ P.chapterList pEnv) (B.end args)
+      let end = fromMaybe (length $ B.chapterList pEnv) (B.end args)
       let chapterIndexRange = [start..end]
       -- Generate the actual chapter in "chunks"
       maxConcurrentThreads <- getNumCapabilities
       limiter <- pool maxConcurrentThreads
       counter <- newMVar 0
-      parMapIO_ (limiter . getContent args pEnv (end - start + 1) tmp counter) chapterIndexRange
+      parMapIO_ (limiter . getContent name pEnv (end - start + 1) tmpDir counter) chapterIndexRange
       putStrLn "" -- "Flush" to next line
       -- Merge the files and store in memory
-      fileContents <- mergeFiles tmp (map applyTemplate chapterIndexRange)
+      fileContents <- mergeFiles tmpDir (map applyTemplate chapterIndexRange)
       -- Perform conversion
       pandocResult <- runIO $ do
         -- Fetch the cover image, ignoring the MimeType
         (fp, _, bs) <- fetchMediaResource $ (cover . metadata) pEnv
-        liftIO $ BL.writeFile (tmp </> fp) bs
+        liftIO $ BL.writeFile (tmpDir </> fp) bs
         -- Sanitize contents before generate epub
         raw <- readHtml getReaderOptions fileContents
         src <- applyFilters getReaderOptions filters [ "html" ] raw
         template <- Just <$> compileDefaultTemplate "epub"
-        writeEPUB3 (getWriterOptions template dataDir (metadata pEnv) (tmp </> fp)) src
+        writeEPUB3 (getWriterOptions template dataDir (metadata pEnv) (tmpDir </> fp)) src
       -- Handle errors and write to output directory
       epub <- handleError pandocResult
       C8.writeFile (prefix </> filename) epub
