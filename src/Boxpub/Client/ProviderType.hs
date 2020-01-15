@@ -1,7 +1,7 @@
 module Boxpub.Client.ProviderType
 ( Chapter(..), Metadata(..)
 , ProviderEnv(..), ProviderConfig(..)
-, defaultFetchMetadata, defaultFetchChapter, defaultFetchChapterList ) where
+, req, defaultFetchMetadata, defaultFetchChapter, defaultFetchChapterList ) where
   import Data.Text as T
   import Data.Maybe ( fromJust, fromMaybe )
   import Network.HTTP.Client ( ManagerSettings )
@@ -46,7 +46,7 @@ module Boxpub.Client.ProviderType
     return Metadata
       { title = strip $ fromJust title
       , cover = strip $ fromJust cover
-      , author = strip $ fromJust author }
+      , author = strip $ fromMaybe "" author }
 
   defaultFetchChapter :: Scraper Text Text -> Scraper Text Text -> URL -> IO Chapter
   defaultFetchChapter chapterName chapterContents chapterURL = do
