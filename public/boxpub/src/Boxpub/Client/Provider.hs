@@ -6,9 +6,15 @@ module Boxpub.Client.Provider
   import Data.Maybe ( fromJust )
   import Text.Printf ( printf )
   import qualified Boxpub.Client.Provider.BoxNovel as BoxNovel
+  import qualified Boxpub.Client.Provider.MachineNovelTranslation as MTL
+  import qualified Boxpub.Client.Provider.NovelPlanet as NovelPlanet
+  import qualified Boxpub.Client.Provider.WuxiaWorld as WuxiaWorld
 
   getProvider :: BoxpubOptions -> ProviderConfig
   getProvider args = case source of
+    "wuxiaworld" -> WuxiaWorld.config
+    "novelplanet" -> NovelPlanet.config
+    "machinenoveltranslation" -> MTL.config
     -- NOTE: Defaults to BoxNovel
     _ -> BoxNovel.config
     where

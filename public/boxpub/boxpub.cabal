@@ -47,6 +47,9 @@ executable boxpub
                     , Boxpub.Client.Provider
                     , Boxpub.Client.ProviderType
                     , Boxpub.Client.Provider.BoxNovel
+                    , Boxpub.Client.Provider.MachineNovelTranslation
+                    , Boxpub.Client.Provider.NovelPlanet
+                    , Boxpub.Client.Provider.WuxiaWorld
                     , Boxpub.EPUB
                     , Boxpub.EPUB.Filters
                     , Boxpub.EPUB.Metadata
