@@ -10,14 +10,9 @@ let
 in {
   inherit boxpub hsPkgs;
 
-  boxpub-1_x = boxpub.overrideAttrs (oldAttrs: rec {
-    name = "${oldAttrs.pname}-${version}";
-    version = "1.2.3.0";
-
-    src = nixpkgs.fetchgit {
-      url = "https://git.sr.ht/~eadwu/boxpub";
-      rev = version;
-      sha256 = "07qqrzdvm665p4s1r3mpw617rk9k1vvirzr4k7djmm2py7kcg0lz";
-    };
-  });
+  boxpub-1_x = (import (nixpkgs.fetchgit {
+    url = "https://git.sr.ht/~eadwu/boxpub";
+    rev = "2d5a022e95d924e7c27778deef1908b164b1343a";
+    sha256 = "0jry51vk96k3lly4xv0548dl27z0wnk2zx6g7f2xv5kh7h44qkjr";
+  }) {}).boxpub-1_x;
 }
