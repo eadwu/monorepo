@@ -1,18 +1,16 @@
 module Boxpub.Client.Provider.MachineNovelTranslation
 ( config ) where
   import Data.Text as T
+  import Data.Maybe ( fromJust )
   import Text.HTML.Scalpel
-  import Boxpub.Client.ProviderType ( ProviderConfig(..) )
+  import Boxpub.Client.ProviderType ( Metadata(..), ProviderConfig(..) )
   import qualified Boxpub.Client.ProviderType as B
 
   novelBaseURL :: Text
   novelBaseURL = "https://machinenoveltranslation.com/%s"
 
   novelTitle :: Scraper Text Text
-  novelTitle = chroot ("div" @: [ hasClass "desc" ]) $ text "h4"
-
-  novelAuthor :: Scraper Text Text
-  novelAuthor = text $ "div" @: [ hasClass "NA_" ]
+  novelTitle = chroot ("div" @: [ hasClass "desc" ]) $ text "h5"
 
   coverImage :: Scraper Text Text
   coverImage = chroot ("div" @: [ hasClass "about-author" ]) $ attr "src" "img"
@@ -29,6 +27,12 @@ module Boxpub.Client.Provider.MachineNovelTranslation
   config :: ProviderConfig
   config = ProviderConfig
     { novelPath = novelBaseURL
-    , fetchMetadata = B.defaultFetchMetadata novelTitle coverImage novelAuthor
+    , fetchMetadata = \url -> do
+      title <- B.req url novelTitle
+      cover <- B.req url coverImage
+      return Metadata
+        { title = strip $ fromJust title
+        , cover = strip $ fromJust cover
+        , author = "UNKNOWN" }
     , fetchChapter = B.defaultFetchChapter chapterName chapterContents
     , fetchChapterList = B.defaultFetchChapterList chapterList }
