@@ -13,7 +13,8 @@ module Boxpub.Client.Provider
   getProvider :: BoxpubOptions -> ProviderConfig
   getProvider args = case source of
     "wuxiaworld" -> WuxiaWorld.config
-    "novelplanet" -> NovelPlanet.config
+    -- NOTE: Cloudflare anti-bot check
+    -- "novelplanet" -> NovelPlanet.config
     "machinenoveltranslation" -> MTL.config
     -- NOTE: Defaults to BoxNovel
     _ -> BoxNovel.config
