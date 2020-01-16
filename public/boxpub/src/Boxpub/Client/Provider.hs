@@ -3,7 +3,7 @@ module Boxpub.Client.Provider
   import Data.Text as T
   import Boxpub.Client.Parser as B ( BoxpubOptions(..) )
   import Boxpub.Client.ProviderType as B
-  import Data.Maybe ( fromJust )
+  import Data.Maybe ( fromJust, fromMaybe )
   import Text.Printf ( printf )
   import qualified Boxpub.Client.Provider.BoxNovel as BoxNovel
   import qualified Boxpub.Client.Provider.MachineNovelTranslation as MTL
@@ -18,7 +18,7 @@ module Boxpub.Client.Provider
     -- NOTE: Defaults to BoxNovel
     _ -> BoxNovel.config
     where
-      source = T.toLower $ fromJust $ B.source args
+      source = T.toLower $ fromMaybe "" $ B.source args
 
   mkEnv :: BoxpubOptions -> IO ProviderEnv
   mkEnv args = do
