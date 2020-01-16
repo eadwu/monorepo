@@ -28,10 +28,10 @@ executable boxpub
                       -with-rtsopts=-N
   build-depends:      base
                     , text
-                    , spawn
                     , pandoc
                     , scalpel ^>=0.6.0
                     , filepath
+                    , unliftio
                     , directory
                     , temporary
                     , bytestring

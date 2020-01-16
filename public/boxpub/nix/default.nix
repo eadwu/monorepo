@@ -10,7 +10,7 @@ let
       src = cleanSourceHaskell { src = ./..; name = "boxpub-src"; };
       index-state = "2020-01-11T00:00:00Z";
       index-sha256 = "0vabvmgpz9p7i7fipkfdap7ird9mw285k10wd3mzkrlss7x2dlcn";
-      plan-sha256 = "1i9dxf152wiqi7wmllf8g0gxzznvqd0ck2hrrhar2fs7b6z1wyvg";
+      plan-sha256 = "1byrxx61lwv39rh2jnrn5snbc30cw5xz7li5ac46ww5h6z5yd62q";
     })).pkgs;
     pkg-def-extras = [ ];
     modules = [
