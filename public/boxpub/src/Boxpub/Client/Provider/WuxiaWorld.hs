@@ -6,7 +6,7 @@ module Boxpub.Client.Provider.WuxiaWorld
   import qualified Boxpub.Client.ProviderType as B
 
   novelBaseURL :: Text
-  novelBaseURL = "https://wuxiaworld.com/novel/%s"
+  novelBaseURL = "https://www.wuxiaworld.com/novel/%s"
 
   novelTitle :: Scraper Text Text
   novelTitle = text "h4"
@@ -15,7 +15,7 @@ module Boxpub.Client.Provider.WuxiaWorld
   novelAuthor = text $ ("div" @: [ hasClass "media-body" ]) // "dd"
 
   coverImage :: Scraper Text Text
-  coverImage = chroot ("div" @: [ hasClass "media" ]) $ attr "src" "img"
+  coverImage = attr "data-cfsrc" ("img" @: [ hasClass "media-object" ])
 
   chapterList :: Scraper Text [Text]
   chapterList = chroots ("ul" @: [ hasClass "list-chapters" ] // "li" @: [ hasClass "chapter-item" ]) $ attr "href" "a"
@@ -33,4 +33,4 @@ module Boxpub.Client.Provider.WuxiaWorld
     , fetchChapter = B.defaultFetchChapter chapterName chapterContents
     , fetchChapterList = \url -> do
       cL <- B.defaultFetchChapterList chapterList url
-      return $ Prelude.map (\path -> T.concat [ T.pack url, "/", path ]) cL }
+      return $ Prelude.map (\path -> T.concat [ "https://www.wuxiaworld.com", path ]) cL }

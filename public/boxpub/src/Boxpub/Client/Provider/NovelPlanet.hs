@@ -32,9 +32,9 @@ module Boxpub.Client.Provider.NovelPlanet
       cover <- B.req url coverImage
       return Metadata
         { title = strip $ fromMaybe "" title
-        , cover = T.concat [ T.pack url, strip $ fromMaybe "" cover ]
+        , cover = T.concat [ "https://novelplanet.com", strip $ fromMaybe "" cover ]
         , author = "UNKNOWN" }
     , fetchChapter = B.defaultFetchChapter chapterName chapterContents
     , fetchChapterList = \url -> do
       cL <- B.defaultFetchChapterList chapterList url
-      return $ Prelude.map (\path -> T.concat [ T.pack url, "/", path ]) cL }
+      return $ Prelude.map (\path -> T.concat [ "https://novelplanet.com", path ]) cL }
