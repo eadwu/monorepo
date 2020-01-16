@@ -1,7 +1,7 @@
 module Boxpub.Client.Provider.NovelPlanet
 ( config ) where
   import Data.Text as T
-  import Data.Maybe ( fromMaybe )
+  import Data.Maybe ( fromJust )
   import Text.HTML.Scalpel
   import Boxpub.Client.ProviderType ( Metadata(..), ProviderConfig(..) )
   import qualified Boxpub.Client.ProviderType as B
@@ -31,8 +31,8 @@ module Boxpub.Client.Provider.NovelPlanet
       title <- B.req url novelTitle
       cover <- B.req url coverImage
       return Metadata
-        { title = strip $ fromMaybe "" title
-        , cover = T.concat [ "https://novelplanet.com", strip $ fromMaybe "" cover ]
+        { title = strip $ fromJust title
+        , cover = T.concat [ "https://novelplanet.com", strip $ fromJust cover ]
         , author = "UNKNOWN" }
     , fetchChapter = B.defaultFetchChapter chapterName chapterContents
     , fetchChapterList = \url -> do

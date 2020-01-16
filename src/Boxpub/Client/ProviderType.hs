@@ -46,7 +46,7 @@ module Boxpub.Client.ProviderType
     return Metadata
       { title = strip $ fromJust title
       , cover = strip $ fromJust cover
-      , author = strip $ fromMaybe "" author }
+      , author = strip $ fromJust author }
 
   defaultFetchChapter :: Scraper Text Text -> Scraper Text Text -> URL -> IO Chapter
   defaultFetchChapter chapterName chapterContents chapterURL = do
