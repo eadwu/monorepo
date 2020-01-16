@@ -5,15 +5,15 @@ module Boxpub.EPUB
   import Boxpub.Client.Parser as B ( BoxpubOptions(..) )
   import Boxpub.EPUB.Filters ( getFilters )
   import Boxpub.Internal.FileSystem ( mkdirp )
-  import Control.Concurrent ( getNumCapabilities )
-  import Control.Concurrent.MVar ( MVar(..), newMVar, readMVar, modifyMVar_)
-  import Control.Concurrent.Spawn ( pool, parMapIO_ )
+  import UnliftIO.Async ( pooledMapConcurrentlyN_ )
+  import UnliftIO.Concurrent ( getNumCapabilities )
+  import UnliftIO.MVar ( MVar(..), newMVar, readMVar, modifyMVar_)
   import Control.Monad.IO.Class ( liftIO )
   import Data.ByteString.Lazy as BL ( writeFile )
   import Data.Default ( def )
   import Data.Map as M ( fromList )
   import Data.Maybe ( fromJust, fromMaybe )
-  import Data.Text as T ( Text, pack, foldl', append, unpack, concat )
+  import Data.Text as T ( Text, pack, append, unpack, concat )
   import Data.Text.IO as T ( readFile, writeFile )
   import System.Directory ( makeAbsolute, getCurrentDirectory )
   import System.FilePath ( (<.>), (</>) )
@@ -136,9 +136,8 @@ module Boxpub.EPUB
       let chapterIndexRange = [start..end]
       -- Generate the actual chapter in "chunks"
       maxConcurrentThreads <- getNumCapabilities
-      limiter <- pool maxConcurrentThreads
       counter <- newMVar 0
-      parMapIO_ (limiter . getContent name pEnv (end - start + 1) tmpDir counter) chapterIndexRange
+      pooledMapConcurrentlyN_ maxConcurrentThreads (getContent name pEnv (end - start + 1) tmpDir counter) chapterIndexRange
       putStrLn "" -- "Flush" to next line
       -- Merge the files and store in memory
       fileContents <- mergeFiles tmpDir (map applyTemplate chapterIndexRange)
