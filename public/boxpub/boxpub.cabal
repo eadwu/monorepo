@@ -1,8 +1,8 @@
 cabal-version:        2.4
 
 name:                 boxpub
-version:              1.2.3.0
-synopsis:             boxnovel epub generator
+version:              2.0.0.0
+synopsis:             epub generator from aggregator sites
 license:              BSD-3-Clause
 license-file:         LICENSE
 author:               Edmund Wu
