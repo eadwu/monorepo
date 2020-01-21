@@ -8,9 +8,9 @@ let
   pkgSet = with haskell; mkCabalProjectPkgSet {
     plan-pkgs = (importAndFilterProject (callCabalProjectToNix {
       src = cleanSourceHaskell { src = ./..; name = "boxpub-src"; };
-      index-state = "2020-01-11T00:00:00Z";
-      index-sha256 = "0vabvmgpz9p7i7fipkfdap7ird9mw285k10wd3mzkrlss7x2dlcn";
-      plan-sha256 = "1byrxx61lwv39rh2jnrn5snbc30cw5xz7li5ac46ww5h6z5yd62q";
+      index-state = "2020-01-21T00:00:00Z";
+      index-sha256 = "0vyf6sixww31ckh2mp7b7ilcipfzgg05wsizismzjdw3sy03n9in";
+      plan-sha256 = "1vs7jcgg72snyl3ckvpdgikj2xbvylkbnbk4rlcda23ihdjwq35p";
     })).pkgs;
     pkg-def-extras = [ ];
     modules = [
