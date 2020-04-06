@@ -1,10 +1,11 @@
-{ compiler }:
+{ compiler, ... }@args:
 
 let
   _sources = import ./sources.nix;
   haskellNix = import _sources."haskell.nix" {};
 
-  _pkgs = with haskellNix; import sources.nixpkgs-1909 nixpkgsArgs;
+  _args = builtins.removeAttrs args [ "compiler" ];
+  _pkgs = with haskellNix; import sources.nixpkgs-1909 (nixpkgsArgs // _args);
   pkgs = _pkgs.pkgsCross.musl64;
 
   pkgSet = with pkgs.haskell-nix; mkCabalProjectPkgSet {

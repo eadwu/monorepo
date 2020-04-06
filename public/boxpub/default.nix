@@ -1,5 +1,5 @@
-{ compiler ? "ghc865" }:
+{ compiler ? "ghc865", ... }@args:
 
 let
-  _pkgs = import ./nix { inherit compiler; };
+  _pkgs = import ./nix ({ inherit compiler; } // args);
 in _pkgs.hsPkgs.boxpub.components.all
