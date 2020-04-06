@@ -1,16 +1,19 @@
-{ pkgs ? import ./nixpkgs.nix { } }:
+{ compiler }:
 
 let
-  haskellNix = import ./haskell.nix { };
-  nixpkgs = (import pkgs.nixpkgs (import haskellNix));
-  haskell = nixpkgs.pkgsCross.musl64.haskell-nix;
+  _sources = import ./sources.nix;
+  haskellNix = import _sources."haskell.nix" {};
 
-  pkgSet = with haskell; mkCabalProjectPkgSet {
+  _pkgs = with haskellNix; import sources.nixpkgs-1909 nixpkgsArgs;
+  pkgs = _pkgs.pkgsCross.musl64;
+
+  pkgSet = with pkgs.haskell-nix; mkCabalProjectPkgSet {
     plan-pkgs = (importAndFilterProject (callCabalProjectToNix {
-      src = cleanSourceHaskell { src = ./..; name = "boxpub-src"; };
+      src = cleanSourceHaskell { src = ./..; name = "boxpub-source"; };
       index-state = "2020-01-21T00:00:00Z";
       index-sha256 = "0vyf6sixww31ckh2mp7b7ilcipfzgg05wsizismzjdw3sy03n9in";
       plan-sha256 = "1vs7jcgg72snyl3ckvpdgikj2xbvylkbnbk4rlcda23ihdjwq35p";
+      ghc = pkgs.buildPackages.pkgs.haskell-nix.compiler.${compiler};
     })).pkgs;
     pkg-def-extras = [ ];
     modules = [
@@ -20,7 +23,7 @@ let
       }
 
       {
-        packages.boxpub.configureFlags = with nixpkgs; [
+        packages.boxpub.configureFlags = with pkgs; [
           "--disable-shared"
           "--disable-executable-dynamic"
           "--ghc-option=-optl=-static"
@@ -33,5 +36,7 @@ let
       }
     ];
   };
-in
-  pkgSet.config.hsPkgs // { inherit nixpkgs; iohaskell = haskell; }
+in {
+  inherit (pkgSet.config) hsPkgs;
+  nixpkgs = pkgs;
+}
