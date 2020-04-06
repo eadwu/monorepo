@@ -4,8 +4,12 @@ let
   _sources = import ./sources.nix;
   haskellNix = import _sources."haskell.nix" {};
 
-  _args = builtins.removeAttrs args [ "compiler" ];
-  _pkgs = with haskellNix; import sources.nixpkgs-1909 (nixpkgsArgs // _args);
+  _args = builtins.removeAttrs args [ "nixpkgs" "compiler" ];
+  nixpkgs = if (args ? nixpkgs)
+    then args.nixpkgs
+    else haskellNix.sources.nixpkgs-1909;
+
+  _pkgs = import nixpkgs (haskellNix.nixpkgsArgs // _args);
   pkgs = _pkgs.pkgsCross.musl64;
 
   pkgSet = with pkgs.haskell-nix; mkCabalProjectPkgSet {
