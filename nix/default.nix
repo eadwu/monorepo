@@ -7,7 +7,9 @@ let
   _args = builtins.removeAttrs args [ "nixpkgs" "compiler" ];
   nixpkgs = if (args ? nixpkgs)
     then args.nixpkgs
-    else haskellNix.sources.nixpkgs-1909;
+    else if (_sources ? nixpkgs)
+      then _sources.nixpkgs
+      else haskellNix.sources.nixpkgs-1909;
 
   _pkgs = import nixpkgs (haskellNix.nixpkgsArgs // _args);
   pkgs = _pkgs.pkgsCross.musl64;
