@@ -1,0 +1,22 @@
+name: "boxpub"
+on:
+  push:
+  pull_request:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    # WARNING: Needed due to GitHub Actions disk space regression on Linux runners
+    - name: init
+      run: |
+        sudo swapoff -a
+        sudo rm -f /swapfile
+        sudo apt clean
+        docker rmi $(docker image ls -aq)
+        df -h
+    - uses: actions/checkout@v2
+    - uses: cachix/install-nix-action@v8
+    - uses: cachix/cachix-action@v5
+      with:
+        name: boxpub
+        signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
