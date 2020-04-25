@@ -17,9 +17,9 @@ let
   pkgSet = with pkgs.haskell-nix; mkCabalProjectPkgSet {
     plan-pkgs = (importAndFilterProject (callCabalProjectToNix {
       src = cleanSourceHaskell { src = ./..; name = "boxpub-source"; };
-      index-state = "2020-04-21T00:00:00Z";
-      index-sha256 = "05a0b1lzlp9g5rismmn54id5qi2bkcxznr7sh6plhdllbjfivyhv";
-      plan-sha256 = "1rvnq4m0mvd4r94gfrh46ranrd3zbwswkvlqdajkbzx4khyqk3si";
+      index-state = "2020-04-25T00:00:00Z";
+      index-sha256 = "0zsczchlvpp9vqqqwq698g5qvp49x9pvzfgjl2mrrsrz6nzk2mig";
+      plan-sha256 = "10jr163bgnds6fj98rr0x44ba1l0n79gn032xrbs739l4vckf031";
       ghc = pkgs.buildPackages.pkgs.haskell-nix.compiler.${compiler};
     })).pkgs;
     pkg-def-extras = [ ];
