@@ -9,13 +9,13 @@ module Boxpub.Client.Provider.WuxiaWorld
   novelBaseURL = "https://www.wuxiaworld.com/novel/%s"
 
   novelTitle :: Scraper Text Text
-  novelTitle = text "h4"
+  novelTitle = text $ ("div" @: [ hasClass "novel-body" ]) // "h2"
 
   novelAuthor :: Scraper Text Text
-  novelAuthor = text $ ("div" @: [ hasClass "media-body" ]) // "dd"
+  novelAuthor = text $ ("div" @: [ hasClass "novel-body" ]) // "dd"
 
   coverImage :: Scraper Text Text
-  coverImage = attr "data-cfsrc" ("img" @: [ hasClass "media-object" ])
+  coverImage = attr "src" ("img" @: [ hasClass "media-object" ])
 
   chapterList :: Scraper Text [Text]
   chapterList = chroots ("ul" @: [ hasClass "list-chapters" ] // "li" @: [ hasClass "chapter-item" ]) $ attr "href" "a"
