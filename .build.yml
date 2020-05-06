@@ -19,6 +19,5 @@ tasks:
       cachix use boxpub
   - build: |
       cd boxpub
-      nix-build --no-out-link --max-jobs 1 -A boxpub
-      nix-build --no-out-link --max-jobs 1 -A boxpub-1_x
-      nix-build --no-out-link --max-jobs 1 -A boxpub -A boxpub-1_x | cachix push boxpub
+      nix-build --no-out-link --max-jobs 1
+      nix-build --no-out-link --max-jobs 1 | cachix push boxpub
