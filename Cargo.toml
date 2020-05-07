@@ -1,0 +1,6 @@
+[package]
+name = "boxpub"
+version = "3.0.0.0"
+authors = [ "Edmund Wu" ]
+
+edition = "2018"
