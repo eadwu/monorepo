@@ -1,8 +1,14 @@
 [package]
 name = "boxpub"
-version = "3.0.0.0"
+version = "3.0.0"
 authors = [ "Edmund Wu" ]
 license = "AGPL-3.0"
-license-file = "LICENSE"
 
 edition = "2018"
+
+[[bin]]
+name = "boxpub"
+path = "src/main.rs"
+
+[dependencies]
+structopt = "0.3.14"

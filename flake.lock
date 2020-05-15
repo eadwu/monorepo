@@ -1,0 +1,240 @@
+{
+  "nodes": {
+    "boxpub": {
+      "flake": false,
+      "info": {
+        "lastModified": 1588725561,
+        "narHash": "sha256-hFNrtDlj7+ueFT8mCHeqe2m7FLNsyooWU9rzwqY8NVc="
+      },
+      "locked": {
+        "owner": "eadwu",
+        "repo": "boxpub",
+        "rev": "2794126472cd5fbf10ca67bcfeb9a9bf0a7a7d5a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "eadwu",
+        "ref": "boxpub/2.x",
+        "repo": "boxpub",
+        "type": "github"
+      }
+    },
+    "cachix": {
+      "flake": false,
+      "info": {
+        "lastModified": 1586710030,
+        "narHash": "sha256-cqaMWQsz7GYr6k82ccVaZ0gxd1EnOQWHU1ShnjFl0FY="
+      },
+      "locked": {
+        "owner": "eadwu",
+        "repo": "cachix",
+        "rev": "30febae6056980adc470d2ccc834c689eea5f6bf",
+        "type": "github"
+      },
+      "original": {
+        "owner": "eadwu",
+        "repo": "cachix",
+        "type": "github"
+      }
+    },
+    "custom": {
+      "info": {
+        "lastModified": 1589156497,
+        "narHash": "sha256-Ag34YRk8z2DsUzEZXJSWWzQrKz1mfpZzre4EAyuxtcM="
+      },
+      "inputs": {
+        "custom": "custom_2",
+        "nixpkgs": "nixpkgs_2",
+        "rolling": "rolling"
+      },
+      "locked": {
+        "owner": "eadwu",
+        "repo": "flakes",
+        "rev": "005f42c45b14fdcae106f45411009f21aa7de6bb",
+        "type": "github"
+      },
+      "original": {
+        "owner": "eadwu",
+        "repo": "flakes",
+        "type": "github"
+      }
+    },
+    "custom_2": {
+      "info": {
+        "lastModified": 1589310760,
+        "narHash": "sha256-g9YmCrIiv20m7qukQM8nenMPYFf6nQAz94kmQQmNZfo="
+      },
+      "inputs": {
+        "boxpub": "boxpub",
+        "cachix": "cachix",
+        "nix-linter": "nix-linter",
+        "nixops": "nixops",
+        "nixpkgs": "nixpkgs",
+        "plymouth-themes": "plymouth-themes"
+      },
+      "locked": {
+        "owner": "eadwu",
+        "repo": "flakes",
+        "rev": "5b5c19ad6e62955b896f9035fab2ab5fc5e746f4",
+        "type": "github"
+      },
+      "original": {
+        "owner": "eadwu",
+        "ref": "custom",
+        "repo": "flakes",
+        "type": "github"
+      }
+    },
+    "nix-linter": {
+      "flake": false,
+      "info": {
+        "lastModified": 1586709851,
+        "narHash": "sha256-idOz72Ac45ZoBuHmT8wScgp5I50VpYbUfbnVgYGr31c="
+      },
+      "locked": {
+        "owner": "eadwu",
+        "repo": "nix-linter",
+        "rev": "d20e56a71350d24293bed5c35828c093cd437119",
+        "type": "github"
+      },
+      "original": {
+        "owner": "eadwu",
+        "repo": "nix-linter",
+        "type": "github"
+      }
+    },
+    "nixops": {
+      "flake": false,
+      "info": {
+        "lastModified": 1588864564,
+        "narHash": "sha256-cT+9gIquClgh6a01kk6ZLiE0JDEJqMlFPYYfo5ErvfQ="
+      },
+      "locked": {
+        "owner": "NixOS",
+        "repo": "nixops",
+        "rev": "890722355db83bb9894276c4f236ad49183fc8c2",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "repo": "nixops",
+        "type": "github"
+      }
+    },
+    "nixpkgs": {
+      "info": {
+        "lastModified": 1589417750,
+        "narHash": "sha256-4ZmgnwjxnLQtNwLGAxbYsE/eKu5TmMzz3O8wzaIipQE="
+      },
+      "locked": {
+        "owner": "eadwu",
+        "repo": "nixpkgs",
+        "rev": "28df4f968ad7924afcfddb60b806ba0dae762c2e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "eadwu",
+        "ref": "develop",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs_2": {
+      "info": {
+        "lastModified": 1589426555,
+        "narHash": "sha256-I22zIKwcpNPUNhw767jPDDTH3T7FgnrkhFwcQn3sRxQ="
+      },
+      "locked": {
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "b87096c7fbe75d6e43e8e5110347afe962c69963",
+        "type": "github"
+      },
+      "original": {
+        "id": "nixpkgs",
+        "type": "indirect"
+      }
+    },
+    "nixpkgs_3": {
+      "info": {
+        "lastModified": 1589426555,
+        "narHash": "sha256-I22zIKwcpNPUNhw767jPDDTH3T7FgnrkhFwcQn3sRxQ="
+      },
+      "locked": {
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "b87096c7fbe75d6e43e8e5110347afe962c69963",
+        "type": "github"
+      },
+      "original": {
+        "id": "nixpkgs",
+        "type": "indirect"
+      }
+    },
+    "nixpkgs_4": {
+      "info": {
+        "lastModified": 1589417750,
+        "narHash": "sha256-4ZmgnwjxnLQtNwLGAxbYsE/eKu5TmMzz3O8wzaIipQE="
+      },
+      "locked": {
+        "owner": "eadwu",
+        "repo": "nixpkgs",
+        "rev": "28df4f968ad7924afcfddb60b806ba0dae762c2e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "eadwu",
+        "ref": "develop",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "plymouth-themes": {
+      "flake": false,
+      "info": {
+        "lastModified": 1587689763,
+        "narHash": "sha256-q3rG4VTzGeWMQIfGRBtoqLnbsrwnhhPpJDvwjwdFlw4="
+      },
+      "locked": {
+        "owner": "eadwu",
+        "repo": "plymouth-themes",
+        "rev": "79a4e889b2f21ed2a2a2f774c3a1ae1152f1a7e2",
+        "type": "github"
+      },
+      "original": {
+        "owner": "eadwu",
+        "repo": "plymouth-themes",
+        "type": "github"
+      }
+    },
+    "rolling": {
+      "info": {
+        "lastModified": 1589418569,
+        "narHash": "sha256-bu7fLjgvL6WlJVgCQ1Nn9sLI4CyPsOnAusauPmWdfYo="
+      },
+      "inputs": {
+        "nixpkgs": "nixpkgs_3"
+      },
+      "locked": {
+        "owner": "eadwu",
+        "repo": "flakes",
+        "rev": "20f4eac3c12ebe9559c552a7b03c7c4a6ec00cb8",
+        "type": "github"
+      },
+      "original": {
+        "owner": "eadwu",
+        "ref": "rolling",
+        "repo": "flakes",
+        "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "custom": "custom",
+        "nixpkgs": "nixpkgs_4"
+      }
+    }
+  },
+  "root": "root",
+  "version": 5
+}

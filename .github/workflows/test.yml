@@ -1,0 +1,33 @@
+name: "boxpub"
+on:
+  push:
+  pull_request:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: cachix/install-nix-action@v8
+    - uses: cachix/cachix-action@v6
+      with:
+        name: boxpub
+        signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
+    - name: nix-build
+      run: |
+        export NIX_DRV="$(nix-build)"
+    - uses: actions/upload-artifact@v2
+      with:
+        name: wasm
+        path: ${env.NIX_DRV}
+  compile:
+    runs-on-: ${{ matrix.platform }}-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [ubuntu, macos, windows]
+
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: wasm

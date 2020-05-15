@@ -1,0 +1,58 @@
+cabal-version:        2.4
+
+name:                 boxpub
+version:              2.0.0.0
+synopsis:             epub generator from aggregator sites
+license:              NONE
+author:               Edmund Wu
+maintainer:           edmund.wu@protonmail.com
+
+homepage:             https://git.sr.ht/~eadwu/boxpub
+bug-reports:          https://todo.sr.ht/~eadwu/boxpub
+
+data-dir:             data
+data-files:           sanitize.lua
+                    , stylesheet.css
+                    , Arvo/*.ttf
+                    , Arvo/OFL.txt
+
+source-repository head
+  type:               git
+  location:           https://git.sr.ht/~eadwu/boxpub
+
+executable boxpub
+  main-is:            Main.hs
+  ghc-options:        -threaded
+                      -rtsopts
+                      -with-rtsopts=-N
+  build-depends:      base
+                    , text
+                    , pandoc
+                    , scalpel ^>=0.6.0
+                    , filepath
+                    , unliftio
+                    , directory
+                    , temporary
+                    , bytestring
+                    , containers
+                    , http-client
+                    , data-default
+                    , doctemplates
+                    , http-client-tls
+                    , optparse-applicative
+  other-modules:      Paths_boxpub
+                    , Boxpub.Client
+                    , Boxpub.Client.Parser
+                    , Boxpub.Client.Provider
+                    , Boxpub.Client.ProviderType
+                    , Boxpub.Client.Provider.BoxNovel
+                    , Boxpub.Client.Provider.MachineNovelTranslation
+                    , Boxpub.Client.Provider.NovelPlanet
+                    , Boxpub.Client.Provider.WuxiaWorld
+                    , Boxpub.EPUB
+                    , Boxpub.EPUB.Filters
+                    , Boxpub.EPUB.Metadata
+                    , Boxpub.Internal.FileSystem
+  hs-source-dirs:     src
+  default-language:   Haskell2010
+  default-extensions: OverloadedStrings
