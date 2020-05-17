@@ -19,12 +19,18 @@ in stdenv.mkDerivation rec {
 
   nativeBuildInputs = [ pythonPackages ];
 
+  # python -m nuitka --output-dir $out/package --module --follow-imports --include-package=ebooklib ebooklib
+  # python -m nuitka --output-dir $out/module --module --follow-imports --include-module=ebooklib ebooklib
   buildPhase = ''
     export HOME=$TMPDIR
-    python -m nuitka --output-dir $out ebooklib/__init__.py
+    python -m nuitka --output-dir $out --module --follow-imports --include-package=ebooklib ebooklib
   '';
 
   dontInstall = true;
+
   dontStrip = true;
-  dontShrink = true;
+  dontPatchELF = true;
+  preFixup = ''
+    chmod +x $out/ebooklib.so
+  '';
 }

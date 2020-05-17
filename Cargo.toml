@@ -10,5 +10,10 @@ edition = "2018"
 name = "boxpub"
 path = "src/main.rs"
 
+[lib]
+name = "boxpub"
+crate-type = [ "cdylib" ]
+
 [dependencies]
+pyo3 = "0.10.1"
 structopt = "0.3.14"
