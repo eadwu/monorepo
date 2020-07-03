@@ -10,6 +10,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      # Maximum storage with Nix
+      - run: sudo rm -rf /opt /usr/local || true
       # WARNING: Needed due to GitHub Actions disk space regression on Linux runners
       - name: init
         run: |
