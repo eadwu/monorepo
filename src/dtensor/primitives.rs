@@ -1,3 +1,5 @@
+pub mod ops;
+
 use crate::dtensor;
 use wgpu::{self, util::DeviceExt};
 
