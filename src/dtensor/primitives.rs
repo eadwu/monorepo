@@ -42,7 +42,7 @@ impl<'tensor> Tensor<'tensor> {
     // Constructors
 
     pub async fn new<T: bytemuck::Pod>(
-        shape: Vec<usize>,
+        shape: &[usize],
         data: &[T],
         wgpu_device: &'tensor dtensor::WgpuDevice,
     ) -> Tensor<'tensor> {
@@ -57,7 +57,7 @@ impl<'tensor> Tensor<'tensor> {
         Tensor::with_buffer(shape, data_buffer, wgpu_device)
     }
 
-    pub async fn of_shape(shape: Vec<usize>, wgpu_device: &'tensor dtensor::WgpuDevice) -> Tensor<'tensor> {
+    pub async fn of_shape(shape: &[usize], wgpu_device: &'tensor dtensor::WgpuDevice) -> Tensor<'tensor> {
         let (device, _) = wgpu_device;
 
         let n_elements: usize = shape.iter().product();
@@ -78,12 +78,12 @@ impl<'tensor> Tensor<'tensor> {
         self.rank
     }
 
-    pub fn shape(&self) -> Vec<usize> {
-        self.shape.clone()
+    pub fn shape(&self) -> &[usize] {
+        &self.shape
     }
 
-    pub fn stride(&self) -> Vec<usize> {
-        self.stride.clone()
+    pub fn stride(&self) -> &[usize] {
+        &self.stride
     }
 
     pub fn contiguous(&self) -> bool {
@@ -104,7 +104,7 @@ impl<'tensor> Tensor<'tensor> {
 
     // Private Helpers
     fn with_buffer(
-        shape: Vec<usize>,
+        shape: &[usize],
         buffer: wgpu::Buffer,
         wgpu_device: &'tensor dtensor::WgpuDevice,
     ) -> Tensor<'tensor> {
@@ -124,7 +124,7 @@ impl<'tensor> Tensor<'tensor> {
 
         Tensor {
             rank: rank,
-            shape: shape,
+            shape: shape.iter().map(|x| x.clone()).collect::<Vec<usize>>(),
             stride: stride,
             contiguous_stride: contiguous_stride,
             contiguous: true,

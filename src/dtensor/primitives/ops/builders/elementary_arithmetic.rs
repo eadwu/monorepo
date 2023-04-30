@@ -18,7 +18,7 @@ pub async fn elementary_arithmetic_builder<'op>(
     let (device, _) = wgpu_device;
 
     let output_shape = compute_output_shape(a, b);
-    let result = Tensor::of_shape(output_shape, wgpu_device).await;
+    let result = Tensor::of_shape(&output_shape, wgpu_device).await;
 
     let shader_source = generate_wgsl_shader(a, b, &result, entry_point, op);
     let compiled_shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
