@@ -1,6 +1,6 @@
 pub mod ops;
 
-use std::ops::{Add,Sub,Mul,Div};
+use std::ops::{Add, Div, Mul, Sub};
 
 use crate::dtensor;
 use wgpu::{self, util::DeviceExt};
@@ -53,13 +53,17 @@ impl<'tensor> Tensor<'tensor> {
             label: None,
             contents: bytemuck::cast_slice(data),
             usage: wgpu::BufferUsages::STORAGE
-                | wgpu::BufferUsages::COPY_DST | wgpu::BufferUsages::COPY_SRC,
+                | wgpu::BufferUsages::COPY_DST
+                | wgpu::BufferUsages::COPY_SRC,
         });
 
         Tensor::with_buffer(shape, data_buffer, wgpu_device)
     }
 
-    pub async fn of_shape(shape: &[usize], wgpu_device: &'tensor dtensor::WgpuDevice) -> Tensor<'tensor> {
+    pub async fn of_shape(
+        shape: &[usize],
+        wgpu_device: &'tensor dtensor::WgpuDevice,
+    ) -> Tensor<'tensor> {
         let (device, _) = wgpu_device;
 
         let n_elements: usize = shape.iter().product();
@@ -68,7 +72,8 @@ impl<'tensor> Tensor<'tensor> {
             label: None,
             size: size as wgpu::BufferAddress,
             usage: wgpu::BufferUsages::STORAGE
-                | wgpu::BufferUsages::COPY_DST | wgpu::BufferUsages::COPY_SRC,
+                | wgpu::BufferUsages::COPY_DST
+                | wgpu::BufferUsages::COPY_SRC,
             mapped_at_creation: false,
         });
 
