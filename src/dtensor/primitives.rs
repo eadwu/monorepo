@@ -1,5 +1,7 @@
 pub mod ops;
 
+use std::ops::{Add,Sub,Mul,Div};
+
 use crate::dtensor;
 use wgpu::{self, util::DeviceExt};
 
@@ -132,5 +134,39 @@ impl<'tensor> Tensor<'tensor> {
             n: n_elements,
             data: buffer,
         }
+    }
+}
+
+// Elementary Arithmetic Implementations
+
+impl Add for Tensor<'_> {
+    type Output = Self;
+
+    fn add(self, other: Self) -> Self::Output {
+        futures::executor::block_on(dtensor::primitives::ops::add(&self, &other))
+    }
+}
+
+impl Sub for Tensor<'_> {
+    type Output = Self;
+
+    fn sub(self, other: Self) -> Self::Output {
+        futures::executor::block_on(dtensor::primitives::ops::subtract(&self, &other))
+    }
+}
+
+impl Mul for Tensor<'_> {
+    type Output = Self;
+
+    fn mul(self, other: Self) -> Self::Output {
+        futures::executor::block_on(dtensor::primitives::ops::multiply(&self, &other))
+    }
+}
+
+impl Div for Tensor<'_> {
+    type Output = Self;
+
+    fn div(self, other: Self) -> Self::Output {
+        futures::executor::block_on(dtensor::primitives::ops::divide(&self, &other))
     }
 }
