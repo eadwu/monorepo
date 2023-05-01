@@ -1,7 +1,10 @@
 pub mod builders;
+mod reshape;
 
 use crate::dtensor::primitives::Tensor;
 use builders::*;
+
+pub use reshape::reshape;
 
 // Elementary Arithmetic
 pub async fn add<'a>(a: &Tensor<'a>, b: &Tensor<'a>) -> Tensor<'a> {
