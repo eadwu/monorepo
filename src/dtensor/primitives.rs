@@ -108,6 +108,15 @@ impl<'tensor> Tensor<'tensor> {
         self.n
     }
 
+    // Utilities
+    pub async fn reshape(&self, shape: &[usize]) -> Tensor<'tensor> {
+        dtensor::primitives::ops::reshape(self, shape).await
+    }
+
+    pub async fn as_contiguous(&self) -> Tensor<'tensor> {
+        self.reshape(self.shape()).await
+    }
+
     // Private Helpers
     fn with_buffer(
         shape: &[usize],
