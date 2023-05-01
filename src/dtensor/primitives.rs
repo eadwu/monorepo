@@ -88,6 +88,10 @@ impl<'tensor> Tensor<'tensor> {
         &self.stride
     }
 
+    pub fn contiguous_stride(&self) -> &[usize] {
+        &self.contiguous_stride
+    }
+
     pub fn contiguous(&self) -> bool {
         self.contiguous
     }
