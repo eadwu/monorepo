@@ -122,6 +122,19 @@ struct TensorMetadata {{
     )
 }
 
+pub fn map_offset(initial_index_var: &str, input_name: &str) -> String {
+    format!("
+// Map index from the contiguous result offset to the strided input offset
+var {input_name}_contiguous_offset: u32 = {index_var};
+var {input_name}_mapped_offset: u32 = 0u;
+for (var i = 0u; i < {input_name}_metadata.rank; i++) {{
+    let index_at_dimension = ({input_name}_contiguous_offset / {input_name}_contiguous_stride[i]) % {input_name}_shape[i];
+    {input_name}_mapped_offset = {input_name}_mapped_offset + (index_at_dimension * {input_name}_stride[i]);
+    {input_name}_contiguous_offset = {input_name}_contiguous_offset % {input_name}_contiguous_stride[i];
+}}
+", input_name=input_name, index_var=initial_index_var)
+}
+
 pub fn create_tensor_bind_group(
     tensor: &Tensor,
     bind_group_layout: &wgpu::BindGroupLayout,

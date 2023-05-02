@@ -16,7 +16,7 @@ pub async fn elementary_arithmetic_builder(
     }
 
     let web_gpu = a.device();
-    let dtensor::WebGPU { device, queue } = web_gpu;
+    let dtensor::WebGPU { device, queue: _ } = web_gpu;
 
     let output_shape = compute_output_shape(&a, &b);
     let result = Tensor::of_shape(&output_shape, a.wgpu_device()).await;
@@ -87,7 +87,12 @@ fn {entry_point}(@builtin(global_invocation_id) global_id: vec3u) {{
   {workarounds}
 
   let index: u32 = global_id.x;
-  result[index] = left[index % left_metadata.length] {op} right[index % right_metadata.length];
+
+  {left_mapped_offset}
+
+  {right_mapped_offset}
+
+  result[index] = left[left_mapped_offset] {op} right[right_mapped_offset];
 }}
 ",
         shader_interface = builders::define_shader_interface(
@@ -97,6 +102,8 @@ fn {entry_point}(@builtin(global_invocation_id) global_id: vec3u) {{
         workgroup_size = WORKGROUP_SIZE,
         entry_point = pipeline_descriptor.entry_point,
         workarounds = builders::shader_workaround_1976(pipeline_descriptor),
+        left_mapped_offset = builders::map_offset("index", "left"),
+        right_mapped_offset = builders::map_offset("index", "right"),
         op = op,
     )
 }

@@ -50,16 +50,9 @@ fn {entry_point}(@builtin(global_invocation_id) global_id: vec3u) {{
   // Unmapped index
   let index: u32 = global_id.x;
 
-  // Map index from the contiguous result offset to the strided input offset
-  var contiguous_offset: u32 = index;
-  var mapped_offset: u32 = 0u;
-  for (var i = 0u; i < input_metadata.rank; i++) {{
-    let input_index = (contiguous_offset / input_contiguous_stride[i]) % input_shape[i];
-    mapped_offset = mapped_offset + (input_index * input_stride[i]);
-    contiguous_offset = contiguous_offset % input_contiguous_stride[i];
-  }}
+  {input_mapped_offset}
 
-  result[index] = input[mapped_offset];
+  result[index] = input[input_mapped_offset];
 }}
 ",
         shader_interface = builders::define_shader_interface(
@@ -69,5 +62,6 @@ fn {entry_point}(@builtin(global_invocation_id) global_id: vec3u) {{
         workgroup_size = WORKGROUP_SIZE,
         entry_point = pipeline_descriptor.entry_point,
         workarounds = builders::shader_workaround_1976(pipeline_descriptor),
+        input_mapped_offset = builders::map_offset("index", "input"),
     )
 }
