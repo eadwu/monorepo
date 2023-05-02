@@ -127,6 +127,15 @@ pub fn create_tensor_bind_group(
     bind_group_layout: &wgpu::BindGroupLayout,
     device: &wgpu::Device,
 ) -> wgpu::BindGroup {
+    let shape = self::usize_to_u32(tensor.shape());
+    let shape_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+        label: None,
+        contents: bytemuck::cast_slice(&shape),
+        usage: wgpu::BufferUsages::STORAGE
+            | wgpu::BufferUsages::COPY_DST
+            | wgpu::BufferUsages::COPY_SRC,
+    });
+
     let stride = self::usize_to_u32(tensor.stride());
     let stride_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
         label: None,
@@ -167,14 +176,18 @@ pub fn create_tensor_bind_group(
             },
             wgpu::BindGroupEntry {
                 binding: 1,
-                resource: stride_buffer.as_entire_binding(),
+                resource: shape_buffer.as_entire_binding(),
             },
             wgpu::BindGroupEntry {
                 binding: 2,
-                resource: contiguous_stride_buffer.as_entire_binding(),
+                resource: stride_buffer.as_entire_binding(),
             },
             wgpu::BindGroupEntry {
                 binding: 3,
+                resource: contiguous_stride_buffer.as_entire_binding(),
+            },
+            wgpu::BindGroupEntry {
+                binding: 4,
                 resource: metadata_buffer.as_entire_binding(),
             },
         ],
@@ -190,9 +203,10 @@ fn tensor_interface(group: &str, name: &str, permission: &str) -> String {
     format!(
         "
 @group({group}) @binding(0) var<storage, {permission}> {name}: array<f32>;
-@group({group}) @binding(1) var<storage, read> {name}_stride: array<u32>;
-@group({group}) @binding(2) var<storage, read> {name}_contiguous_stride: array<u32>;
-@group({group}) @binding(3) var<uniform> {name}_metadata: TensorMetadata;
+@group({group}) @binding(1) var<storage, read> {name}_shape: array<u32>;
+@group({group}) @binding(2) var<storage, read> {name}_stride: array<u32>;
+@group({group}) @binding(3) var<storage, read> {name}_contiguous_stride: array<u32>;
+@group({group}) @binding(4) var<uniform> {name}_metadata: TensorMetadata;
 ",
         group = group,
         name = name,
@@ -204,6 +218,7 @@ fn workaround_1976(var: &str, descriptor: &TensorDescriptor) -> String {
     format!(
         "
   {var} = f32({name}[0]);
+  {var} = f32({name}_shape[0]);
   {var} = f32({name}_stride[0]);
   {var} = f32({name}_contiguous_stride[0]);
   {var} = f32({name}_metadata.rank);
