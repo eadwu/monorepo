@@ -1,7 +1,10 @@
 pub mod ops;
 
 use itertools::{EitherOrBoth::*, Itertools};
-use std::ops::{Add, Div, Mul, Sub};
+use std::{
+    borrow::Borrow,
+    ops::{Add, Div, Mul, Sub},
+};
 
 use crate::dtensor;
 use wgpu::{self, util::DeviceExt};
@@ -9,8 +12,7 @@ use wgpu::{self, util::DeviceExt};
 // Restrict to f32 for simplicity
 type TensorType = f32;
 
-#[derive(Debug)]
-pub struct Tensor<'tensor> {
+pub struct Tensor {
     // Tensor Shape
     rank: usize,
     shape: Vec<usize>,
@@ -19,7 +21,7 @@ pub struct Tensor<'tensor> {
 
     // Extra State
     contiguous: bool,
-    wgpu_device: &'tensor dtensor::WgpuDevice,
+    wgpu_device: dtensor::WgpuDevice,
 
     // Data
     n: usize,
@@ -41,15 +43,15 @@ fn compute_contiguous_stride(shape: &[usize]) -> Vec<usize> {
         .collect()
 }
 
-impl<'tensor> Tensor<'tensor> {
+impl Tensor {
     // Constructors
 
     pub async fn new<T: bytemuck::Pod>(
         shape: &[usize],
         data: &[T],
-        wgpu_device: &'tensor dtensor::WgpuDevice,
-    ) -> Tensor<'tensor> {
-        let (device, _) = wgpu_device;
+        wgpu_device: &dtensor::WgpuDevice,
+    ) -> Tensor {
+        let dtensor::WebGPU { device, queue } = wgpu_device.borrow();
         let data_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: None,
             contents: bytemuck::cast_slice(data),
@@ -61,11 +63,8 @@ impl<'tensor> Tensor<'tensor> {
         Tensor::with_buffer(shape, data_buffer, wgpu_device)
     }
 
-    pub async fn of_shape(
-        shape: &[usize],
-        wgpu_device: &'tensor dtensor::WgpuDevice,
-    ) -> Tensor<'tensor> {
-        let (device, _) = wgpu_device;
+    pub async fn of_shape(shape: &[usize], wgpu_device: &dtensor::WgpuDevice) -> Tensor {
+        let dtensor::WebGPU { device, queue } = wgpu_device.borrow();
 
         let n_elements: usize = shape.iter().product();
         let size = n_elements * std::mem::size_of::<TensorType>();
@@ -102,8 +101,12 @@ impl<'tensor> Tensor<'tensor> {
         self.contiguous
     }
 
-    pub fn device(&self) -> &'tensor dtensor::WgpuDevice {
-        self.wgpu_device
+    pub fn device(&self) -> &dtensor::WebGPU {
+        self.wgpu_device.borrow()
+    }
+
+    pub fn wgpu_device(&self) -> &dtensor::WgpuDevice {
+        &self.wgpu_device
     }
 
     pub fn size(&self) -> usize {
@@ -147,11 +150,11 @@ impl<'tensor> Tensor<'tensor> {
             .unzip();
     }
 
-    pub async fn reshape(&self, shape: &[usize]) -> Tensor<'tensor> {
+    pub async fn reshape(&self, shape: &[usize]) -> Tensor {
         dtensor::primitives::ops::reshape(self, shape).await
     }
 
-    pub async fn as_contiguous(&self) -> Tensor<'tensor> {
+    pub async fn as_contiguous(&self) -> Tensor {
         self.reshape(self.shape()).await
     }
 
@@ -159,8 +162,8 @@ impl<'tensor> Tensor<'tensor> {
     fn with_buffer(
         shape: &[usize],
         buffer: wgpu::Buffer,
-        wgpu_device: &'tensor dtensor::WgpuDevice,
-    ) -> Tensor<'tensor> {
+        wgpu_device: &dtensor::WgpuDevice,
+    ) -> Tensor {
         let rank = shape.len();
         let n_elements: usize = shape.iter().product();
 
@@ -181,7 +184,7 @@ impl<'tensor> Tensor<'tensor> {
             stride: stride,
             contiguous_stride: contiguous_stride,
             contiguous: true,
-            wgpu_device: wgpu_device,
+            wgpu_device: wgpu_device.clone(),
             n: n_elements,
             data: buffer,
         }
@@ -190,7 +193,7 @@ impl<'tensor> Tensor<'tensor> {
 
 // Elementary Arithmetic Implementations
 
-impl Add for Tensor<'_> {
+impl Add for Tensor {
     type Output = Self;
 
     fn add(self, other: Self) -> Self::Output {
@@ -198,7 +201,7 @@ impl Add for Tensor<'_> {
     }
 }
 
-impl Sub for Tensor<'_> {
+impl Sub for Tensor {
     type Output = Self;
 
     fn sub(self, other: Self) -> Self::Output {
@@ -206,7 +209,7 @@ impl Sub for Tensor<'_> {
     }
 }
 
-impl Mul for Tensor<'_> {
+impl Mul for Tensor {
     type Output = Self;
 
     fn mul(self, other: Self) -> Self::Output {
@@ -214,7 +217,7 @@ impl Mul for Tensor<'_> {
     }
 }
 
-impl Div for Tensor<'_> {
+impl Div for Tensor {
     type Output = Self;
 
     fn div(self, other: Self) -> Self::Output {

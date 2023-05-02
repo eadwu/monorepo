@@ -2,4 +2,9 @@ pub mod primitives;
 
 use wgpu;
 
-pub type WgpuDevice = (wgpu::Device, wgpu::Queue);
+pub struct WebGPU {
+    pub device: wgpu::Device,
+    pub queue: wgpu::Queue,
+}
+
+pub type WgpuDevice = std::rc::Rc<WebGPU>;

@@ -7,24 +7,24 @@ use builders::*;
 pub use reshape::reshape;
 
 // Elementary Arithmetic
-pub async fn add<'a>(a: &Tensor<'a>, b: &Tensor<'a>) -> Tensor<'a> {
+pub async fn add(a: &Tensor, b: &Tensor) -> Tensor {
     elementary_arithmetic::elementary_arithmetic_builder(a, b, "add", "+").await
 }
 
-pub async fn subtract<'a>(a: &Tensor<'a>, b: &Tensor<'a>) -> Tensor<'a> {
+pub async fn subtract(a: &Tensor, b: &Tensor) -> Tensor {
     elementary_arithmetic::elementary_arithmetic_builder(a, b, "subtract", "-").await
 }
 
-pub async fn multiply<'a>(a: &Tensor<'a>, b: &Tensor<'a>) -> Tensor<'a> {
+pub async fn multiply(a: &Tensor, b: &Tensor) -> Tensor {
     elementary_arithmetic::elementary_arithmetic_builder(a, b, "multiply", "*").await
 }
 
-pub async fn divide<'a>(a: &Tensor<'a>, b: &Tensor<'a>) -> Tensor<'a> {
+pub async fn divide(a: &Tensor, b: &Tensor) -> Tensor {
     elementary_arithmetic::elementary_arithmetic_builder(a, b, "subtract", "/").await
 }
 
 // Element-wise operations
-pub async fn clamp<'a>(x: &Tensor<'a>, low: f32, high: f32) -> Tensor<'a> {
+pub async fn clamp(x: &Tensor, low: f32, high: f32) -> Tensor {
     elementwise_functions::elementwise_function_builder(
         x,
         "clamp_function",
@@ -33,7 +33,7 @@ pub async fn clamp<'a>(x: &Tensor<'a>, low: f32, high: f32) -> Tensor<'a> {
     .await
 }
 
-pub async fn exp<'a>(x: &Tensor<'a>) -> Tensor<'a> {
+pub async fn exp(x: &Tensor) -> Tensor {
     elementwise_functions::elementwise_function_builder(
         x,
         "natural_exponential_function",
@@ -42,7 +42,7 @@ pub async fn exp<'a>(x: &Tensor<'a>) -> Tensor<'a> {
     .await
 }
 
-pub async fn tanh<'a>(x: &Tensor<'a>) -> Tensor<'a> {
+pub async fn tanh(x: &Tensor) -> Tensor {
     elementwise_functions::elementwise_function_builder(
         x,
         "hyperbolic_tangent",

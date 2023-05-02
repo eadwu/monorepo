@@ -4,15 +4,14 @@ use wgpu;
 const WORKGROUP_SIZE: usize = 64;
 
 // Functional implementation
-pub async fn elementwise_function_builder<'op>(
-    a: &Tensor<'op>,
+pub async fn elementwise_function_builder(
+    a: &Tensor,
     entry_point: &str,
     elementwise_function: String,
-) -> Tensor<'op> {
-    let wgpu_device = a.device();
-    let (device, _) = wgpu_device;
-
-    let result = Tensor::of_shape(a.shape(), wgpu_device).await;
+) -> Tensor {
+    let web_gpu = a.device();
+    let dtensor::WebGPU { device, queue } = web_gpu;
+    let result = Tensor::of_shape(a.shape(), a.wgpu_device()).await;
 
     let pipeline_descriptor = builders::TensorOpDescriptor {
         inputs: &[builders::TensorDescriptor {
@@ -32,7 +31,7 @@ pub async fn elementwise_function_builder<'op>(
         source: wgpu::ShaderSource::Wgsl(shader_source.into()),
     });
 
-    builders::build_op_pipeline(&pipeline_descriptor, &compiled_shader, wgpu_device);
+    builders::build_op_pipeline(&pipeline_descriptor, &compiled_shader, web_gpu);
     result
 }
 

@@ -5,11 +5,10 @@ const ENTRY_POINT: &str = "reshape";
 const WORKGROUP_SIZE: usize = 64;
 
 // Functional implementation
-pub async fn reshape<'op>(input: &Tensor<'op>, shape: &[usize]) -> Tensor<'op> {
-    let wgpu_device = input.device();
-    let (device, _) = wgpu_device;
-
-    let result = Tensor::of_shape(shape, wgpu_device).await;
+pub async fn reshape(input: &Tensor, shape: &[usize]) -> Tensor {
+    let web_gpu = input.device();
+    let dtensor::WebGPU { device, queue } = web_gpu;
+    let result = Tensor::of_shape(shape, input.wgpu_device()).await;
 
     let pipeline_descriptor = builders::TensorOpDescriptor {
         inputs: &[builders::TensorDescriptor {
@@ -29,7 +28,7 @@ pub async fn reshape<'op>(input: &Tensor<'op>, shape: &[usize]) -> Tensor<'op> {
         source: wgpu::ShaderSource::Wgsl(shader_source.into()),
     });
 
-    builders::build_op_pipeline(&pipeline_descriptor, &compiled_shader, wgpu_device);
+    builders::build_op_pipeline(&pipeline_descriptor, &compiled_shader, web_gpu);
     result
 }
 

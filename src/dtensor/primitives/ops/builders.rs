@@ -8,7 +8,7 @@ const DUMMY_VAR: &str = "_dummy";
 
 pub struct TensorDescriptor<'a> {
     pub name: &'a str,
-    pub tensor: &'a Tensor<'a>,
+    pub tensor: &'a Tensor,
 }
 
 pub struct TensorOpDescriptor<'a> {
@@ -40,12 +40,12 @@ pub fn shader_workaround_1976(descriptor: &TensorOpDescriptor) -> String {
     )
 }
 
-pub fn build_op_pipeline<'op>(
+pub fn build_op_pipeline(
     descriptor: &TensorOpDescriptor,
     compiled_shader: &wgpu::ShaderModule,
-    wgpu_device: &dtensor::WgpuDevice,
+    web_gpu: &dtensor::WebGPU,
 ) {
-    let (device, queue) = wgpu_device;
+    let dtensor::WebGPU { device, queue } = web_gpu;
 
     let pipeline = device.create_compute_pipeline(&wgpu::ComputePipelineDescriptor {
         label: None,

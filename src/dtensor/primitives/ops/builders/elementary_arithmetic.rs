@@ -5,21 +5,21 @@ use wgpu;
 const WORKGROUP_SIZE: usize = 64;
 
 // Functional implementation
-pub async fn elementary_arithmetic_builder<'op>(
-    a: &Tensor<'op>,
-    b: &Tensor<'op>,
+pub async fn elementary_arithmetic_builder(
+    a: &Tensor,
+    b: &Tensor,
     entry_point: &str,
     op: &str,
-) -> Tensor<'op> {
-    if !std::ptr::eq(a.device(), b.device()) {
+) -> Tensor {
+    if !std::rc::Rc::ptr_eq(a.wgpu_device(), b.wgpu_device()) {
         panic!("Can't perform operations on Tensors on different devices");
     }
 
-    let wgpu_device = a.device();
-    let (device, _) = wgpu_device;
+    let web_gpu = a.device();
+    let dtensor::WebGPU { device, queue } = web_gpu;
 
     let output_shape = compute_output_shape(&a, &b);
-    let result = Tensor::of_shape(&output_shape, wgpu_device).await;
+    let result = Tensor::of_shape(&output_shape, a.wgpu_device()).await;
 
     // Strided Tensors are unlikely to be friendly to cache
     let contiguous_a = a.as_contiguous().await;
@@ -53,15 +53,16 @@ pub async fn elementary_arithmetic_builder<'op>(
         source: wgpu::ShaderSource::Wgsl(shader_source.into()),
     });
 
-    builders::build_op_pipeline(&pipeline_descriptor, &compiled_shader, wgpu_device);
+    builders::build_op_pipeline(&pipeline_descriptor, &compiled_shader, web_gpu);
     result
 }
 
 // Utility functions
 fn compute_output_shape(a: &Tensor, b: &Tensor) -> Vec<usize> {
-    a.shape
-        .iter().rev()
-        .zip_longest(b.shape.iter().rev())
+    a.shape()
+        .iter()
+        .rev()
+        .zip_longest(b.shape().iter().rev())
         .map(|element| match element {
             Both(&l, &r) => std::cmp::max(l, r),
             Left(&l) => l,
