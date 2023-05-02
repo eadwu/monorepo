@@ -1,10 +1,8 @@
 use itertools::{EitherOrBoth::*, Itertools};
-use std::{
-    borrow::Borrow,
-    ops::{Add, Div, Mul, Sub},
-};
+use std::{borrow::Borrow, ops};
 
 use crate::dtensor;
+use impl_ops::*;
 use wgpu::{self, util::DeviceExt};
 
 // Restrict to f32 for simplicity
@@ -194,35 +192,38 @@ impl Tensor {
 }
 
 // Elementary Arithmetic Implementations
+impl_op_ex!(+ |a: &Tensor, b: &Tensor| -> Tensor {
+    futures::executor::block_on(dtensor::primitives::ops::add(a, b))
+});
 
-impl Add for Tensor {
-    type Output = Self;
+impl_op_ex_commutative!(+ |a: &Tensor, b: f32| -> Tensor {
+    let literal = futures::executor::block_on(Tensor::new(&[1], &[b], a.wgpu_device()));
+    a + literal
+});
 
-    fn add(self, other: Self) -> Self::Output {
-        futures::executor::block_on(dtensor::primitives::ops::add(&self, &other))
-    }
-}
+impl_op_ex!(- |a: &Tensor, b: &Tensor| -> Tensor {
+    futures::executor::block_on(dtensor::primitives::ops::subtract(a, b))
+});
 
-impl Sub for Tensor {
-    type Output = Self;
+impl_op_ex!(- |a: &Tensor, b: f32| -> Tensor {
+    let literal = futures::executor::block_on(Tensor::new(&[1], &[b], a.wgpu_device()));
+    a - literal
+});
 
-    fn sub(self, other: Self) -> Self::Output {
-        futures::executor::block_on(dtensor::primitives::ops::subtract(&self, &other))
-    }
-}
+impl_op_ex!(* |a: &Tensor, b: &Tensor| -> Tensor {
+    futures::executor::block_on(dtensor::primitives::ops::multiply(a, b))
+});
 
-impl Mul for Tensor {
-    type Output = Self;
+impl_op_ex_commutative!(* |a: &Tensor, b: f32| -> Tensor {
+    let literal = futures::executor::block_on(Tensor::new(&[1], &[b], a.wgpu_device()));
+    a * literal
+});
 
-    fn mul(self, other: Self) -> Self::Output {
-        futures::executor::block_on(dtensor::primitives::ops::multiply(&self, &other))
-    }
-}
+impl_op_ex!(/ |a: &Tensor, b: &Tensor| -> Tensor {
+    futures::executor::block_on(dtensor::primitives::ops::divide(a, b))
+});
 
-impl Div for Tensor {
-    type Output = Self;
-
-    fn div(self, other: Self) -> Self::Output {
-        futures::executor::block_on(dtensor::primitives::ops::divide(&self, &other))
-    }
-}
+impl_op_ex!(/ |a: &Tensor, b: f32| -> Tensor {
+    let literal = futures::executor::block_on(Tensor::new(&[1], &[b], a.wgpu_device()));
+    a / literal
+});
