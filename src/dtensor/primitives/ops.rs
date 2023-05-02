@@ -33,6 +33,15 @@ pub async fn clamp(x: &Tensor, low: f32, high: f32) -> Tensor {
     .await
 }
 
+pub async fn pow(x: &Tensor, power: f32) -> Tensor {
+    elementwise_functions::elementwise_function_builder(
+        x,
+        "power_function",
+        format!("pow({}, {:.32})", "{input}", power),
+    )
+    .await
+}
+
 pub async fn exp(x: &Tensor) -> Tensor {
     elementwise_functions::elementwise_function_builder(
         x,
