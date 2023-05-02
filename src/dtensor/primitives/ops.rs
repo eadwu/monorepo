@@ -6,56 +6,70 @@ use builders::*;
 
 pub use reshape::reshape;
 
+macro_rules! impl_tensor_op {
+        ($f_op:ident $op:tt |$( $i:ident : $v:ty ),*| -> $out:path $body:block) => {
+        pub struct $f_op;
+        impl $f_op {
+            pub async fn forward(&self, $( $i : $v ),*) -> $out $body
+        }
+
+        pub async fn $op($( $i : $v ),*) -> $out {
+            $f_op.forward($( $i ),*).await
+        }
+    };
+}
+pub (crate) use impl_tensor_op;
+
 // Elementary Arithmetic
-pub async fn add(a: &Tensor, b: &Tensor) -> Tensor {
+impl_tensor_op!(Add add |a: &Tensor, b: &Tensor| -> Tensor {
     elementary_arithmetic::elementary_arithmetic_builder(a, b, "add", "+").await
-}
+});
 
-pub async fn subtract(a: &Tensor, b: &Tensor) -> Tensor {
+impl_tensor_op!(Subtract subtract |a: &Tensor, b: &Tensor| -> Tensor {
     elementary_arithmetic::elementary_arithmetic_builder(a, b, "subtract", "-").await
-}
+});
 
-pub async fn multiply(a: &Tensor, b: &Tensor) -> Tensor {
+impl_tensor_op!(Multiply multiply |a: &Tensor, b: &Tensor| -> Tensor {
     elementary_arithmetic::elementary_arithmetic_builder(a, b, "multiply", "*").await
-}
+});
 
-pub async fn divide(a: &Tensor, b: &Tensor) -> Tensor {
-    elementary_arithmetic::elementary_arithmetic_builder(a, b, "subtract", "/").await
-}
+impl_tensor_op!(Divide divide |a: &Tensor, b: &Tensor| -> Tensor {
+    elementary_arithmetic::elementary_arithmetic_builder(a, b, "divide", "/").await
+});
 
 // Element-wise operations
-pub async fn clamp(x: &Tensor, low: f32, high: f32) -> Tensor {
+impl_tensor_op!(Clamp clamp |x: &Tensor, low: f32, high: f32| -> Tensor {
     elementwise_functions::elementwise_function_builder(
         x,
         "clamp_function",
         format!("clamp({}, {:.32}, {:.32})", "{input}", low, high),
     )
     .await
-}
+});
 
-pub async fn pow(x: &Tensor, power: f32) -> Tensor {
+impl_tensor_op!(Pow pow |x: &Tensor, power: f32| -> Tensor {
     elementwise_functions::elementwise_function_builder(
         x,
         "power_function",
         format!("pow({}, {:.32})", "{input}", power),
     )
     .await
-}
+});
 
-pub async fn exp(x: &Tensor) -> Tensor {
+impl_tensor_op!(Exp exp |x: &Tensor| -> Tensor {
     elementwise_functions::elementwise_function_builder(
         x,
         "natural_exponential_function",
         format!("exp({})", "{input}"),
     )
     .await
-}
+});
 
-pub async fn tanh(x: &Tensor) -> Tensor {
+impl_tensor_op!(Tanh tanh |x: &Tensor| -> Tensor {
     elementwise_functions::elementwise_function_builder(
         x,
         "hyperbolic_tangent",
         format!("tanh({})", "{input}"),
     )
     .await
-}
+});

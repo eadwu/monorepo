@@ -1,13 +1,14 @@
-use crate::dtensor::{self, primitives::ops::builders, primitives::Tensor};
+use crate::dtensor::{
+    self, primitives::ops::builders, primitives::ops::impl_tensor_op, primitives::Tensor,
+};
 use wgpu;
 
 const ENTRY_POINT: &str = "reshape";
 const WORKGROUP_SIZE: usize = 64;
 
-// Functional implementation
-pub async fn reshape(input: &Tensor, shape: &[usize]) -> Tensor {
+impl_tensor_op!(Reshape reshape |input: &Tensor, shape: &[usize]| -> Tensor {
     let web_gpu = input.device();
-    let dtensor::WebGPU { device, queue } = web_gpu;
+    let dtensor::WebGPU { device, queue: _ } = web_gpu;
     let result = Tensor::of_shape(shape, input.wgpu_device()).await;
 
     let pipeline_descriptor = builders::TensorOpDescriptor {
@@ -30,7 +31,7 @@ pub async fn reshape(input: &Tensor, shape: &[usize]) -> Tensor {
 
     builders::build_op_pipeline(&pipeline_descriptor, &compiled_shader, web_gpu);
     result
-}
+});
 
 fn generate_wgsl_shader(pipeline_descriptor: &builders::TensorOpDescriptor) -> String {
     format!(
@@ -60,7 +61,10 @@ fn {entry_point}(@builtin(global_invocation_id) global_id: vec3u) {{
   result[index] = input[mapped_offset];
 }}
 ",
-        shader_interface = builders::define_shader_interface(pipeline_descriptor.inputs, &pipeline_descriptor.output),
+        shader_interface = builders::define_shader_interface(
+            pipeline_descriptor.inputs,
+            &pipeline_descriptor.output
+        ),
         workgroup_size = WORKGROUP_SIZE,
         entry_point = pipeline_descriptor.entry_point,
         workarounds = builders::shader_workaround_1976(pipeline_descriptor),
