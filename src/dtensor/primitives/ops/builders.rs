@@ -163,7 +163,7 @@ pub fn create_tensor_bind_group(
         entries: &[
             wgpu::BindGroupEntry {
                 binding: 0,
-                resource: tensor.data.as_entire_binding(),
+                resource: tensor.buffer().as_entire_binding(),
             },
             wgpu::BindGroupEntry {
                 binding: 1,
