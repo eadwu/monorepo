@@ -1,5 +1,6 @@
 pub mod ops;
 
+use itertools::{EitherOrBoth::*, Itertools};
 use std::ops::{Add, Div, Mul, Sub};
 
 use crate::dtensor;
@@ -114,6 +115,38 @@ impl<'tensor> Tensor<'tensor> {
     }
 
     // Utilities
+    pub fn broadcastable_to(&self, other: &Tensor) {
+        // https://numpy.org/doc/stable/user/basics.broadcasting.html
+        // When operating on two arrays, NumPy compares their shapes element-wise.
+        // It starts with the trailing (i.e. rightmost) dimension and works its way left.
+        // Two dimensions are compatible when
+        //   1. they are equal, or
+        //   2. one of them is 1.
+        let a_shape = self.shape().iter().rev();
+        let b_shape = other.shape().iter().rev();
+
+        // Polyfill with 1-dimensions to get the same ranks
+        let (a_shape, b_shape): (Vec<usize>, Vec<usize>) = a_shape
+            .zip_longest(b_shape)
+            .map(|element| match element {
+                Both(&l, &r) => {
+                    if l == r || l == 1 || r == 1 {
+                        (l, r)
+                    } else {
+                        panic!(
+                            "Unable to broadcast tensor of shape {:?} and {:?}",
+                            self.shape(),
+                            other.shape()
+                        );
+                    }
+                }
+                Left(&l) => (l, 1),
+                Right(&r) => (1, r),
+            })
+            .rev()
+            .unzip();
+    }
+
     pub async fn reshape(&self, shape: &[usize]) -> Tensor<'tensor> {
         dtensor::primitives::ops::reshape(self, shape).await
     }

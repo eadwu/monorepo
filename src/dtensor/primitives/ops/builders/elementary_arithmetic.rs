@@ -1,4 +1,5 @@
 use crate::dtensor::{self, primitives::ops::builders, primitives::Tensor};
+use itertools::{EitherOrBoth::*, Itertools};
 use wgpu;
 
 const WORKGROUP_SIZE: usize = 64;
@@ -14,15 +15,19 @@ pub async fn elementary_arithmetic_builder<'op>(
         panic!("Can't perform operations on Tensors on different devices");
     }
 
+    let wgpu_device = a.device();
+    let (device, _) = wgpu_device;
+
+    let output_shape = compute_output_shape(&a, &b);
+    let result = Tensor::of_shape(&output_shape, wgpu_device).await;
+
     // Strided Tensors are unlikely to be friendly to cache
     let contiguous_a = a.as_contiguous().await;
     let contiguous_b = b.as_contiguous().await;
 
-    let wgpu_device = contiguous_a.device();
-    let (device, _) = wgpu_device;
-
-    let output_shape = compute_output_shape(&contiguous_a, &contiguous_b);
-    let result = Tensor::of_shape(&output_shape, wgpu_device).await;
+    // Ensure Tensors are broadcastable
+    contiguous_a.broadcastable_to(&contiguous_b);
+    contiguous_b.broadcastable_to(&contiguous_a);
 
     let pipeline_descriptor = builders::TensorOpDescriptor {
         inputs: &[
@@ -55,9 +60,14 @@ pub async fn elementary_arithmetic_builder<'op>(
 // Utility functions
 fn compute_output_shape(a: &Tensor, b: &Tensor) -> Vec<usize> {
     a.shape
-        .iter()
-        .zip(b.shape.iter())
-        .map(|(a, b)| std::cmp::max(*a, *b))
+        .iter().rev()
+        .zip_longest(b.shape.iter().rev())
+        .map(|element| match element {
+            Both(&l, &r) => std::cmp::max(l, r),
+            Left(&l) => l,
+            Right(&r) => r,
+        })
+        .rev()
         .collect()
 }
 
@@ -76,7 +86,7 @@ fn {entry_point}(@builtin(global_invocation_id) global_id: vec3u) {{
   {workarounds}
 
   let index: u32 = global_id.x;
-  result[index] = left[index] {op} right[index];
+  result[index] = left[index % left_metadata.length] {op} right[index % right_metadata.length];
 }}
 ",
         shader_interface = builders::define_shader_interface(
