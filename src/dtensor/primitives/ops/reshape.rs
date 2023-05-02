@@ -54,7 +54,8 @@ fn {entry_point}(@builtin(global_invocation_id) global_id: vec3u) {{
   var contiguous_offset: u32 = index;
   var mapped_offset: u32 = 0u;
   for (var i = 0u; i < input_metadata.rank; i++) {{
-    mapped_offset = mapped_offset + (contiguous_offset / input_contiguous_stride[i] * input_stride[i]);
+    let input_index = (contiguous_offset / input_contiguous_stride[i]) % input_shape[i];
+    mapped_offset = mapped_offset + (input_index * input_stride[i]);
     contiguous_offset = contiguous_offset % input_contiguous_stride[i];
   }}
 
