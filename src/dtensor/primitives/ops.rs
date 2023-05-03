@@ -1,9 +1,11 @@
 pub mod builders;
+mod gemm;
 mod reshape;
 
 use crate::dtensor::primitives::Tensor;
 use builders::*;
 
+pub use gemm::{mm, MM};
 pub use reshape::{reshape, Reshape};
 
 macro_rules! impl_tensor_op {
