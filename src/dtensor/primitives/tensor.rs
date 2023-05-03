@@ -50,7 +50,8 @@ impl Tensor {
         data: &[T],
         wgpu_device: &dtensor::WgpuDevice,
     ) -> Tensor {
-        let dtensor::WebGPU { device, queue } = wgpu_device.borrow();
+        let stride = compute_contiguous_stride(&shape);
+        let dtensor::WebGPU { device, queue: _ } = wgpu_device.borrow();
         let data_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: None,
             contents: bytemuck::cast_slice(data),
@@ -59,11 +60,12 @@ impl Tensor {
                 | wgpu::BufferUsages::COPY_SRC,
         });
 
-        Tensor::with_buffer(shape, data_buffer, wgpu_device)
+        Tensor::with_strided_buffer(shape, &stride, data_buffer, wgpu_device)
     }
 
     pub async fn of_shape(shape: &[usize], wgpu_device: &dtensor::WgpuDevice) -> Tensor {
-        let dtensor::WebGPU { device, queue } = wgpu_device.borrow();
+        let stride = compute_contiguous_stride(&shape);
+        let dtensor::WebGPU { device, queue: _ } = wgpu_device.borrow();
 
         let n_elements: usize = shape.iter().product();
         let size = n_elements * std::mem::size_of::<TensorType>();
@@ -76,7 +78,7 @@ impl Tensor {
             mapped_at_creation: false,
         });
 
-        Tensor::with_buffer(shape, data_buffer, wgpu_device)
+        Tensor::with_strided_buffer(shape, &stride, data_buffer, wgpu_device)
     }
 
     // Properties
@@ -162,8 +164,9 @@ impl Tensor {
     }
 
     // Private Helpers
-    fn with_buffer(
+    fn with_strided_buffer(
         shape: &[usize],
+        stride: &[usize],
         buffer: wgpu::Buffer,
         wgpu_device: &dtensor::WgpuDevice,
     ) -> Tensor {
@@ -172,19 +175,12 @@ impl Tensor {
 
         // Stride is the offset in terms of the `data` contiguous vector
         // Calculated by a running sum right-to-left
-        let stride: Vec<usize> = compute_contiguous_stride(&shape);
-
-        // STORAGE: Mark as a buffer usable as a Storage buffer for bind group
-        // MAP_READ: Allow mapping over to the CPU to allow reading
-        // MAP_WRITE: Allow mapping over to the CPU to allow modification
-        // COPY_DST: Allow to be a destination for a copy
-        // COPY_SRC: Allow to be a source for a copy
         let contiguous_stride = compute_contiguous_stride(&shape);
 
         Tensor {
             rank: rank,
             shape: shape.iter().map(|x| x.clone()).collect::<Vec<usize>>(),
-            stride: stride,
+            stride: stride.to_vec(),
             contiguous_stride: contiguous_stride,
             contiguous: true,
             wgpu_device: wgpu_device.clone(),
