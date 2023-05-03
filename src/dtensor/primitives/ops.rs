@@ -4,7 +4,7 @@ mod reshape;
 use crate::dtensor::primitives::Tensor;
 use builders::*;
 
-pub use reshape::reshape;
+pub use reshape::{reshape, Reshape};
 
 macro_rules! impl_tensor_op {
         ($f_op:ident $op:tt |$( $i:ident : $v:ty ),*| -> $out:path $body:block) => {
