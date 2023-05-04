@@ -259,6 +259,45 @@ impl Tensor {
         self.reshape(self.shape()).await
     }
 
+    pub async fn snapshot(&self) -> Vec<TensorType> {
+        let dtensor::WebGPU { device, queue: _ } = self.device();
+
+        let mapped_buffer =
+            self.buffer_with(wgpu::BufferUsages::MAP_READ | wgpu::BufferUsages::COPY_DST);
+
+        // Note that we're not calling `.await` here.
+        let buffer_slice = mapped_buffer.slice(..);
+        // Sets the buffer up for mapping, sending over the result of the mapping back to us when it is finished.
+        let (sender, receiver) = futures_intrusive::channel::shared::oneshot_channel();
+        buffer_slice.map_async(wgpu::MapMode::Read, move |v| sender.send(v).unwrap());
+
+        // Poll the device in a blocking manner so that our future resolves.
+        // In an actual application, `device.poll(...)` should
+        // be called in an event loop or on another thread.
+        device.poll(wgpu::Maintain::Wait);
+
+        // Awaits until `buffer_future` can be read from
+        if let Some(Ok(())) = receiver.receive().await {
+            // Gets contents of buffer
+            let data = buffer_slice.get_mapped_range();
+            // Since contents are got in bytes, this converts these bytes back to u32
+            let result: Vec<TensorType> = bytemuck::cast_slice(&data).to_vec();
+
+            // With the current interface, we have to make sure all mapped views are
+            // dropped before we unmap the buffer.
+            drop(data);
+            mapped_buffer.unmap(); // Unmaps buffer from memory
+                                   // If you are familiar with C++ these 2 lines can be thought of similarly to:
+                                   //   delete myPointer;
+                                   //   myPointer = NULL;
+                                   // It effectively frees the memory
+
+            result
+        } else {
+            panic!("failed to run compute on gpu!")
+        }
+    }
+
     // Private Helpers
     pub fn with_strided_buffer(
         shape: &[usize],

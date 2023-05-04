@@ -7,6 +7,10 @@ edition = "2021"
 name = "dtensor"
 path = "src/lib.rs"
 
+[[bin]]
+name = "test"
+path = "src/main.rs"
+
 [dependencies]
 bytemuck = { version = "1.13.1", features = ["derive"] }
 env_logger = "0.10.0"
@@ -15,4 +19,5 @@ futures-intrusive = "0.5.0"
 impl_ops = "0.1.1"
 itertools = "0.10.5"
 pollster = "0.3.0"
+safetensors = "0.3.1"
 wgpu = "0.16.0"
