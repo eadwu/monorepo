@@ -8,7 +8,7 @@ const C4: f32 = 0.044715;
 
 pub struct GeLU {}
 impl GeLU {
-    pub fn new() -> GeLU {
+    pub async fn new() -> GeLU {
       GeLU {  }
     }
 
