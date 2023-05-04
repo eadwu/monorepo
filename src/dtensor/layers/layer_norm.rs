@@ -6,8 +6,9 @@ pub struct LayerNorm {
     mean: Tensor,
     power_sum_average: Tensor,
     variance: Tensor,
-
     epsilon: Tensor,
+
+    elementwise_affine: bool,
     gamma: Tensor,
     beta: Tensor,
 }
@@ -25,6 +26,7 @@ impl LayerNorm {
             power_sum_average: Tensor::of_shape(normalized_shape, wgpu_device).await,
             variance: Tensor::of_shape(normalized_shape, wgpu_device).await,
             epsilon: Tensor::literal(eps, wgpu_device).await,
+            elementwise_affine: elementwise_affine,
             gamma: Tensor::of_shape(&normalized_shape, wgpu_device).await + 1.0,
             beta: Tensor::of_shape(&normalized_shape, wgpu_device).await,
         }
@@ -49,6 +51,12 @@ impl LayerNorm {
         let variance = &self.variance;
 
         let variance_eps = variance + &self.epsilon;
-        (x - mean) / sqrt(&variance_eps).await * &self.gamma + &self.beta
+        let layer_norm = (x - mean) / sqrt(&variance_eps).await;
+
+        if self.elementwise_affine {
+            layer_norm * &self.gamma + &self.beta
+        } else {
+            layer_norm
+        }
     }
 }
