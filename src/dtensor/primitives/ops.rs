@@ -1,12 +1,14 @@
 pub mod builders;
 mod gemm;
 mod reshape;
+mod embedding_lookup;
 
 use crate::dtensor::primitives::Tensor;
 use builders::*;
 
 pub use gemm::{mm, MM};
 pub use reshape::{reshape, Reshape};
+pub use embedding_lookup::{embedding_lookup, EmbeddingLookup};
 
 macro_rules! impl_tensor_op {
         ($f_op:ident $op:tt |$( $i:ident : $v:ty ),*| -> $out:path $body:block) => {
