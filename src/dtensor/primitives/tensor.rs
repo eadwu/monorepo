@@ -130,6 +130,24 @@ impl Tensor {
     }
 
     // Utilities
+    pub fn buffer_with(&self, usage: wgpu::BufferUsages) -> wgpu::Buffer {
+        let dtensor::WebGPU { device, queue } = self.device();
+
+        let new_buffer = device.create_buffer(&wgpu::BufferDescriptor {
+            label: None,
+            size: self.size() as u64,
+            usage: usage,
+            mapped_at_creation: false,
+        });
+
+        let mut encoder =
+            device.create_command_encoder(&wgpu::CommandEncoderDescriptor { label: None });
+        encoder.copy_buffer_to_buffer(&self.data, 0, &new_buffer, 0, self.size() as u64);
+        queue.submit(Some(encoder.finish()));
+
+        new_buffer
+    }
+
     pub fn bind_group(&self, bind_group_layout: &wgpu::BindGroupLayout) -> wgpu::BindGroup {
         let dtensor::WebGPU { device, queue: _ } = self.device();
 
@@ -242,7 +260,7 @@ impl Tensor {
     }
 
     // Private Helpers
-    fn with_strided_buffer(
+    pub fn with_strided_buffer(
         shape: &[usize],
         stride: &[usize],
         buffer: wgpu::Buffer,
@@ -265,6 +283,13 @@ impl Tensor {
             n: n_elements,
             data: buffer,
         }
+    }
+}
+
+impl Clone for Tensor {
+    fn clone(&self) -> Self {
+        let new_buffer = self.buffer_with(self.buffer().usage());
+        Tensor::with_strided_buffer(self.shape(), self.stride(), new_buffer, self.wgpu_device())
     }
 }
 
