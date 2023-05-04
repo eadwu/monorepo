@@ -47,7 +47,12 @@ impl LayerNorm {
         self.power_sum_average = power_sum_average + (x * x - power_sum_average) / n;
         let power_sum_average = &self.power_sum_average;
 
-        self.variance = (power_sum_average * n - n * mean * mean) / (n - 1.0);
+        self.variance = if self.n > 1 {
+            (power_sum_average * n - n * mean * mean) / (n - 1.0)
+        } else {
+            Tensor::literal(0.0, x.wgpu_device()).await
+        };
+
         let variance = &self.variance;
 
         let variance_eps = variance + &self.epsilon;
