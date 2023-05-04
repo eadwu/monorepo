@@ -67,6 +67,15 @@ impl_tensor_op!(Exp exp |x: &Tensor| -> Tensor {
     .await
 });
 
+impl_tensor_op!(Sqrt sqrt |x: &Tensor| -> Tensor {
+    elementwise_functions::elementwise_function_builder(
+        x,
+        "square_root_function",
+        format!("sqrt({})", "{input}"),
+    )
+    .await
+});
+
 impl_tensor_op!(Tanh tanh |x: &Tensor| -> Tensor {
     elementwise_functions::elementwise_function_builder(
         x,
