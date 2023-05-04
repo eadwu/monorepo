@@ -48,7 +48,7 @@ fn compute_contiguous_stride(shape: &[usize]) -> Vec<usize> {
 
 impl Tensor {
     // Constructors
-    pub async fn literal(literal: f32, wgpu_device: &dtensor::WgpuDevice) -> Tensor {
+    pub async fn literal(literal: TensorType, wgpu_device: &dtensor::WgpuDevice) -> Tensor {
         Tensor::new(&[1], &[literal], wgpu_device).await
     }
 
@@ -298,7 +298,7 @@ impl_op_ex!(+ |a: &Tensor, b: &Tensor| -> Tensor {
     futures::executor::block_on(dtensor::primitives::ops::add(a, b))
 });
 
-impl_op_ex_commutative!(+ |a: &Tensor, b: f32| -> Tensor {
+impl_op_ex_commutative!(+ |a: &Tensor, b: TensorType| -> Tensor {
     let literal = futures::executor::block_on(Tensor::literal(b, a.wgpu_device()));
     a + literal
 });
@@ -307,7 +307,7 @@ impl_op_ex!(- |a: &Tensor, b: &Tensor| -> Tensor {
     futures::executor::block_on(dtensor::primitives::ops::subtract(a, b))
 });
 
-impl_op_ex!(- |a: &Tensor, b: f32| -> Tensor {
+impl_op_ex!(- |a: &Tensor, b: TensorType| -> Tensor {
     let literal = futures::executor::block_on(Tensor::literal(b, a.wgpu_device()));
     a - literal
 });
@@ -316,7 +316,7 @@ impl_op_ex!(* |a: &Tensor, b: &Tensor| -> Tensor {
     futures::executor::block_on(dtensor::primitives::ops::multiply(a, b))
 });
 
-impl_op_ex_commutative!(* |a: &Tensor, b: f32| -> Tensor {
+impl_op_ex_commutative!(* |a: &Tensor, b: TensorType| -> Tensor {
     let literal = futures::executor::block_on(Tensor::literal(b, a.wgpu_device()));
     a * literal
 });
@@ -325,7 +325,7 @@ impl_op_ex!(/ |a: &Tensor, b: &Tensor| -> Tensor {
     futures::executor::block_on(dtensor::primitives::ops::divide(a, b))
 });
 
-impl_op_ex!(/ |a: &Tensor, b: f32| -> Tensor {
+impl_op_ex!(/ |a: &Tensor, b: TensorType| -> Tensor {
     let literal = futures::executor::block_on(Tensor::literal(b, a.wgpu_device()));
     a / literal
 });
