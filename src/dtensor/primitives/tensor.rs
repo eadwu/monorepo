@@ -24,6 +24,13 @@ pub struct Tensor {
     data: wgpu::Buffer,
 }
 
+#[repr(C)]
+#[derive(bytemuck::Pod, Copy, Clone, bytemuck::Zeroable)]
+struct TensorMetadata {
+    rank: u32,
+    length: u32,
+}
+
 fn compute_contiguous_stride(shape: &[usize]) -> Vec<usize> {
     shape
         .iter()
@@ -123,6 +130,77 @@ impl Tensor {
     }
 
     // Utilities
+    pub fn bind_group(&self, bind_group_layout: &wgpu::BindGroupLayout) -> wgpu::BindGroup {
+        let dtensor::WebGPU { device, queue: _ } = self.device();
+
+        let shape = usize_to_u32(self.shape());
+        let shape_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: None,
+            contents: bytemuck::cast_slice(&shape),
+            usage: wgpu::BufferUsages::STORAGE
+                | wgpu::BufferUsages::COPY_DST
+                | wgpu::BufferUsages::COPY_SRC,
+        });
+
+        let stride = usize_to_u32(self.stride());
+        let stride_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: None,
+            contents: bytemuck::cast_slice(&stride),
+            usage: wgpu::BufferUsages::STORAGE
+                | wgpu::BufferUsages::COPY_DST
+                | wgpu::BufferUsages::COPY_SRC,
+        });
+
+        let contiguous_stride = self::usize_to_u32(self.contiguous_stride());
+        let contiguous_stride_buffer =
+            device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                label: None,
+                contents: bytemuck::cast_slice(&contiguous_stride),
+                usage: wgpu::BufferUsages::STORAGE
+                    | wgpu::BufferUsages::COPY_DST
+                    | wgpu::BufferUsages::COPY_SRC,
+            });
+
+        let metadata = TensorMetadata {
+            rank: self.rank() as u32,
+            length: self.len() as u32,
+        };
+        let metadata_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: None,
+            contents: bytemuck::cast_slice(&[metadata]),
+            usage: wgpu::BufferUsages::UNIFORM
+                | wgpu::BufferUsages::COPY_DST
+                | wgpu::BufferUsages::COPY_SRC,
+        });
+
+        device.create_bind_group(&wgpu::BindGroupDescriptor {
+            label: None,
+            layout: bind_group_layout,
+            entries: &[
+                wgpu::BindGroupEntry {
+                    binding: 0,
+                    resource: self.data.as_entire_binding(),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 1,
+                    resource: shape_buffer.as_entire_binding(),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 2,
+                    resource: stride_buffer.as_entire_binding(),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 3,
+                    resource: contiguous_stride_buffer.as_entire_binding(),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 4,
+                    resource: metadata_buffer.as_entire_binding(),
+                },
+            ],
+        })
+    }
+
     pub fn broadcastable_to(&self, other: &Tensor) {
         // https://numpy.org/doc/stable/user/basics.broadcasting.html
         // When operating on two arrays, NumPy compares their shapes element-wise.
@@ -226,3 +304,8 @@ impl_op_ex!(/ |a: &Tensor, b: f32| -> Tensor {
     let literal = futures::executor::block_on(Tensor::literal(b, a.wgpu_device()));
     a / literal
 });
+
+// Helpers
+fn usize_to_u32(data: &[usize]) -> Vec<u32> {
+    data.iter().map(|&x| x as u32).collect::<Vec<_>>()
+}

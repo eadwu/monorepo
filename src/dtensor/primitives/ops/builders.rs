@@ -60,11 +60,9 @@ pub fn build_op_pipeline(
         .chain(std::iter::once(&descriptor.output))
         .enumerate()
         .map(|(index, tensor_descriptor)| {
-            self::create_tensor_bind_group(
-                tensor_descriptor.tensor,
-                &pipeline.get_bind_group_layout(index as u32),
-                device,
-            )
+            tensor_descriptor
+                .tensor
+                .bind_group(&pipeline.get_bind_group_layout(index as u32))
         })
         .collect::<Vec<_>>();
 
@@ -87,13 +85,6 @@ pub fn build_op_pipeline(
 }
 
 // Utility Functions
-#[repr(C)]
-#[derive(bytemuck::Pod, Copy, Clone, bytemuck::Zeroable)]
-struct TensorMetadata {
-    rank: u32,
-    length: u32,
-}
-
 pub fn define_shader_interface<'a>(
     inputs: &[TensorDescriptor<'a>],
     output: &TensorDescriptor<'a>,
@@ -135,83 +126,7 @@ for (var i = 0u; i < {input_name}_metadata.rank; i++) {{
 ", input_name=input_name, index_var=initial_index_var)
 }
 
-pub fn create_tensor_bind_group(
-    tensor: &Tensor,
-    bind_group_layout: &wgpu::BindGroupLayout,
-    device: &wgpu::Device,
-) -> wgpu::BindGroup {
-    let shape = self::usize_to_u32(tensor.shape());
-    let shape_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-        label: None,
-        contents: bytemuck::cast_slice(&shape),
-        usage: wgpu::BufferUsages::STORAGE
-            | wgpu::BufferUsages::COPY_DST
-            | wgpu::BufferUsages::COPY_SRC,
-    });
-
-    let stride = self::usize_to_u32(tensor.stride());
-    let stride_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-        label: None,
-        contents: bytemuck::cast_slice(&stride),
-        usage: wgpu::BufferUsages::STORAGE
-            | wgpu::BufferUsages::COPY_DST
-            | wgpu::BufferUsages::COPY_SRC,
-    });
-
-    let contiguous_stride = self::usize_to_u32(tensor.contiguous_stride());
-    let contiguous_stride_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-        label: None,
-        contents: bytemuck::cast_slice(&contiguous_stride),
-        usage: wgpu::BufferUsages::STORAGE
-            | wgpu::BufferUsages::COPY_DST
-            | wgpu::BufferUsages::COPY_SRC,
-    });
-
-    let metadata = TensorMetadata {
-        rank: tensor.rank() as u32,
-        length: tensor.len() as u32,
-    };
-    let metadata_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-        label: None,
-        contents: bytemuck::cast_slice(&[metadata]),
-        usage: wgpu::BufferUsages::UNIFORM
-            | wgpu::BufferUsages::COPY_DST
-            | wgpu::BufferUsages::COPY_SRC,
-    });
-
-    device.create_bind_group(&wgpu::BindGroupDescriptor {
-        label: None,
-        layout: bind_group_layout,
-        entries: &[
-            wgpu::BindGroupEntry {
-                binding: 0,
-                resource: tensor.buffer().as_entire_binding(),
-            },
-            wgpu::BindGroupEntry {
-                binding: 1,
-                resource: shape_buffer.as_entire_binding(),
-            },
-            wgpu::BindGroupEntry {
-                binding: 2,
-                resource: stride_buffer.as_entire_binding(),
-            },
-            wgpu::BindGroupEntry {
-                binding: 3,
-                resource: contiguous_stride_buffer.as_entire_binding(),
-            },
-            wgpu::BindGroupEntry {
-                binding: 4,
-                resource: metadata_buffer.as_entire_binding(),
-            },
-        ],
-    })
-}
-
 // Helper Functions
-fn usize_to_u32(data: &[usize]) -> Vec<u32> {
-    data.iter().map(|&x| x as u32).collect::<Vec<_>>()
-}
-
 fn tensor_interface(group: &str, name: &str, permission: &str) -> String {
     format!(
         "
