@@ -1,0 +1,16 @@
+[package]
+name = "dtensor"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "dtensor"
+path = "src/lib.rs"
+
+[[bin]]
+name = "test"
+path = "src/main.rs"
+
+[dependencies]
+impl_ops = "0.1.1"
+num-traits = "0.2.15"
