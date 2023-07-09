@@ -12,5 +12,7 @@ name = "test"
 path = "src/main.rs"
 
 [dependencies]
+half = "2.2.1"
 impl_ops = "0.1.1"
 num-traits = "0.2.15"
+once_cell = "1.18.0"
