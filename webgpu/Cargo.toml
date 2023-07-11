@@ -1,0 +1,15 @@
+[package]
+name = "webgpu"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+path = "src/lib.rs"
+crate-type = ["cdylib"]
+
+[dependencies]
+wgpu = "0.16.2"
+
+[profile.release]
+lto = true
+opt-level = 's'
