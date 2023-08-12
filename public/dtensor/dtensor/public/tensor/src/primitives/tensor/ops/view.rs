@@ -26,6 +26,17 @@ impl Tensor {
 
     pub fn broadcast(&self, other: &Tensor) -> Tensor {
         let view = self.view().broadcast(other.view());
+        self.reshape(view)
+    }
+
+    pub fn reshape(&self, view: TensorView) -> Tensor {
+        assert!(
+            self.view().len() == view.len(),
+            "Expected shapes to be equal, got {} and {} elements",
+            self.view().len(),
+            view.len()
+        );
+
         self.view_op(view).contiguous()
     }
 }

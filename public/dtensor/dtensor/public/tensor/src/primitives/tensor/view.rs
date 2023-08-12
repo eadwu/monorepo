@@ -58,6 +58,10 @@ impl TensorView {
 }
 
 impl TensorView {
+    pub fn len(&self) -> usize {
+        self.shape.iter().map(|&x| x as usize).product()
+    }
+
     pub fn broadcast(&self, other: &TensorView) -> TensorView {
         // https://numpy.org/doc/stable/user/basics.broadcasting.html
         // When operating on two arrays, NumPy compares their shapes element-wise.
