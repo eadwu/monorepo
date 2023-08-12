@@ -1,5 +1,6 @@
 use crate::primitives::tensor::Tensor;
 
+#[derive(Clone, Copy, Debug)]
 pub enum UnaryType {
     IDENTITY, // NOOP,
     EXP2,
@@ -10,6 +11,7 @@ pub enum UnaryType {
     RECIP,
 }
 
+#[derive(Clone, Debug)]
 pub struct UnarySpec {
     pub op: UnaryType,
     pub input: Tensor,

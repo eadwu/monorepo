@@ -12,7 +12,11 @@ use super::*;
 static ID_GENERATOR: AtomicU32 = AtomicU32::new(0);
 
 pub type TensorType = f32;
+
+#[derive(Clone, Debug)]
 pub struct Tensor(Rc<TensorInternals>);
+
+#[derive(Clone, Debug)]
 pub struct TensorInternals {
     pub id: u32,
     view: TensorView,
