@@ -18,9 +18,9 @@ pub struct Tensor(Rc<TensorInternals>);
 
 #[derive(Clone, Debug)]
 pub struct TensorInternals {
-    pub id: u32,
+    id: u32,
     view: TensorView,
-    pub data: TensorInput,
+    data: TensorInput,
 }
 
 impl TensorInternals {
@@ -53,5 +53,13 @@ impl Tensor {
             TensorView::from_shape(shape),
             TensorInput::from_raw(path.to_path_buf(), 0),
         )))
+    }
+
+    pub fn view(&self) -> &TensorView {
+        &self.0.view
+    }
+
+    pub fn data(&self) -> &TensorInput {
+        &self.0.data
     }
 }
