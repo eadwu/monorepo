@@ -1,6 +1,8 @@
 use itertools::{EitherOrBoth::*, Itertools};
 
 pub type ViewType = u32;
+
+#[derive(Clone, Debug)]
 pub struct TensorView {
     pub contiguous: bool,
     pub shape: Box<[ViewType]>,
