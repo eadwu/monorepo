@@ -34,6 +34,10 @@ impl TensorInternals {
 }
 
 impl Tensor {
+    pub fn new(view: TensorView, data: TensorInput) -> Tensor {
+        Tensor(Rc::new(TensorInternals::new(view, data)))
+    }
+
     pub fn scalar<T: AsPrimitive<TensorType>>(data: T) -> Tensor {
         let data = vec![data.as_()];
         let shape = vec![1];
@@ -49,10 +53,10 @@ impl Tensor {
             .create_with_bytes(path, bytemuck::cast_slice(data))
             .unwrap();
 
-        Tensor(Rc::new(TensorInternals::new(
+        Tensor::new(
             TensorView::from_shape(shape),
-            TensorInput::from_raw(path.to_path_buf(), 0),
-        )))
+            TensorInput::from_raw(path, 0),
+        )
     }
 
     pub fn view(&self) -> &TensorView {
