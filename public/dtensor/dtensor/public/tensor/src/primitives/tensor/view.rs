@@ -26,12 +26,12 @@ impl TensorView {
         }
     }
 
-    pub fn from_shape(shape: Box<[ViewType]>) -> TensorView {
-        let stride = TensorView::compute_contiguous_stride(&shape);
+    pub fn from_shape(shape: &[ViewType]) -> TensorView {
+        let stride = TensorView::compute_contiguous_stride(shape);
         let offset = shape.iter().map(|_| 0).collect_vec();
         TensorView::new(
             true,
-            shape,
+            shape.to_vec().into_boxed_slice(),
             stride.into_boxed_slice(),
             offset.into_boxed_slice(),
         )
