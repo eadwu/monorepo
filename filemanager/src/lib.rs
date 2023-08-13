@@ -16,28 +16,25 @@ impl FileManager {
         }
     }
 
-    pub fn open(&mut self, path: &Path, size: usize, offset: usize) -> io::Result<Mmap> {
+    pub fn open(&mut self, path: &Path, offset: usize) -> io::Result<Mmap> {
         if !self.cache.contains_key(path) {
             let file = File::open(&path)?;
             self.cache.insert(path.to_path_buf(), file);
         }
 
         let file = self.cache.get(path).unwrap();
-        let minimum_size = (size + offset) as u64;
-        if file.metadata()?.len() < minimum_size {
-            file.set_len(minimum_size)?;
-        }
-
         Ok(unsafe { MmapOptions::new().offset(offset as u64).map(file).unwrap() })
     }
 
     pub fn create(&mut self, path: &Path, size: usize, offset: usize) -> io::Result<Mmap> {
         if !self.cache.contains_key(path) {
             let file = tempfile::tempfile()?;
+            file.set_len(size as u64)?;
+
             self.cache.insert(path.to_path_buf(), file);
         }
 
-        self.open(path, size, offset)
+        self.open(path, offset)
     }
 
     pub fn create_with_bytes(&mut self, path: &Path, bytes: &[u8]) -> io::Result<Mmap> {
