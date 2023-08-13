@@ -55,7 +55,7 @@ impl Tensor {
 
         Tensor::new(
             TensorView::from_shape(shape),
-            TensorInput::from_raw(path, 0),
+            TensorInput::from_raw(path, std::mem::size_of_val(data), 0),
         )
     }
 
