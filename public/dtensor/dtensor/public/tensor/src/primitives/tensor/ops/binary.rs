@@ -51,7 +51,7 @@ impl Tensor {
         self.binary_op(BinaryType::DIVIDE, rhs)
     }
 
-    pub fn Max(&self, rhs: &Tensor) -> Tensor {
+    pub fn Maximum(&self, rhs: &Tensor) -> Tensor {
         self.binary_op(BinaryType::MAX, rhs)
     }
 
