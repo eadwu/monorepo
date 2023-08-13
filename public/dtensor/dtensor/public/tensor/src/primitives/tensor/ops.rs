@@ -15,6 +15,7 @@ pub use load::*;
 pub enum TensorInput {
     ExplicitInput(InputSpec),
     OperationResult(OperationSpec),
+    Invalidated,
 }
 
 #[derive(Clone, Debug)]
