@@ -58,8 +58,12 @@ impl TensorView {
 }
 
 impl TensorView {
-    pub fn len(&self) -> usize {
-        self.shape.iter().map(|&x| x as usize).product()
+    pub fn len(&self) -> ViewType {
+        self.shape.iter().product()
+    }
+
+    pub fn dimension(&self) -> ViewType {
+        self.shape.len() as ViewType
     }
 
     pub fn broadcast(&self, other: &TensorView) -> TensorView {
