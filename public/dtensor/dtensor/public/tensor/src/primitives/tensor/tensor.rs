@@ -58,6 +58,15 @@ impl Tensor {
             TensorInput::from_raw(path, std::mem::size_of_val(data), 0),
         )
     }
+}
+
+impl Tensor {
+    fn has_data(&self) -> bool {
+        match self.data() {
+            TensorInput::ExplicitInput(_) => true,
+            _ => false,
+        }
+    }
 
     pub fn view(&self) -> &TensorView {
         &self.0.view
@@ -65,5 +74,23 @@ impl Tensor {
 
     pub fn data(&self) -> &TensorInput {
         &self.0.data
+    }
+
+    pub fn load(&self) -> Vec<u8> {
+        assert!(self.has_data(), "Tensor does not contain any data");
+
+        if let TensorInput::ExplicitInput(input) = self.data() {
+            if let InputSpec::Raw(spec) = input {
+                let data = FILE_MANAGER
+                    .lock()
+                    .unwrap()
+                    .open(&spec.file, spec.offset)
+                    .unwrap();
+                let bytes = &data[..spec.size];
+                return bytes.to_vec();
+            }
+        }
+
+        unreachable!("Reached unreachable path for Tensor.load()");
     }
 }
