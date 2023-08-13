@@ -17,7 +17,7 @@ impl ToWebGPUBuffer for Tensor {
         let data = self.load();
         let minimum_size = data.len().max(WEBGPU_MINIMUM_BUFFER_SIZE);
         let aligned_size =
-            minimum_size + (WEBGPU_FLOAT4_ALIGNMENT - WEBGPU_FLOAT4_ALIGNMENT % minimum_size);
+            minimum_size + (WEBGPU_FLOAT4_ALIGNMENT - 1) & !(WEBGPU_FLOAT4_ALIGNMENT - 1);
 
         let buffer = device.create_buffer(&wgpu::BufferDescriptor {
             label: None,
