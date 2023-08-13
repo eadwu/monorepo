@@ -25,7 +25,7 @@ pub struct TensorMetadata {
     pub stride_offset: ViewType,
     pub contiguous_stride_offset: ViewType,
     pub offset_offset: ViewType,
-    pub data: Vec<ViewType>,
+    pub metadata: Vec<ViewType>,
 }
 
 impl From<&TensorView> for TensorMetadata {
@@ -71,7 +71,7 @@ impl TensorMetadata {
         stride_offset: ViewType,
         contiguous_stride_offset: ViewType,
         offset_offset: ViewType,
-        data: Vec<ViewType>,
+        metadata: Vec<ViewType>,
     ) -> TensorMetadata {
         TensorMetadata {
             length,
@@ -80,11 +80,11 @@ impl TensorMetadata {
             stride_offset,
             contiguous_stride_offset,
             offset_offset,
-            data,
+            metadata,
         }
     }
 
     pub fn bytes(&self) -> &[u8] {
-        bytemuck::cast_slice(&self.data)
+        bytemuck::cast_slice(&self.metadata)
     }
 }
