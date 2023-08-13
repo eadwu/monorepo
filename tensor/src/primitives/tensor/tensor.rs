@@ -1,3 +1,4 @@
+use std::mem::replace;
 use std::path::Path;
 use std::rc::Rc;
 use std::sync::atomic::{AtomicU32, Ordering};
@@ -92,5 +93,36 @@ impl Tensor {
         }
 
         unreachable!("Reached unreachable path for Tensor.load()");
+    }
+}
+
+impl Drop for Tensor {
+    fn drop(&mut self) {
+        fn consume_to(value: &mut Tensor, dest: &mut Vec<Tensor>) {
+            if let Some(tensor) = Rc::get_mut(&mut value.0) {
+                if let TensorInput::OperationResult(ref mut result) = tensor.data {
+                    if let OperationSpec::UnaryOp(ref mut op) = result {
+                        dest.push(op.input.clone());
+                    }
+
+                    if let OperationSpec::BinaryOp(ref mut op) = result {
+                        dest.push(op.lhs.clone());
+                        dest.push(op.rhs.clone());
+                    }
+
+                    if let OperationSpec::ViewOp(ref mut op) = result {
+                        dest.push(op.input.clone());
+                    }
+                }
+
+                let _ = replace(&mut tensor.data, TensorInput::Invalidated);
+            }
+        }
+
+        let mut stack = vec![];
+        consume_to(self, &mut stack);
+        while let Some(mut value) = stack.pop() {
+            consume_to(&mut value, &mut stack);
+        }
     }
 }
