@@ -1,5 +1,6 @@
 use super::TensorMetadata;
 
+pub mod unary;
 pub mod view;
 
 pub fn shader_header() -> String {
