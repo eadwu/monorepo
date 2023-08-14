@@ -2,8 +2,12 @@ use std::iter::once;
 
 use ::tensor::primitives::tensor::{TensorView, ViewType};
 
+pub mod generators;
+
 mod tensor;
 pub use tensor::*;
+
+const WORKGROUP_SIZE: WebGPUWorkGroup = WebGPUWorkGroup::new(4, 4, 4);
 
 #[derive(Debug)]
 pub struct WebGPUDevice {
@@ -15,6 +19,40 @@ pub struct WebGPUDevice {
 pub struct TensorLayout {
     pub metadata: wgpu::Buffer,
     pub data: wgpu::Buffer,
+}
+
+#[derive(Debug)]
+pub struct WebGPUWorkGroup {
+    pub x: u32,
+    pub y: u32,
+    pub z: u32,
+}
+
+impl WebGPUWorkGroup {
+    pub const fn new(x: u32, y: u32, z: u32) -> WebGPUWorkGroup {
+        WebGPUWorkGroup { x, y, z }
+    }
+
+    pub fn serialize_strides(&self, variable_name: &str) -> String {
+        format!(
+            "
+const {variable_name} = vec3u({stride_x}u, {stride_y}u, {stride_z}u);
+",
+            variable_name = variable_name,
+            stride_x = self.y * self.z,
+            stride_y = self.z,
+            stride_z = 1
+        )
+    }
+
+    pub fn serialize_decorator(&self) -> String {
+        format!(
+            "@workgroup_size({x}, {y}, {z})",
+            x = self.x,
+            y = self.y,
+            z = self.z,
+        )
+    }
 }
 
 #[derive(Debug)]
@@ -82,6 +120,24 @@ impl TensorMetadata {
             offset_offset,
             metadata,
         }
+    }
+
+    pub fn serialize_definition() -> String {
+        format!(
+            "
+struct TensorMetadata {{
+    length: {ViewType},
+    dimension: {ViewType},
+    shape_offset: {ViewType},
+    stride_offset: {ViewType},
+    contiguous_stride_offset: {ViewType},
+    offset_offset: {ViewType},
+    metadata: {Vec}<{ViewType}>,
+}}
+",
+            ViewType = "u32",
+            Vec = "array",
+        )
     }
 
     pub fn bytes(&self) -> &[u8] {
