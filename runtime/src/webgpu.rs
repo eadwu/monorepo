@@ -36,7 +36,7 @@ impl WebGPUWorkGroup {
     pub fn serialize_strides(&self, variable_name: &str) -> String {
         format!(
             "
-const {variable_name} = vec3u({stride_x}u, {stride_y}u, {stride_z}u);
+const {variable_name}: vec3u = vec3u({stride_x}u, {stride_y}u, {stride_z}u);
 ",
             variable_name = variable_name,
             stride_x = self.y * self.z,
