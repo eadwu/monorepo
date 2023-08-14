@@ -30,8 +30,9 @@ fn {entry_point}(
 ",
         header = shader_header(),
         workgroup_stride = WORKGROUP_SIZE.serialize_strides("WORKGROUP_STRIDE"),
-        input_interface = tensor_interface("0", "read", "input", "f32", "input_metadata"),
-        output_interface = tensor_interface("1", "read_write", "output", "f32", "output_metadata"),
+        input_interface = tensor_interface("0", "read", "input", "array<f32>", "input_metadata"),
+        output_interface =
+            tensor_interface("1", "read_write", "output", "array<f32>", "output_metadata"),
         workgroup_size = WORKGROUP_SIZE.serialize_decorator(),
         entry_point = "main",
         index = compute_index("index", "global_id", "WORKGROUP_STRIDE"),
