@@ -39,7 +39,7 @@ impl ToWebGPUBuffer for TensorView {
         device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: None,
             contents: Into::<TensorMetadata>::into(self).bytes(),
-            usage: wgpu::BufferUsages::UNIFORM
+            usage: wgpu::BufferUsages::STORAGE
                 | wgpu::BufferUsages::COPY_DST
                 | wgpu::BufferUsages::COPY_SRC,
         })
