@@ -25,7 +25,7 @@ fn {entry_point}(
 
     {mapped_index}
 
-    output[index] = index[mapped_index];
+    output[index] = input[mapped_index];
 }}
 ",
         header = shader_header(),

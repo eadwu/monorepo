@@ -57,6 +57,6 @@ fn {entry_point}(
         index = compute_index("index", "global_id", "WORKGROUP_STRIDE"),
         mapped_index =
             compute_strided_offset("mapped_index", "index", "output_metadata", "input_metadata"),
-        output = build_webgpu_operation(op)("index[mapped_index]"),
+        output = build_webgpu_operation(op)("input[mapped_index]"),
     )
 }
