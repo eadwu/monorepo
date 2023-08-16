@@ -23,7 +23,7 @@ pub fn tensor_interface(
     format!(
         "
 @group({group}) @binding(0) var<storage, {permission}> {name}: {container_type};
-@group({group}) @binding(1) var<uniform> {metadata_name}: TensorMetadata;
+@group({group}) @binding(1) var<storage, read> {metadata_name}: TensorMetadata;
 ",
         group = group,
         permission = permission,
