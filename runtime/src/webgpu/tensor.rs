@@ -1,4 +1,4 @@
-use tensor::primitives::tensor::{Tensor, TensorView, TensorType};
+use tensor::primitives::tensor::{Tensor, TensorType, TensorView};
 use wgpu::util::DeviceExt;
 
 use super::{TensorLayout, WebGPUDevice, TensorMetadata};
@@ -14,8 +14,8 @@ impl ToWebGPUBuffer for Tensor {
     fn as_webgpu_buffer(&self, wgpu_device: &WebGPUDevice) -> wgpu::Buffer {
         let WebGPUDevice { device, queue: _ } = wgpu_device;
 
-        let data = self.load();
-        let minimum_size = data.len().max(WEBGPU_MINIMUM_BUFFER_SIZE);
+        let data_len = (self.view().len() as usize) * std::mem::size_of::<TensorType>();
+        let minimum_size = data_len.max(WEBGPU_MINIMUM_BUFFER_SIZE);
         let aligned_size =
             minimum_size + (WEBGPU_FLOAT4_ALIGNMENT - 1) & !(WEBGPU_FLOAT4_ALIGNMENT - 1);
 
@@ -27,7 +27,12 @@ impl ToWebGPUBuffer for Tensor {
                 | wgpu::BufferUsages::COPY_DST,
             mapped_at_creation: true,
         });
-        buffer.slice(..).get_mapped_range_mut()[..data.len()].copy_from_slice(&data);
+
+        if self.has_data() {
+            let data = self.load();
+            buffer.slice(..).get_mapped_range_mut()[..data.len()].copy_from_slice(&data);
+        }
+
         buffer.unmap();
         buffer
     }

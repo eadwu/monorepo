@@ -62,7 +62,7 @@ impl Tensor {
 }
 
 impl Tensor {
-    fn has_data(&self) -> bool {
+    pub fn has_data(&self) -> bool {
         match self.data() {
             TensorInput::ExplicitInput(_) => true,
             _ => false,
