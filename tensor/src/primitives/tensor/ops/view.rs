@@ -31,8 +31,8 @@ impl Tensor {
 
     pub fn reshape(&self, view: TensorView) -> Tensor {
         assert!(
-            self.view().len() == view.len(),
-            "Expected shapes to be equal, got {} and {} elements",
+            view.len() % self.view().len() == 0,
+            "Expected shapes to be multiples, got {} -> {} elements",
             self.view().len(),
             view.len()
         );
