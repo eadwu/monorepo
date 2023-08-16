@@ -19,7 +19,7 @@ fn {entry_point}(
     {index}
 
     // Guard against out-of-bounds work group sizes
-    if index >= input_metadata.length {{
+    if index >= output_metadata.length {{
         return;
     }}
 
