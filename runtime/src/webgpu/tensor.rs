@@ -1,7 +1,7 @@
 use tensor::primitives::tensor::{Tensor, TensorType, TensorView};
 use wgpu::util::DeviceExt;
 
-use super::{TensorLayout, WebGPUDevice, TensorMetadata};
+use super::{TensorLayout, TensorMetadata, WebGPUDevice};
 
 const WEBGPU_MINIMUM_BUFFER_SIZE: usize = 16;
 const WEBGPU_FLOAT4_ALIGNMENT: usize = std::mem::size_of::<TensorType>() * 4;
@@ -61,5 +61,49 @@ impl ToWebGPUTensorLayout for Tensor {
             metadata: self.view().as_webgpu_buffer(wgpu_device),
             data: self.as_webgpu_buffer(wgpu_device),
         }
+    }
+}
+
+pub trait ToWebGPUBindGroup {
+    fn as_webgpu_bind_group(
+        &self,
+        bind_group_layout: &wgpu::BindGroupLayout,
+        wgpu_device: &WebGPUDevice,
+    ) -> wgpu::BindGroup;
+}
+
+impl ToWebGPUBindGroup for Tensor {
+    fn as_webgpu_bind_group(
+        &self,
+        bind_group_layout: &wgpu::BindGroupLayout,
+        wgpu_device: &WebGPUDevice,
+    ) -> wgpu::BindGroup {
+        self.as_webgpu_tensor(wgpu_device)
+            .as_webgpu_bind_group(bind_group_layout, wgpu_device)
+    }
+}
+
+impl ToWebGPUBindGroup for TensorLayout {
+    fn as_webgpu_bind_group(
+        &self,
+        bind_group_layout: &wgpu::BindGroupLayout,
+        wgpu_device: &WebGPUDevice,
+    ) -> wgpu::BindGroup {
+        let WebGPUDevice { device, queue: _ } = wgpu_device;
+
+        device.create_bind_group(&wgpu::BindGroupDescriptor {
+            label: None,
+            layout: bind_group_layout,
+            entries: &[
+                wgpu::BindGroupEntry {
+                    binding: 0,
+                    resource: self.data.as_entire_binding(),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 1,
+                    resource: self.metadata.as_entire_binding(),
+                },
+            ],
+        })
     }
 }
