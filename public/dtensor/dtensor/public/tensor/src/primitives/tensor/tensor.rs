@@ -69,6 +69,10 @@ impl Tensor {
         }
     }
 
+    pub fn id(&self) -> u32 {
+        self.0.id
+    }
+
     pub fn view(&self) -> &TensorView {
         &self.0.view
     }
