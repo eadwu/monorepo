@@ -5,7 +5,7 @@ use crate::webgpu::WORKGROUP_SIZE;
 
 fn build_webgpu_operation<'a>(op: UnaryType) -> impl Fn(&'a str) -> String {
     match op {
-        UnaryType::EXP2 => |input| format!("exp2({input}", input = input),
+        UnaryType::EXP2 => |input| format!("exp2({input})", input = input),
         UnaryType::IDENTITY => |input| format!("{input}", input = input),
         UnaryType::LOG2 => |input| format!("log2({input})", input = input),
         UnaryType::RECIP => |input| format!("1 / ({input})", input = input),
