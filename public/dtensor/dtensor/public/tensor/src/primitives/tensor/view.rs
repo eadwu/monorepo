@@ -2,7 +2,7 @@ use itertools::{EitherOrBoth::*, Itertools};
 
 pub type ViewType = u32;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct TensorView {
     pub contiguous: bool,
     pub shape: Box<[ViewType]>,
@@ -140,11 +140,15 @@ impl TensorView {
             .collect_vec();
 
         let offset = broadcasted_shape.iter().map(|_| 0).collect_vec();
-        TensorView::new(
-            false,
-            broadcasted_shape.into_boxed_slice(),
-            adjusted_stride.into_boxed_slice(),
-            offset.into_boxed_slice(),
-        )
+
+        let shape = broadcasted_shape.into_boxed_slice();
+        let stride = adjusted_stride.into_boxed_slice();
+        let offset = offset.into_boxed_slice();
+
+        if shape == self.shape && offset == self.offset {
+            self.clone()
+        } else {
+            TensorView::new(false, shape, stride, offset)
+        }
     }
 }
