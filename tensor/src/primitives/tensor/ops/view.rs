@@ -16,7 +16,11 @@ impl TensorInput {
 
 impl Tensor {
     fn view_op(&self, view: TensorView) -> Tensor {
-        Tensor::new(view.clone(), TensorInput::view(view, self.clone()))
+        if self.view() == &view {
+            self.clone()
+        } else {
+            Tensor::new(view.clone(), TensorInput::view(view, self.clone()))
+        }
     }
 
     pub fn contiguous(&self) -> Tensor {
