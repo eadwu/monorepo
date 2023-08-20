@@ -7,6 +7,9 @@ pub mod generators;
 mod tensor;
 pub use tensor::*;
 
+mod pipeline;
+pub use pipeline::*;
+
 const WORKGROUP_SIZE: WebGPUWorkGroup = WebGPUWorkGroup::new(4, 4, 4);
 
 #[derive(Debug)]
