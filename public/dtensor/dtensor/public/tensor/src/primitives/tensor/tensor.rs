@@ -120,6 +120,10 @@ impl Drop for Tensor {
                         dest.push(op.rhs.clone());
                     }
 
+                    if let OperationSpec::ReduceOp(ref mut op) = result {
+                        dest.push(op.input.clone());
+                    }
+
                     if let OperationSpec::ViewOp(ref mut op) = result {
                         dest.push(op.input.clone());
                     }

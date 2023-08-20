@@ -41,6 +41,7 @@ impl WebGPUEvaluation for Tensor {
                     OperationSpec::ViewOp(op) => {
                         (generators::view::build_shader(), vec![op.input.id()])
                     }
+                    _ => panic!("Unsupported Operation {:?}", operation),
                 };
 
                 let dependencies = inputs
