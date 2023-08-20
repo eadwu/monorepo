@@ -1,6 +1,6 @@
 use std::mem::replace;
 use std::path::Path;
-use std::rc::Rc;
+use std::sync::Arc;
 use std::sync::atomic::{AtomicU32, Ordering};
 
 use num_traits::AsPrimitive;
@@ -15,7 +15,7 @@ static ID_GENERATOR: AtomicU32 = AtomicU32::new(0);
 pub type TensorType = f32;
 
 #[derive(Clone, Debug)]
-pub struct Tensor(Rc<TensorInternals>);
+pub struct Tensor(Arc<TensorInternals>);
 
 #[derive(Clone, Debug)]
 pub struct TensorInternals {
@@ -36,7 +36,7 @@ impl TensorInternals {
 
 impl Tensor {
     pub fn new(view: TensorView, data: TensorInput) -> Tensor {
-        Tensor(Rc::new(TensorInternals::new(view, data)))
+        Tensor(Arc::new(TensorInternals::new(view, data)))
     }
 
     pub fn scalar<T: AsPrimitive<TensorType>>(data: T) -> Tensor {
@@ -103,7 +103,7 @@ impl Tensor {
 impl Drop for Tensor {
     fn drop(&mut self) {
         fn consume_to(value: &mut Tensor, dest: &mut Vec<Tensor>) {
-            if let Some(tensor) = Rc::get_mut(&mut value.0) {
+            if let Some(tensor) = Arc::get_mut(&mut value.0) {
                 if let TensorInput::ExplicitInput(ref mut input) = tensor.data {
                     if let InputSpec::Raw(ref mut spec) = input {
                         FILE_MANAGER.lock().unwrap().close(&spec.file);
