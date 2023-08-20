@@ -5,6 +5,9 @@ pub use binary::*;
 mod unary;
 pub use unary::*;
 
+mod reduce;
+pub use reduce::*;
+
 mod view;
 pub use view::*;
 
@@ -22,5 +25,6 @@ pub enum TensorInput {
 pub enum OperationSpec {
     UnaryOp(UnarySpec),
     BinaryOp(BinarySpec),
+    ReduceOp(ReduceSpec),
     ViewOp(ViewSpec),
 }
