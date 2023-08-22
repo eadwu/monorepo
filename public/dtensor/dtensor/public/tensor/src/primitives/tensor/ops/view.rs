@@ -29,8 +29,11 @@ impl Tensor {
     }
 
     pub fn broadcast(&self, other: &Tensor) -> Tensor {
-        let view = self.view().broadcast(other.view());
-        self.reshape(view)
+        self.broadcast_to(other.view())
+    }
+
+    pub fn broadcast_to(&self, view: &TensorView) -> Tensor {
+        self.reshape(self.view().broadcast(view))
     }
 
     pub fn reshape(&self, view: TensorView) -> Tensor {
