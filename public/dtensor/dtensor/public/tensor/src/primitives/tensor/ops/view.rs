@@ -1,4 +1,4 @@
-use crate::primitives::tensor::{Tensor, TensorView};
+use crate::primitives::tensor::{Tensor, TensorView, ViewType};
 
 use super::{OperationSpec, TensorInput};
 
@@ -34,6 +34,55 @@ impl Tensor {
 
     pub fn broadcast_to(&self, view: &TensorView) -> Tensor {
         self.reshape(self.view().broadcast(view))
+    }
+
+    pub fn squeeze(&self, axis: ViewType) -> Tensor {
+        let axis = axis as usize;
+        let n_dimension = self.view().shape.len();
+        let axis_rank = self.view().shape[axis];
+
+        assert!(
+            axis < n_dimension,
+            "Axis {} must be within 0 <= axis < {}",
+            axis,
+            n_dimension
+        );
+        assert!(
+            axis_rank == 1,
+            "Cannot remove axis {} with rank {} != 1",
+            axis,
+            axis_rank
+        );
+
+        let (exclusive_left, inclusive_right) = self.view().shape.split_at(axis);
+        let new_shape = exclusive_left
+            .iter()
+            .chain(inclusive_right.iter().skip(1))
+            .map(|&n| n)
+            .collect::<Vec<_>>();
+
+        self.reshape(TensorView::from_shape(&new_shape))
+    }
+
+    pub fn unsqueeze(&self, axis: ViewType) -> Tensor {
+        let axis = axis as usize;
+        let n_dimension = self.view().shape.len();
+        assert!(
+            axis <= n_dimension,
+            "Axis {} must be within 0 <= axis <= {}",
+            axis,
+            n_dimension
+        );
+
+        let (exclusive_left, inclusive_right) = self.view().shape.split_at(axis);
+        let new_shape = exclusive_left
+            .iter()
+            .chain(std::iter::once(&1))
+            .chain(inclusive_right.iter())
+            .map(|&n| n)
+            .collect::<Vec<_>>();
+
+        self.reshape(TensorView::from_shape(&new_shape))
     }
 
     pub fn reshape(&self, view: TensorView) -> Tensor {
