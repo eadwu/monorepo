@@ -60,12 +60,13 @@ var {output_variable}: u32 = 0u;
 for (var i = 0u; i < {input_metadata_variable}.dimension; i++) {{
     let input_contiguous_stride = {input_metadata_variable}.metadata[{input_metadata_variable}.contiguous_stride_offset + i];
 
+    let input_shape = {input_metadata_variable}.metadata[{input_metadata_variable}.shape_offset + i];
     let mapped_shape = {mapped_metadata_variable}.metadata[{mapped_metadata_variable}.shape_offset + i];
-    let index_at_dimension = ({output_variable}_temp / input_contiguous_stride) % mapped_shape;
-
     let mapped_stride = {mapped_metadata_variable}.metadata[{mapped_metadata_variable}.stride_offset + i];
-    {output_variable} += index_at_dimension * mapped_stride;
-    {output_variable}_temp %= input_contiguous_stride;
+
+    let index_at_dimension = {output_variable}_temp / input_contiguous_stride;
+    {output_variable} += (index_at_dimension % mapped_shape) * mapped_stride;
+    {output_variable}_temp -= (index_at_dimension % input_shape) * input_contiguous_stride;
 }}
 ",
         output_variable = output_variable,
