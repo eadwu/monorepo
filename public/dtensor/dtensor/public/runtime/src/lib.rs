@@ -45,6 +45,10 @@ impl GraphView for Tensor {
                     queue.push(op.rhs.clone());
                 } else if let OperationSpec::ViewOp(op) = operation {
                     queue.push(op.input.clone());
+                } else if let OperationSpec::IndexOp(op) = operation {
+                    for (_, tensor) in &op.dependencies {
+                        queue.push(tensor.clone());
+                    }
                 }
             }
         }
@@ -65,6 +69,10 @@ impl GraphView for Tensor {
                     parents.push(op.rhs.clone());
                 } else if let OperationSpec::ViewOp(op) = operation {
                     parents.push(op.input.clone());
+                } else if let OperationSpec::IndexOp(op) = operation {
+                    for (_, tensor) in &op.dependencies {
+                        parents.push(tensor.clone());
+                    }
                 }
             };
 
@@ -90,6 +98,10 @@ impl GraphView for Tensor {
                     dependencies.insert(op.rhs.id(), tensor.id());
                 } else if let OperationSpec::ViewOp(op) = operation {
                     dependencies.insert(op.input.id(), tensor.id());
+                } else if let OperationSpec::IndexOp(op) = operation {
+                    for (_, dependency) in &op.dependencies {
+                        dependencies.insert(dependency.id(), tensor.id());
+                    }
                 }
             }
         }

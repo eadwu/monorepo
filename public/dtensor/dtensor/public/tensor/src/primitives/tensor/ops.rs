@@ -14,6 +14,9 @@ pub use view::*;
 mod load;
 pub use load::*;
 
+mod index;
+pub use index::*;
+
 #[derive(Clone, Debug)]
 pub enum TensorInput {
     ExplicitInput(InputSpec),
@@ -27,4 +30,5 @@ pub enum OperationSpec {
     BinaryOp(BinarySpec),
     ReduceOp(ReduceSpec),
     ViewOp(ViewSpec),
+    IndexOp(IndexSpec),
 }
