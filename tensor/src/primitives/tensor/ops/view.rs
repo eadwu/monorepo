@@ -19,13 +19,18 @@ impl Tensor {
         if self.view() == view {
             self.clone()
         } else {
-            Tensor::new(view.clone(), TensorInput::view(view.clone(), self.clone()))
+            Tensor::new(view.clone(), self.data().clone())
         }
     }
 
     pub fn contiguous(&self) -> Tensor {
         let view = TensorView::from_shape(&self.view().shape);
-        self.view_op(&view)
+
+        if self.view() == &view {
+            self.clone()
+        } else {
+            Tensor::new(view.clone(), TensorInput::view(view.clone(), self.clone()))
+        }
     }
 
     pub fn broadcast(&self, other: &Tensor) -> Tensor {
@@ -93,6 +98,6 @@ impl Tensor {
             view.len()
         );
 
-        self.view_op(&view).contiguous()
+        self.view_op(&view)
     }
 }
