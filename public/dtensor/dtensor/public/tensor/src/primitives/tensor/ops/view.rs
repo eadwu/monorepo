@@ -15,17 +15,17 @@ impl TensorInput {
 }
 
 impl Tensor {
-    fn view_op(&self, view: TensorView) -> Tensor {
-        if self.view() == &view {
+    fn view_op(&self, view: &TensorView) -> Tensor {
+        if self.view() == view {
             self.clone()
         } else {
-            Tensor::new(view.clone(), TensorInput::view(view, self.clone()))
+            Tensor::new(view.clone(), TensorInput::view(view.clone(), self.clone()))
         }
     }
 
     pub fn contiguous(&self) -> Tensor {
         let view = TensorView::from_shape(&self.view().shape);
-        self.view_op(view)
+        self.view_op(&view)
     }
 
     pub fn broadcast(&self, other: &Tensor) -> Tensor {
@@ -33,7 +33,7 @@ impl Tensor {
     }
 
     pub fn broadcast_to(&self, view: &TensorView) -> Tensor {
-        self.reshape(self.view().broadcast(view))
+        self.reshape(&self.view().broadcast(view))
     }
 
     pub fn squeeze(&self, axis: ViewType) -> Tensor {
@@ -61,7 +61,7 @@ impl Tensor {
             .map(|&n| n)
             .collect::<Vec<_>>();
 
-        self.reshape(TensorView::from_shape(&new_shape))
+        self.reshape(&TensorView::from_shape(&new_shape))
     }
 
     pub fn unsqueeze(&self, axis: ViewType) -> Tensor {
@@ -82,10 +82,10 @@ impl Tensor {
             .map(|&n| n)
             .collect::<Vec<_>>();
 
-        self.reshape(TensorView::from_shape(&new_shape))
+        self.reshape(&TensorView::from_shape(&new_shape))
     }
 
-    pub fn reshape(&self, view: TensorView) -> Tensor {
+    pub fn reshape(&self, view: &TensorView) -> Tensor {
         assert!(
             view.len() % self.view().len() == 0,
             "Expected shapes to be multiples, got {} -> {} elements",
@@ -93,6 +93,6 @@ impl Tensor {
             view.len()
         );
 
-        self.view_op(view).contiguous()
+        self.view_op(&view).contiguous()
     }
 }
