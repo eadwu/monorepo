@@ -2,17 +2,17 @@ use std::fs::File;
 use std::io;
 use std::path::{Path, PathBuf};
 
-use hashlink::LruCache;
+use hashlink::LinkedHashMap;
 use memmap2::{Mmap, MmapOptions};
 
 pub struct FileManager {
-    cache: LruCache<PathBuf, File>,
+    cache: LinkedHashMap<PathBuf, File>,
 }
 
 impl FileManager {
     pub fn new(cache_size: usize) -> FileManager {
         FileManager {
-            cache: LruCache::new(cache_size),
+            cache: LinkedHashMap::new(),
         }
     }
 
