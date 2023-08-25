@@ -27,7 +27,9 @@ impl WebGPUEvaluation for Tensor {
         let mut intermediate_results = HashMap::new();
 
         for tensor in &runtime.graph {
-            if let TensorInput::ExplicitInput(_) = tensor.data() {
+            if let TensorInput::NoOp(input) = tensor.data() {
+                intermediate_results.insert(tensor.id(), input.clone());
+            } else if let TensorInput::ExplicitInput(_) = tensor.data() {
                 intermediate_results.insert(tensor.id(), tensor.clone());
             } else if let TensorInput::OperationResult(operation) = tensor.data() {
                 let (shader, inputs) = match operation {

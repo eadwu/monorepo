@@ -17,8 +17,11 @@ pub use load::*;
 mod index;
 pub use index::*;
 
+use super::Tensor;
+
 #[derive(Clone, Debug)]
 pub enum TensorInput {
+    NoOp(Tensor),
     ExplicitInput(InputSpec),
     OperationResult(OperationSpec),
     Invalidated,
@@ -31,4 +34,10 @@ pub enum OperationSpec {
     ReduceOp(ReduceSpec),
     ViewOp(ViewSpec),
     IndexOp(IndexSpec),
+}
+
+impl TensorInput {
+    pub fn no_op(input: Tensor) -> TensorInput {
+        TensorInput::NoOp(input)
+    }
 }
