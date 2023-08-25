@@ -49,13 +49,13 @@ fn {entry_point}(
 ",
         header = shader_header(),
         workgroup_stride = WORKGROUP_SIZE.serialize_strides("WORKGROUP_STRIDE"),
-        lhs_interface = tensor_interface("0", "read", "lhs", "array<vec4<f32>>", "lhs_metadata"),
-        rhs_interface = tensor_interface("1", "read", "rhs", "array<vec4<f32>>", "rhs_metadata"),
+        lhs_interface = tensor_interface("0", "read", "lhs", "array<f32>", "lhs_metadata"),
+        rhs_interface = tensor_interface("1", "read", "rhs", "array<f32>", "rhs_metadata"),
         output_interface = tensor_interface(
             "2",
             "read_write",
             "output",
-            "array<vec4<f32>>",
+            "array<f32>",
             "output_metadata"
         ),
         workgroup_size = WORKGROUP_SIZE.serialize_decorator(),
