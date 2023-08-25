@@ -3,6 +3,7 @@ use super::TensorMetadata;
 pub mod binary;
 pub mod unary;
 pub mod view;
+pub mod index;
 
 pub fn shader_header() -> String {
     format!(
