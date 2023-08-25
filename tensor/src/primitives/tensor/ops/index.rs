@@ -126,7 +126,7 @@ impl Tensor {
             .chain(gather_element_shape.iter().skip(1).map(|_| &1))
             .map(|&n| n)
             .collect::<Vec<_>>();
-        let transmuted_indices = indices.reshape(TensorView::from_shape(&transmuted_shape));
+        let transmuted_indices = indices.reshape(&TensorView::from_shape(&transmuted_shape));
         let broadcasted_indices = transmuted_indices.broadcast_to(&adjusted_view);
 
         self.GatherElements(axis, &broadcasted_indices)
