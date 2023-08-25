@@ -1,6 +1,6 @@
 use std::{borrow::Cow, collections::HashMap};
 
-use tensor::primitives::tensor::{OperationSpec, Tensor, TensorInput};
+use tensor::primitives::tensor::{GatherParams, IndexType, OperationSpec, Tensor, TensorInput};
 
 use crate::GraphView;
 
@@ -41,6 +41,19 @@ impl WebGPUEvaluation for Tensor {
                     OperationSpec::ViewOp(op) => {
                         (generators::view::build_shader(), vec![op.input.id()])
                     }
+                    OperationSpec::IndexOp(op) => match op.op {
+                        IndexType::GatherElements => {
+                            let params =
+                                bincode::deserialize::<GatherParams>(&op.serialized_params[..])
+                                    .unwrap();
+
+                            (
+                                generators::index::build_gather_shader(params.axis),
+                                vec![params.input, params.indices],
+                            )
+                        }
+                        _ => panic!("ScatterElements has not been implemented"),
+                    },
                     _ => panic!("Unsupported Operation {:?}", operation),
                 };
 
