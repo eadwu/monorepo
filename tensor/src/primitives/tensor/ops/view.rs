@@ -19,7 +19,7 @@ impl Tensor {
         if self.view() == view {
             self.clone()
         } else {
-            Tensor::new(view.clone(), self.data().clone())
+            Tensor::new(view.clone(), TensorInput::no_op(self.clone()))
         }
     }
 
