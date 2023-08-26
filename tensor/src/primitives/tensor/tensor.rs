@@ -40,9 +40,7 @@ impl Tensor {
     }
 
     pub fn scalar<T: AsPrimitive<TensorType>>(data: T) -> Tensor {
-        let data = vec![data.as_()];
-        let shape = vec![1];
-        Tensor::from_contiguous(&data, &shape)
+        Tensor::from_contiguous(&[data.as_()], &[])
     }
 
     pub fn from_contiguous(data: &[TensorType], shape: &[ViewType]) -> Tensor {

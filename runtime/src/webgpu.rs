@@ -90,6 +90,9 @@ impl From<&TensorView> for TensorMetadata {
             .chain(view.contiguous_stride.iter())
             .chain(view.offset.iter())
             .map(|&x| x)
+            // If it is a scalar then the metadata is 0 bytes
+            // WebGPU does not like 0-length arrays, so append an extra 0
+            .chain(std::iter::once(0))
             .collect::<Vec<_>>();
 
         TensorMetadata::new(
