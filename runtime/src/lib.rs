@@ -43,6 +43,8 @@ impl GraphView for Tensor {
                 } else if let OperationSpec::BinaryOp(op) = operation {
                     queue.push(op.lhs.clone());
                     queue.push(op.rhs.clone());
+                } else if let OperationSpec::ReduceOp(op) = operation {
+                    queue.push(op.input.clone());
                 } else if let OperationSpec::ViewOp(op) = operation {
                     queue.push(op.input.clone());
                 } else if let OperationSpec::IndexOp(op) = operation {
@@ -67,6 +69,8 @@ impl GraphView for Tensor {
                 } else if let OperationSpec::BinaryOp(op) = operation {
                     parents.push(op.lhs.clone());
                     parents.push(op.rhs.clone());
+                } else if let OperationSpec::ReduceOp(op) = operation {
+                    parents.push(op.input.clone());
                 } else if let OperationSpec::ViewOp(op) = operation {
                     parents.push(op.input.clone());
                 } else if let OperationSpec::IndexOp(op) = operation {
@@ -96,6 +100,8 @@ impl GraphView for Tensor {
                 } else if let OperationSpec::BinaryOp(op) = operation {
                     dependencies.insert(op.lhs.id(), tensor.id());
                     dependencies.insert(op.rhs.id(), tensor.id());
+                } else if let OperationSpec::ReduceOp(op) = operation {
+                    dependencies.insert(op.input.id(), tensor.id());
                 } else if let OperationSpec::ViewOp(op) = operation {
                     dependencies.insert(op.input.id(), tensor.id());
                 } else if let OperationSpec::IndexOp(op) = operation {
