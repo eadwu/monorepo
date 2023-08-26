@@ -42,50 +42,11 @@ impl Tensor {
     }
 
     pub fn squeeze(&self, axis: ViewType) -> Tensor {
-        let n_dimension = self.view().dimension();
-        let axis_rank = self.view().shape[axis as usize];
-
-        assert!(
-            axis < n_dimension,
-            "Axis {} must be within 0 <= axis < {}",
-            axis,
-            n_dimension
-        );
-        assert!(
-            axis_rank == 1,
-            "Cannot remove axis {} with rank {} != 1",
-            axis,
-            axis_rank
-        );
-
-        let (exclusive_left, inclusive_right) = self.view().shape.split_at(axis as usize);
-        let new_shape = exclusive_left
-            .iter()
-            .chain(inclusive_right.iter().skip(1))
-            .map(|&n| n)
-            .collect::<Vec<_>>();
-
-        self.reshape(&TensorView::from_shape(&new_shape))
+        self.reshape(&self.view().squeeze(axis))
     }
 
     pub fn unsqueeze(&self, axis: ViewType) -> Tensor {
-        let n_dimension = self.view().dimension();
-        assert!(
-            axis <= n_dimension,
-            "Axis {} must be within 0 <= axis <= {}",
-            axis,
-            n_dimension
-        );
-
-        let (exclusive_left, inclusive_right) = self.view().shape.split_at(axis as usize);
-        let new_shape = exclusive_left
-            .iter()
-            .chain(std::iter::once(&1))
-            .chain(inclusive_right.iter())
-            .map(|&n| n)
-            .collect::<Vec<_>>();
-
-        self.reshape(&TensorView::from_shape(&new_shape))
+        self.reshape(&self.view().unsqueeze(axis))
     }
 
     pub fn reshape(&self, view: &TensorView) -> Tensor {

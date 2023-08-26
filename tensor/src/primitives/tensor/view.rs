@@ -1,4 +1,7 @@
+use std::slice::Iter;
+
 use itertools::{EitherOrBoth::*, Itertools};
+use num_traits::AsPrimitive;
 
 pub type ViewType = u32;
 
@@ -64,6 +67,92 @@ impl TensorView {
 
     pub fn dimension(&self) -> ViewType {
         self.shape.len() as ViewType
+    }
+
+    fn _split_and_join<T>(
+        slice: &[T],
+        index: usize,
+        default: T,
+        merge_function: impl Fn(Iter<'_, T>, Iter<'_, T>, T) -> Vec<T>,
+    ) -> Vec<T> {
+        let (left_exclusive, right_inclusive) = slice.split_at(index);
+        merge_function(left_exclusive.iter(), right_inclusive.iter(), default)
+    }
+
+    fn _join_squeeze<T: AsPrimitive<usize>>(
+        left_exclusive: Iter<'_, T>,
+        right_inclusive: Iter<'_, T>,
+        default: T,
+    ) -> Vec<T> {
+        left_exclusive
+            .chain(right_inclusive.skip(default.as_()))
+            .map(|&x| x)
+            .collect_vec()
+    }
+
+    fn _join_unsqueeze<T: Copy>(
+        left_exclusive: Iter<'_, T>,
+        right_inclusive: Iter<'_, T>,
+        default: T,
+    ) -> Vec<T> {
+        left_exclusive
+            .chain(std::iter::once(&default))
+            .chain(right_inclusive)
+            .map(|&x| x)
+            .collect_vec()
+    }
+
+    pub fn squeeze(&self, axis: ViewType) -> TensorView {
+        let axis_rank = self.shape[axis as usize];
+
+        assert!(
+            axis < self.dimension(),
+            "Squeeze axis {} is out of bounds, 0 <= axis < {}",
+            axis,
+            self.dimension()
+        );
+
+        assert!(
+            axis_rank == 1,
+            "Squeeze axis {} cannot be removed as axis rank {} != 1",
+            axis,
+            axis_rank
+        );
+
+        let axis = axis as usize;
+        let shape = TensorView::_split_and_join(&self.shape, axis, 1, TensorView::_join_squeeze);
+        let stride = TensorView::_split_and_join(&self.stride, axis, 1, TensorView::_join_squeeze);
+        let offset = TensorView::_split_and_join(&self.offset, axis, 1, TensorView::_join_squeeze);
+
+        TensorView::new(
+            self.contiguous,
+            shape.into_boxed_slice(),
+            stride.into_boxed_slice(),
+            offset.into_boxed_slice(),
+        )
+    }
+
+    pub fn unsqueeze(&self, axis: ViewType) -> TensorView {
+        assert!(
+            axis <= self.dimension(),
+            "Unsqueeze axis {} is out of bounds, 0 <= axis <= {}",
+            axis,
+            self.dimension()
+        );
+
+        let axis = axis as usize;
+        let shape = TensorView::_split_and_join(&self.shape, axis, 1, TensorView::_join_unsqueeze);
+        let stride =
+            TensorView::_split_and_join(&self.stride, axis, 0, TensorView::_join_unsqueeze);
+        let offset =
+            TensorView::_split_and_join(&self.offset, axis, 0, TensorView::_join_unsqueeze);
+
+        TensorView::new(
+            self.contiguous,
+            shape.into_boxed_slice(),
+            stride.into_boxed_slice(),
+            offset.into_boxed_slice(),
+        )
     }
 
     pub fn broadcast(&self, other: &TensorView) -> TensorView {
