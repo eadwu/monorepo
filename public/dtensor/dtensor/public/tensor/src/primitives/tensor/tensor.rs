@@ -91,7 +91,7 @@ impl Tensor {
                 let data = FILE_MANAGER
                     .lock()
                     .unwrap()
-                    .open(&spec.file, spec.offset)
+                    .open(&spec.file, spec.offset, spec.size)
                     .unwrap();
                 let bytes = &data[..spec.size];
                 return bytes.to_vec();
