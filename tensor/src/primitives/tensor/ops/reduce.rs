@@ -1,10 +1,8 @@
-use std::collections::HashSet;
-
 use crate::primitives::tensor::{Tensor, TensorView, ViewType};
 
 use super::{OperationSpec, TensorInput};
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 pub enum ReduceType {
     SUM,
     MAX,
@@ -14,20 +12,41 @@ pub enum ReduceType {
 pub struct ReduceSpec {
     pub op: ReduceType,
     pub input: Tensor,
-    pub axes: Vec<ViewType>,
+    pub axis: ViewType,
 }
 
 impl TensorInput {
-    pub fn reduce(op: ReduceType, input: Tensor, axes: &[ViewType]) -> TensorInput {
-        TensorInput::OperationResult(OperationSpec::ReduceOp(ReduceSpec {
-            op,
-            input,
-            axes: axes.to_vec(),
-        }))
+    pub fn reduce(op: ReduceType, input: Tensor, axis: ViewType) -> TensorInput {
+        TensorInput::OperationResult(OperationSpec::ReduceOp(ReduceSpec { op, input, axis }))
     }
 }
 
 impl Tensor {
+    fn _reduce(&self, op: ReduceType, axis: ViewType, keep_dim: bool) -> Tensor {
+        let output_shape = self
+            .view()
+            .shape
+            .iter()
+            .enumerate()
+            .filter_map(|(idx, &dimension)| {
+                if idx == axis as usize {
+                    if keep_dim {
+                        Some(1)
+                    } else {
+                        None
+                    }
+                } else {
+                    Some(dimension)
+                }
+            })
+            .collect::<Vec<_>>();
+
+        Tensor::new(
+            TensorView::from_shape(&output_shape),
+            TensorInput::reduce(op, self.clone(), axis),
+        )
+    }
+
     fn reduce_op(&self, op: ReduceType, axes: &[ViewType], keep_dims: bool) -> Tensor {
         // If &[] is given, assume it is a reduction along all axes
         let axes = if axes.len() == 0 {
@@ -38,7 +57,9 @@ impl Tensor {
                 .map(|(idx, _)| idx as ViewType)
                 .collect::<Vec<_>>()
         } else {
-            axes.to_vec()
+            let mut axes = axes.to_vec();
+            axes.sort();
+            axes
         };
 
         // Make sure axes are within 0 <= axis < rank
@@ -51,30 +72,10 @@ impl Tensor {
             )
         });
 
-        let axes_lookup = axes.iter().collect::<HashSet<_>>();
-        let output_shape = self
-            .view()
-            .shape
-            .iter()
-            .enumerate()
-            .filter_map(|(idx, &rank)| {
-                let dimension = idx as ViewType;
-                if axes_lookup.contains(&dimension) {
-                    if keep_dims {
-                        Some(1)
-                    } else {
-                        None
-                    }
-                } else {
-                    Some(rank)
-                }
-            })
-            .collect::<Vec<_>>();
-
-        Tensor::new(
-            TensorView::from_shape(&output_shape),
-            TensorInput::reduce(op, self.clone(), &axes),
-        )
+        // Start from the back so that indices are accurate if keep_dims is false
+        axes.iter().rev().fold(self.clone(), |accumulator, &axis| {
+            accumulator._reduce(op, axis, keep_dims)
+        })
     }
 
     pub fn Sum(&self, axes: &[ViewType], keep_dims: bool) -> Tensor {
