@@ -44,6 +44,10 @@ impl Tensor {
     }
 
     pub fn from_contiguous(data: &[TensorType], shape: &[ViewType]) -> Tensor {
+        Tensor::with_shape(data, TensorView::from_shape(shape))
+    }
+
+    pub fn with_shape(data: &[TensorType], view: TensorView) -> Tensor {
         let identifier = Uuid::new_v4().to_string();
         let path = Path::new(&identifier);
         FILE_MANAGER
@@ -53,7 +57,7 @@ impl Tensor {
             .unwrap();
 
         Tensor::new(
-            TensorView::from_shape(shape),
+            view,
             TensorInput::from_raw(path, std::mem::size_of_val(data), 0),
         )
     }

@@ -28,7 +28,10 @@ impl WebGPUEvaluation for Tensor {
 
         for tensor in &runtime.graph {
             if let TensorInput::NoOp(input) = tensor.data() {
-                intermediate_results.insert(tensor.id(), input.clone());
+                let input: &Tensor = intermediate_results.get(&input.id()).unwrap();
+                let clone =
+                    Tensor::with_shape(bytemuck::cast_slice(&input.load()), tensor.view().clone());
+                intermediate_results.insert(tensor.id(), clone);
             } else if let TensorInput::ExplicitInput(_) = tensor.data() {
                 intermediate_results.insert(tensor.id(), tensor.clone());
             } else if let TensorInput::OperationResult(operation) = tensor.data() {
