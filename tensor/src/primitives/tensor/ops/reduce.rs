@@ -28,23 +28,27 @@ impl Tensor {
             .shape
             .iter()
             .enumerate()
-            .filter_map(|(idx, &dimension)| {
-                if idx == axis as usize {
-                    if keep_dim {
-                        Some(1)
+            .map(
+                |(idx, &dimension)| {
+                    if idx == axis as usize {
+                        1
                     } else {
-                        None
+                        dimension
                     }
-                } else {
-                    Some(dimension)
-                }
-            })
+                },
+            )
             .collect::<Vec<_>>();
 
-        Tensor::new(
+        let result = Tensor::new(
             TensorView::from_shape(&output_shape),
             TensorInput::reduce(op, self.clone(), axis),
-        )
+        );
+
+        if keep_dim {
+            result
+        } else {
+            result.squeeze(axis)
+        }
     }
 
     fn reduce_op(&self, op: ReduceType, axes: &[ViewType], keep_dims: bool) -> Tensor {
