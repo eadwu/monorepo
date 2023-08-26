@@ -40,6 +40,10 @@ impl WebGPUEvaluation for Tensor {
                         generators::binary::build_shader(op.op),
                         vec![op.lhs.id(), op.rhs.id()],
                     ),
+                    OperationSpec::ReduceOp(op) => (
+                        generators::reduce::build_shader(op.op, op.axis),
+                        vec![op.input.id()],
+                    ),
                     OperationSpec::ViewOp(op) => {
                         (generators::view::build_shader(), vec![op.input.id()])
                     }

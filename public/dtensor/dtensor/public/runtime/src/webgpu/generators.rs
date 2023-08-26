@@ -2,6 +2,7 @@ use super::TensorMetadata;
 
 pub mod binary;
 pub mod unary;
+pub mod reduce;
 pub mod view;
 pub mod index;
 
