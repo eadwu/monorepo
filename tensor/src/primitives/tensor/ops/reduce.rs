@@ -69,10 +69,10 @@ impl Tensor {
         // Make sure axes are within 0 <= axis < rank
         axes.iter().for_each(|&dimension| {
             assert!(
-                (dimension as usize) < self.view().shape.len(),
+                dimension < self.view().dimension(),
                 "Unexpected axis {} >= {}",
                 dimension,
-                self.view().shape.len()
+                self.view().dimension()
             )
         });
 
