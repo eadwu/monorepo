@@ -37,6 +37,10 @@ impl GraphView for Tensor {
                 continue;
             }
 
+            if let TensorInput::NoOp(input) = current.data() {
+                queue.push(input.clone());
+            }
+
             if let TensorInput::OperationResult(operation) = current.data() {
                 if let OperationSpec::UnaryOp(op) = operation {
                     queue.push(op.input.clone());
@@ -63,6 +67,10 @@ impl GraphView for Tensor {
             graph.push(current.clone());
 
             let mut parents = vec![];
+            if let TensorInput::NoOp(input) = current.data() {
+                parents.push(input.clone());
+            }
+
             if let TensorInput::OperationResult(operation) = current.data() {
                 if let OperationSpec::UnaryOp(op) = operation {
                     parents.push(op.input.clone());
@@ -94,6 +102,10 @@ impl GraphView for Tensor {
         let graph: Vec<Tensor> = graph.into_iter().rev().collect();
         let mut dependencies = HashMap::new();
         for tensor in &graph {
+            if let TensorInput::NoOp(input) = tensor.data() {
+                dependencies.insert(input.id(), tensor.id());
+            }
+
             if let TensorInput::OperationResult(operation) = tensor.data() {
                 if let OperationSpec::UnaryOp(op) = operation {
                     dependencies.insert(op.input.id(), tensor.id());
