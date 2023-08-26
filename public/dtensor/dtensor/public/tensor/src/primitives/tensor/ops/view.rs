@@ -42,9 +42,8 @@ impl Tensor {
     }
 
     pub fn squeeze(&self, axis: ViewType) -> Tensor {
-        let axis = axis as usize;
-        let n_dimension = self.view().shape.len();
-        let axis_rank = self.view().shape[axis];
+        let n_dimension = self.view().dimension();
+        let axis_rank = self.view().shape[axis as usize];
 
         assert!(
             axis < n_dimension,
@@ -59,7 +58,7 @@ impl Tensor {
             axis_rank
         );
 
-        let (exclusive_left, inclusive_right) = self.view().shape.split_at(axis);
+        let (exclusive_left, inclusive_right) = self.view().shape.split_at(axis as usize);
         let new_shape = exclusive_left
             .iter()
             .chain(inclusive_right.iter().skip(1))
@@ -70,8 +69,7 @@ impl Tensor {
     }
 
     pub fn unsqueeze(&self, axis: ViewType) -> Tensor {
-        let axis = axis as usize;
-        let n_dimension = self.view().shape.len();
+        let n_dimension = self.view().dimension();
         assert!(
             axis <= n_dimension,
             "Axis {} must be within 0 <= axis <= {}",
@@ -79,7 +77,7 @@ impl Tensor {
             n_dimension
         );
 
-        let (exclusive_left, inclusive_right) = self.view().shape.split_at(axis);
+        let (exclusive_left, inclusive_right) = self.view().shape.split_at(axis as usize);
         let new_shape = exclusive_left
             .iter()
             .chain(std::iter::once(&1))
