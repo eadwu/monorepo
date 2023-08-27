@@ -17,6 +17,9 @@ pub use load::*;
 mod index;
 pub use index::*;
 
+mod derived;
+pub use derived::*;
+
 use super::Tensor;
 
 #[derive(Clone, Debug)]
