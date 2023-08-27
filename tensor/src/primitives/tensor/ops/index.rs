@@ -136,6 +136,10 @@ impl Tensor {
         self.gather_op(axis, indices)
     }
 
+    pub fn Scatter(&self, axis: ViewType, indices: &Tensor, updates: &Tensor) -> Tensor {
+        self.ScatterElements(axis, ScatterReduction::None, indices, updates)
+    }
+
     pub fn ScatterElements(
         &self,
         axis: ViewType,
@@ -143,6 +147,10 @@ impl Tensor {
         indices: &Tensor,
         updates: &Tensor,
     ) -> Tensor {
-        self.scatter_op(axis, reduction, indices, updates)
+        if let ScatterReduction::None = reduction {
+            self.scatter_op(axis, reduction, indices, updates)
+        } else {
+            panic!("No reduction are supported due to the lack of dispatch-level synchronization barriers");
+        }
     }
 }

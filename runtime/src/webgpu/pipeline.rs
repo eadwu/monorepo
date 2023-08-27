@@ -1,6 +1,8 @@
 use std::{borrow::Cow, collections::HashMap};
 
-use tensor::primitives::tensor::{GatherParams, IndexType, OperationSpec, Tensor, TensorInput};
+use tensor::primitives::tensor::{
+    GatherParams, IndexType, OperationSpec, ScatterParams, Tensor, TensorInput,
+};
 
 use crate::{webgpu::WORKGROUP_SIZE, GraphView};
 
@@ -34,21 +36,27 @@ impl WebGPUEvaluation for Tensor {
             } else if let TensorInput::ExplicitInput(_) = tensor.data() {
                 intermediate_results.insert(tensor.id(), tensor.clone());
             } else if let TensorInput::OperationResult(operation) = tensor.data() {
-                let (shader, inputs) = match operation {
-                    OperationSpec::UnaryOp(op) => {
-                        (generators::unary::build_shader(op.op), vec![op.input.id()])
-                    }
+                let (shader, inputs, output) = match operation {
+                    OperationSpec::UnaryOp(op) => (
+                        generators::unary::build_shader(op.op),
+                        vec![op.input.id()],
+                        tensor,
+                    ),
                     OperationSpec::BinaryOp(op) => (
                         generators::binary::build_shader(op.op),
                         vec![op.lhs.id(), op.rhs.id()],
+                        tensor,
                     ),
                     OperationSpec::ReduceOp(op) => (
                         generators::reduce::build_shader(op.op, op.axis),
                         vec![op.input.id()],
+                        tensor,
                     ),
-                    OperationSpec::ViewOp(op) => {
-                        (generators::view::build_shader(), vec![op.input.id()])
-                    }
+                    OperationSpec::ViewOp(op) => (
+                        generators::view::build_shader(),
+                        vec![op.input.id()],
+                        tensor,
+                    ),
                     OperationSpec::IndexOp(op) => match op.op {
                         IndexType::GatherElements => {
                             let params =
@@ -58,9 +66,30 @@ impl WebGPUEvaluation for Tensor {
                             (
                                 generators::index::build_gather_shader(params.axis),
                                 vec![params.input, params.indices],
+                                tensor,
                             )
                         }
-                        _ => panic!("ScatterElements has not been implemented"),
+                        IndexType::ScatterElements => {
+                            let params =
+                                bincode::deserialize::<ScatterParams>(&op.serialized_params[..])
+                                    .unwrap();
+                            let input_tensor = intermediate_results.get(&params.input).unwrap();
+
+                            (
+                                generators::index::build_scatter_shader(
+                                    params.axis,
+                                    params.reduction,
+                                ),
+                                vec![params.indices, params.updates],
+                                // Scatter needs a copy of the initial data
+                                // Fungle it here for now and just load in the input data
+                                //
+                                // In the future, maybe integrate a hook-based system since
+                                // CommandEncoder commands are run with memory barriers in between
+                                // https://github.com/gpuweb/gpuweb/issues/3809
+                                input_tensor,
+                            )
+                        }
                     },
                     _ => panic!("Unsupported Operation {:?}", operation),
                 };
@@ -83,7 +112,7 @@ impl WebGPUEvaluation for Tensor {
                     &WebGPUPipeline {
                         shader: &shader,
                         inputs: &dependencies,
-                        output: tensor,
+                        output,
                         dispatch_workgroups: &tensor.view().into(),
                     },
                     &wgpu_device,
