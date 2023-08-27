@@ -1,6 +1,7 @@
 use std::iter::once;
 
 use ::tensor::primitives::tensor::{TensorView, ViewType};
+use num::integer::Roots;
 
 pub mod generators;
 
@@ -10,7 +11,8 @@ pub use tensor::*;
 mod pipeline;
 pub use pipeline::*;
 
-const WORKGROUP_SIZE: WebGPUWorkGroup = WebGPUWorkGroup::new(4, 4, 4);
+const WORKGROUP_SIZE: WebGPUWorkGroup = WebGPUWorkGroup { x: 4, y: 4, z: 4 };
+const MAXIMUM_DISPATCH_WORKGROUP_DIMENSION: usize = 65535;
 
 #[derive(Debug)]
 pub struct WebGPUDevice {
@@ -32,7 +34,23 @@ pub struct WebGPUWorkGroup {
 }
 
 impl WebGPUWorkGroup {
-    pub const fn new(x: u32, y: u32, z: u32) -> WebGPUWorkGroup {
+    pub fn new(x: u32, y: u32, z: u32) -> WebGPUWorkGroup {
+        assert!(
+            (x as usize) <= MAXIMUM_DISPATCH_WORKGROUP_DIMENSION,
+            "{} exceeds maximum workgroup dimension",
+            x
+        );
+        assert!(
+            (y as usize) <= MAXIMUM_DISPATCH_WORKGROUP_DIMENSION,
+            "{} exceeds maximum workgroup dimension",
+            y
+        );
+        assert!(
+            (z as usize) <= MAXIMUM_DISPATCH_WORKGROUP_DIMENSION,
+            "{} exceeds maximum workgroup dimension",
+            z
+        );
+
         WebGPUWorkGroup { x, y, z }
     }
 
@@ -55,6 +73,16 @@ const {variable_name}: vec3u = vec3u({stride_x}u, {stride_y}u, {stride_z}u);
             y = self.y,
             z = self.z,
         )
+    }
+}
+
+impl From<&TensorView> for WebGPUWorkGroup {
+    fn from(value: &TensorView) -> Self {
+        let length = value.len();
+        let x = length.cbrt();
+        let y = ((length / x) + 1).sqrt();
+        let z = length / (x * y) + 1;
+        WebGPUWorkGroup { x, y, z }
     }
 }
 

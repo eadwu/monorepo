@@ -2,11 +2,9 @@ use std::{borrow::Cow, collections::HashMap};
 
 use tensor::primitives::tensor::{GatherParams, IndexType, OperationSpec, Tensor, TensorInput};
 
-use crate::GraphView;
+use crate::{webgpu::WORKGROUP_SIZE, GraphView};
 
-use super::{generators, ToWebGPUBindGroup, ToWebGPUTensorLayout, WebGPUDevice};
-
-const MAXIMUM_DISPATCH_GROUP_DIMENSION: usize = 65535;
+use super::{generators, ToWebGPUBindGroup, ToWebGPUTensorLayout, WebGPUDevice, WebGPUWorkGroup};
 
 #[async_trait::async_trait]
 pub trait WebGPUEvaluation {
@@ -18,6 +16,7 @@ pub struct WebGPUPipeline<'a> {
     pub shader: &'a str,
     pub inputs: &'a [&'a Tensor],
     pub output: &'a Tensor,
+    pub dispatch_workgroups: &'a WebGPUWorkGroup,
 }
 
 #[async_trait::async_trait]
@@ -85,6 +84,7 @@ impl WebGPUEvaluation for Tensor {
                         shader: &shader,
                         inputs: &dependencies,
                         output: tensor,
+                        dispatch_workgroups: &tensor.view().into(),
                     },
                     &wgpu_device,
                 )
@@ -116,6 +116,7 @@ pub async fn webgpu_tensor_pipeline<'a>(
         shader,
         inputs,
         output,
+        dispatch_workgroups,
     } = pipeline;
 
     let compiled_shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
@@ -158,10 +159,11 @@ pub async fn webgpu_tensor_pipeline<'a>(
                 workload.set_bind_group(index as u32, &bind_group, &[])
             });
 
-        let elements = output.view().len() as usize;
-        let z = elements.min(MAXIMUM_DISPATCH_GROUP_DIMENSION);
-        let y = elements / MAXIMUM_DISPATCH_GROUP_DIMENSION + 1;
-        workload.dispatch_workgroups(1, y as u32, z as u32);
+        workload.dispatch_workgroups(
+            dispatch_workgroups.x / WORKGROUP_SIZE.x + 1,
+            dispatch_workgroups.y / WORKGROUP_SIZE.y + 1,
+            dispatch_workgroups.z / dispatch_workgroups.z + 1,
+        );
     }
 
     let output_layout = tensor_layouts.last().unwrap();
