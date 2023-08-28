@@ -30,29 +30,18 @@ fn {entry_point}(
         return;
     }}
 
-    {mapped_indices_index}
+    var mapped_indices_index_temp = index;
+    var mapped_indices_index = 0u;
+    {map_indices_index}
 
     var input_gather_shape: u32 = 1u;
     for (var i = AXIS + 1u; i < input_metadata.dimension; i++) {{
       input_gather_shape *= input_metadata.metadata[input_metadata.shape_offset + i];
     }}
 
-    var mapped_index: u32 = 0u;
-
-    // Batch dimensions are the same
     var mapped_index_temp = index;
-    for (var i = 0u; i < AXIS; i++) {{
-        let output_contiguous_stride = output_metadata.metadata[output_metadata.contiguous_stride_offset + i];
-        let output_stride = output_metadata.metadata[output_metadata.stride_offset + i];
-        let output_shape = output_metadata.metadata[output_metadata.shape_offset + i];
-
-        let input_stride = input_metadata.metadata[input_metadata.stride_offset + i];
-        let input_shape = input_metadata.metadata[input_metadata.shape_offset + i];
-
-        let index_at_dimension = mapped_index_temp / output_contiguous_stride;
-        mapped_index_temp -= (index_at_dimension % output_shape) * output_stride;
-        mapped_index += (index_at_dimension % input_shape) * input_stride;
-    }}
+    var mapped_index = 0u;
+    {map_pre_axis_index}
 
     // Axis index is given by indices
     let axis_index = u32(indices[mapped_indices_index]);
@@ -62,16 +51,7 @@ fn {entry_point}(
 
     // Gather element dimension fungles
     mapped_index_temp = index % input_gather_shape;
-    for (var i = AXIS + 1u; i < input_metadata.dimension; i++) {{
-        // Output is contiguous so fungle this using input contiguous strides
-        let contiguous_stride = input_metadata.metadata[input_metadata.contiguous_stride_offset + i];
-        let stride = input_metadata.metadata[input_metadata.stride_offset + i];
-        let shape = input_metadata.metadata[input_metadata.shape_offset + i];
-
-        let index_at_dimension = mapped_index_temp / contiguous_stride;
-        mapped_index_temp -= (index_at_dimension % shape) * contiguous_stride;
-        mapped_index += (index_at_dimension % shape) * stride;
-    }}
+    {map_post_axis_index}
 
     output[index] = input[mapped_index];
 }}
@@ -87,24 +67,44 @@ fn {entry_point}(
         workgroup_size = WORKGROUP_SIZE.serialize_decorator(),
         entry_point = "main",
         index = compute_index("index", "global_id", "WORKGROUP_STRIDE"),
-        mapped_indices_index = compute_strided_offset(
+        map_indices_index = compute_strided_offset(
+            "mapped_indices_index_temp",
             "mapped_indices_index",
-            "index",
+            "0u",
+            "output_metadata.dimension",
             "output_metadata",
             "indices_metadata"
+        ),
+        map_pre_axis_index = compute_strided_offset(
+            "mapped_index_temp",
+            "mapped_index",
+            "0u",
+            "AXIS",
+            "output_metadata",
+            "input_metadata"
+        ),
+        map_post_axis_index = compute_strided_offset(
+            "mapped_index_temp",
+            "mapped_index",
+            "AXIS + 1u",
+            "input_metadata.dimension",
+            "input_metadata",
+            "input_metadata"
         ),
     )
 }
 
-pub fn build_scatter_shader(axis: ViewType, reduction: ScatterReduction) -> String {
-    let reduction_op = match reduction {
+fn build_reduction_webgpu_operation(reduction: ScatterReduction) -> fn(&str, &str) -> String {
+    match reduction {
         ScatterReduction::None => |_, update| format!("{}", update),
         ScatterReduction::Add => |data, update| format!("{} + {}", data, update),
         ScatterReduction::Max => |data, update| format!("max({}, {})", data, update),
         ScatterReduction::Min => |data, update| format!("min({}, {})", data, update),
         ScatterReduction::Mul => |data, update| format!("{} * {}", data, update),
-    };
+    }
+}
 
+pub fn build_scatter_shader(axis: ViewType, reduction: ScatterReduction) -> String {
     format!(
         "
 {header}
@@ -129,21 +129,10 @@ fn {entry_point}(
       return;
   }}
 
+  // Map index, except with an override for AXIS
   var mapped_index_temp = index;
   var mapped_index = 0u;
-
-  // Map index, except with an override for AXIS
-  for (var i = 0u; i < AXIS; i++) {{
-    let indices_contiguous_stride = indices_metadata.metadata[indices_metadata.contiguous_stride_offset + i];
-    let indices_shape = indices_metadata.metadata[indices_metadata.shape_offset + i];
-
-    let output_stride = output_metadata.metadata[output_metadata.stride_offset + i];
-    let output_shape = output_metadata.metadata[output_metadata.shape_offset + i];
-
-    let index_at_dimension = mapped_index_temp / indices_contiguous_stride;
-    mapped_index_temp -= (index_at_dimension % indices_shape) * indices_contiguous_stride;
-    mapped_index += (index_at_dimension % output_shape) * output_stride;
-  }}
+  {map_pre_axis_index}
 
   let axis_index = u32(indices[index]);
   let axis_stride = output_metadata.metadata[output_metadata.stride_offset + AXIS];
@@ -155,17 +144,7 @@ fn {entry_point}(
   let index_at_axis = mapped_index_temp / indices_contiguous_stride_at_axis;
   mapped_index_temp -= (index_at_axis % indices_shape_at_axis) * indices_contiguous_stride_at_axis;
 
-  for (var i = AXIS + 1u; i < output_metadata.dimension; i++) {{
-    let indices_contiguous_stride = indices_metadata.metadata[indices_metadata.contiguous_stride_offset + i];
-    let indices_shape = indices_metadata.metadata[indices_metadata.shape_offset + i];
-
-    let output_stride = output_metadata.metadata[output_metadata.stride_offset + i];
-    let output_shape = output_metadata.metadata[output_metadata.shape_offset + i];
-
-    let index_at_dimension = mapped_index_temp / indices_contiguous_stride;
-    mapped_index_temp -= (index_at_dimension % indices_shape) * indices_contiguous_stride;
-    mapped_index += (index_at_dimension % output_shape) * output_stride;
-  }}
+  {map_post_axis_index}
 
   // Barriers are needed because mapped indices may be the same both within
   // and outside the workgroup
@@ -195,6 +174,23 @@ fn {entry_point}(
         workgroup_size = WORKGROUP_SIZE.serialize_decorator(),
         entry_point = "main",
         index = compute_index("index", "global_id", "WORKGROUP_STRIDE"),
-        operation_reduce = reduction_op("output[mapped_index]", "updates[index]"),
+        map_pre_axis_index = compute_strided_offset(
+            "mapped_index_temp",
+            "mapped_index",
+            "0u",
+            "AXIS",
+            "indices_metadata",
+            "output_metadata",
+        ),
+        map_post_axis_index = compute_strided_offset(
+            "mapped_index_temp",
+            "mapped_index",
+            "AXIS + 1u",
+            "output_metadata.dimension",
+            "indices_metadata",
+            "output_metadata"
+        ),
+        operation_reduce =
+            build_reduction_webgpu_operation(reduction)("output[mapped_index]", "updates[index]"),
     )
 }

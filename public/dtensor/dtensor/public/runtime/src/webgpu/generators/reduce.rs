@@ -12,8 +12,6 @@ fn build_webgpu_operation<'a>(op: ReduceType) -> impl Fn(&'a str, &'a str) -> St
 }
 
 pub fn build_shader(op: ReduceType, axis: ViewType) -> String {
-    let operation = build_webgpu_operation(op);
-
     format!(
         "
 {header}
@@ -40,30 +38,10 @@ fn {entry_point}(
     // Essentially map indices without AXIS
     var mapped_index_temp = index;
     var mapped_index = 0u;
-    for (var i = 0u; i < AXIS; i++) {{
-        let output_contiguous_stride = output_metadata.metadata[output_metadata.contiguous_stride_offset + i];
-        let output_shape = output_metadata.metadata[output_metadata.shape_offset + i];
-
-        let input_stride = input_metadata.metadata[input_metadata.stride_offset + i];
-        let input_shape = input_metadata.metadata[input_metadata.shape_offset + i];
-
-        let index_at_dimension = mapped_index_temp / output_contiguous_stride;
-        mapped_index_temp -= (index_at_dimension % output_shape) * output_contiguous_stride;
-        mapped_index += (index_at_dimension % input_shape) * input_stride;
-    }}
+    {map_pre_axis_index}
 
     // Assumption is keep_dims is always true for computation, then squeezed out later if needed
-    for (var i = AXIS + 1u; i < output_metadata.dimension; i++) {{
-        let output_contiguous_stride = output_metadata.metadata[output_metadata.contiguous_stride_offset + i];
-        let output_shape = output_metadata.metadata[output_metadata.shape_offset + i];
-
-        let input_stride = input_metadata.metadata[input_metadata.stride_offset + i];
-        let input_shape = input_metadata.metadata[input_metadata.shape_offset + i];
-
-        let index_at_dimension = mapped_index_temp / output_contiguous_stride;
-        mapped_index_temp -= (index_at_dimension % output_shape) * output_contiguous_stride;
-        mapped_index += (index_at_dimension % input_shape) * input_stride;
-    }}
+    {map_post_axis_index}
 
     let axis_rank = input_metadata.metadata[input_metadata.shape_offset + AXIS];
     let axis_stride = input_metadata.metadata[input_metadata.stride_offset + AXIS];
@@ -84,6 +62,22 @@ fn {entry_point}(
         workgroup_size = WORKGROUP_SIZE.serialize_decorator(),
         entry_point = "main",
         index = compute_index("index", "global_id", "WORKGROUP_STRIDE"),
-        operation = operation("reduction", "input[mapped_axis_index]"),
+        map_pre_axis_index = compute_strided_offset(
+            "mapped_index_temp",
+            "mapped_index",
+            "0u",
+            "AXIS",
+            "output_metadata",
+            "input_metadata"
+        ),
+        map_post_axis_index = compute_strided_offset(
+            "mapped_index_temp",
+            "mapped_index",
+            "AXIS + 1u",
+            "output_metadata.dimension",
+            "output_metadata",
+            "input_metadata"
+        ),
+        operation = build_webgpu_operation(op)("reduction", "input[mapped_axis_index]"),
     )
 }

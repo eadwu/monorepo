@@ -40,9 +40,13 @@ fn {entry_point}(
         return;
     }}
 
-    {lhs_mapped_index}
+    var lhs_mapped_index_temp = index;
+    var lhs_mapped_index = 0u;
+    {map_lhs_index}
 
-    {rhs_mapped_index}
+    var rhs_mapped_index_temp = index;
+    var rhs_mapped_index = 0u;
+    {map_rhs_index}
 
     output[index] = {output};
 }}
@@ -51,27 +55,26 @@ fn {entry_point}(
         workgroup_stride = WORKGROUP_SIZE.serialize_strides("WORKGROUP_STRIDE"),
         lhs_interface = tensor_interface("0", "read", "lhs", "array<f32>", "lhs_metadata"),
         rhs_interface = tensor_interface("1", "read", "rhs", "array<f32>", "rhs_metadata"),
-        output_interface = tensor_interface(
-            "2",
-            "read_write",
-            "output",
-            "array<f32>",
-            "output_metadata"
-        ),
+        output_interface =
+            tensor_interface("2", "read_write", "output", "array<f32>", "output_metadata"),
         workgroup_size = WORKGROUP_SIZE.serialize_decorator(),
         entry_point = "main",
         index = compute_index("index", "global_id", "WORKGROUP_STRIDE"),
-        lhs_mapped_index = compute_strided_offset(
+        map_lhs_index = compute_strided_offset(
+            "lhs_mapped_index_temp",
             "lhs_mapped_index",
-            "index",
+            "0u",
+            "output_metadata.dimension",
             "output_metadata",
-            "lhs_metadata"
+            "lhs_metadata",
         ),
-        rhs_mapped_index = compute_strided_offset(
+        map_rhs_index = compute_strided_offset(
+            "rhs_mapped_index_temp",
             "rhs_mapped_index",
-            "index",
+            "0u",
+            "output_metadata.dimension",
             "output_metadata",
-            "rhs_metadata"
+            "rhs_metadata",
         ),
         output = build_webgpu_operation(op)("lhs[lhs_mapped_index]", "rhs[rhs_mapped_index]"),
     )

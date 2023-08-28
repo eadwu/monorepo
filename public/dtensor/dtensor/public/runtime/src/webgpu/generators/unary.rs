@@ -36,27 +36,29 @@ fn {entry_point}(
         return;
     }}
 
-    {mapped_index}
+    var mapped_index_temp = index;
+    var mapped_index = 0u;
+    {map_index}
 
     output[index] = {output};
 }}
 ",
         header = shader_header(),
         workgroup_stride = WORKGROUP_SIZE.serialize_strides("WORKGROUP_STRIDE"),
-        input_interface =
-            tensor_interface("0", "read", "input", "array<f32>", "input_metadata"),
-        output_interface = tensor_interface(
-            "1",
-            "read_write",
-            "output",
-            "array<f32>",
-            "output_metadata"
-        ),
+        input_interface = tensor_interface("0", "read", "input", "array<f32>", "input_metadata"),
+        output_interface =
+            tensor_interface("1", "read_write", "output", "array<f32>", "output_metadata"),
         workgroup_size = WORKGROUP_SIZE.serialize_decorator(),
         entry_point = "main",
         index = compute_index("index", "global_id", "WORKGROUP_STRIDE"),
-        mapped_index =
-            compute_strided_offset("mapped_index", "index", "output_metadata", "input_metadata"),
+        map_index = compute_strided_offset(
+            "mapped_index_temp",
+            "mapped_index",
+            "0u",
+            "output_metadata.dimension",
+            "output_metadata",
+            "input_metadata"
+        ),
         output = build_webgpu_operation(op)("input[mapped_index]"),
     )
 }
