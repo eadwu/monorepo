@@ -1,10 +1,10 @@
 use super::TensorMetadata;
 
 pub mod binary;
-pub mod unary;
-pub mod reduce;
-pub mod view;
 pub mod index;
+pub mod reduce;
+pub mod unary;
+pub mod view;
 
 pub fn shader_header() -> String {
     format!(
@@ -49,31 +49,34 @@ pub fn compute_index(
 }
 
 pub fn compute_strided_offset(
-    output_variable: &str,
-    index_variable: &str,
-    input_metadata_variable: &str,
+    origin_index_var: &str,
+    mapped_index_var: &str,
+    start_axis_var: &str,
+    end_axis_var: &str,
+    origin_metadata_variable: &str,
     mapped_metadata_variable: &str,
 ) -> String {
     format!(
         "
-var {output_variable}_temp: u32 = {index_variable};
-var {output_variable}: u32 = 0u;
+for (var i = {start_axis_var}; i < {end_axis_var}; i++) {{
+    let origin_stride = {origin_metadata_variable}.metadata[{origin_metadata_variable}.contiguous_stride_offset + i];
+    let origin_shape = {origin_metadata_variable}.metadata[{origin_metadata_variable}.shape_offset + i];
+    let origin_offset = {origin_metadata_variable}.metadata[{origin_metadata_variable}.offset_offset + i];
 
-for (var i = 0u; i < {input_metadata_variable}.dimension; i++) {{
-    let input_contiguous_stride = {input_metadata_variable}.metadata[{input_metadata_variable}.contiguous_stride_offset + i];
-
-    let input_shape = {input_metadata_variable}.metadata[{input_metadata_variable}.shape_offset + i];
-    let mapped_shape = {mapped_metadata_variable}.metadata[{mapped_metadata_variable}.shape_offset + i];
     let mapped_stride = {mapped_metadata_variable}.metadata[{mapped_metadata_variable}.stride_offset + i];
+    let mapped_shape = {mapped_metadata_variable}.metadata[{mapped_metadata_variable}.shape_offset + i];
+    let mapped_offset = {mapped_metadata_variable}.metadata[{mapped_metadata_variable}.offset_offset + i];
 
-    let index_at_dimension = {output_variable}_temp / input_contiguous_stride;
-    {output_variable} += (index_at_dimension % mapped_shape) * mapped_stride;
-    {output_variable}_temp -= (index_at_dimension % input_shape) * input_contiguous_stride;
+    let index_at_dimension = {origin_index_var} / origin_stride;
+    {origin_index_var} -= ((index_at_dimension + origin_offset) % origin_shape) * origin_stride;
+    {mapped_index_var} += ((index_at_dimension + mapped_offset) % mapped_shape) * mapped_stride;
 }}
 ",
-        output_variable = output_variable,
-        index_variable = index_variable,
-        input_metadata_variable = input_metadata_variable,
+        origin_index_var = origin_index_var,
+        mapped_index_var = mapped_index_var,
+        start_axis_var = start_axis_var,
+        end_axis_var = end_axis_var,
+        origin_metadata_variable = origin_metadata_variable,
         mapped_metadata_variable = mapped_metadata_variable,
     )
 }
