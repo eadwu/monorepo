@@ -47,6 +47,18 @@ impl Tensor {
         Tensor::with_shape(data, TensorView::from_shape(shape))
     }
 
+    pub fn arange(shape: &[ViewType]) -> Tensor {
+        let view = TensorView::from_shape(shape);
+        let n = view.len() as usize;
+        let data = (0..n).map(|x| x as TensorType).collect::<Vec<_>>();
+        Tensor::with_shape(&data, view)
+    }
+
+    pub fn zeros_like(shape: &[ViewType]) -> Tensor {
+        let view = TensorView::from_shape(shape);
+        Tensor::scalar(0).broadcast_to(&view)
+    }
+
     pub fn with_shape(data: &[TensorType], view: TensorView) -> Tensor {
         let identifier = Uuid::new_v4().to_string();
         let path = Path::new(&identifier);
