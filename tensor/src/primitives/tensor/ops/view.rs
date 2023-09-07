@@ -60,6 +60,6 @@ impl Tensor {
             view.len()
         );
 
-        self.view_op(&view)
+        self.view_op(view)
     }
 }
