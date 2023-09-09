@@ -140,23 +140,26 @@ impl Tensor {
             _ => other.clone(),
         };
 
-        let input_dimension = input.view().dimension() as usize;
-        let other_dimension = other.view().dimension() as usize;
-        let n = input.view().shape[input_dimension - 2];
-        let k = input.view().shape[input_dimension - 1];
-        let m = other.view().shape[other_dimension - 1];
+        let input_dimension = input.view().dimension();
+        let other_dimension = other.view().dimension();
+        let [_batch_size @ .., _n, k] = &input.view().shape[..] else {
+            panic!("MatMul requires input to be at least 2D");
+        };
+        let [_batch_size @ .., other_k, _m] = &other.view().shape[..] else {
+            panic!("MatMul requires tensor to be at least 2D");
+        };
 
         assert!(
-            other.view().shape[(other.view().dimension() - 2) as usize] == k,
+            k == other_k,
             "Failed to multiply matrices of shape {:?} @ {:?}",
             self.view(),
             other.view()
         );
 
         // (..., n, k, 1)
-        let input = input.unsqueeze(input_dimension as ViewType);
+        let input = input.unsqueeze(input_dimension);
         // (..., 1, k, m) - index `-3` which in this case will be axis `other_dimension + 1 - 3`
-        let other = other.unsqueeze((other_dimension - 2) as ViewType);
+        let other = other.unsqueeze(other_dimension - 2);
         // (..., n, k, m)
         let intermediate_result = input.Multiply(&other);
         let reduce_dimension = intermediate_result.view().dimension() - 2;
