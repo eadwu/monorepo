@@ -9,6 +9,7 @@ pub type ViewType = u32;
 pub struct TensorView {
     pub contiguous: bool,
     pub shape: Box<[ViewType]>,
+    pub _container_shape: Box<[ViewType]>,
     pub stride: Box<[ViewType]>,
     pub contiguous_stride: Box<[ViewType]>,
     pub offset: Box<[ViewType]>,
@@ -20,7 +21,8 @@ impl TensorView {
         let offset = shape.iter().map(|_| 0).collect_vec();
         TensorView {
             contiguous: contiguous,
-            shape: shape,
+            shape: shape.clone(),
+            _container_shape: shape,
             stride: stride,
             contiguous_stride: contiguous_shape.into_boxed_slice(),
             offset: offset.into_boxed_slice(),
@@ -34,6 +36,21 @@ impl TensorView {
             shape.to_vec().into_boxed_slice(),
             stride.into_boxed_slice(),
         )
+    }
+
+    pub fn from_container(
+        view: &TensorView,
+        shape: Box<[ViewType]>,
+        offset: Box<[ViewType]>,
+    ) -> TensorView {
+        TensorView {
+            contiguous: false,
+            shape: shape,
+            _container_shape: view._container_shape.clone(),
+            stride: view.stride.clone(),
+            contiguous_stride: view.contiguous_stride.clone(),
+            offset: offset,
+        }
     }
 
     pub fn compute_contiguous_stride(contiguous_shape: &[ViewType]) -> Vec<ViewType> {
@@ -56,7 +73,7 @@ impl TensorView {
 
 impl TensorView {
     pub fn len(&self) -> ViewType {
-        self.shape.iter().product()
+        self._container_shape.iter().product()
     }
 
     pub fn dimension(&self) -> ViewType {
