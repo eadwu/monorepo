@@ -80,6 +80,44 @@ impl TensorView {
         self.shape.len() as ViewType
     }
 
+    pub fn pad(&self, padding: &[(ViewType, ViewType)]) -> TensorView {
+        assert!(
+            (self.dimension() as usize) == padding.len(),
+            "Padding must be specified for all dimensions"
+        );
+
+        let expanded_shape = self
+            .shape
+            .iter()
+            .zip(padding.iter())
+            .map(|(rank, (padding_pre, padding_post))| padding_pre + rank + padding_post)
+            .collect_vec();
+
+        TensorView::from_shape(&expanded_shape)
+    }
+
+    pub fn offset(&self, offsets: &[(ViewType, ViewType)]) -> TensorView {
+        assert!(
+            (self.dimension() as usize) == offsets.len(),
+            "Offsets must be specified for all dimensions"
+        );
+
+        let shape = self
+            .shape
+            .iter()
+            .zip(offsets.iter())
+            .map(|(shape, (pre, post))| shape - pre - post)
+            .collect_vec();
+        let offset = self
+            .offset
+            .iter()
+            .zip(offsets.iter())
+            .map(|(previous_offset, (pre, _))| previous_offset + pre)
+            .collect_vec();
+
+        TensorView::from_container(self, shape.into_boxed_slice(), offset.into_boxed_slice())
+    }
+
     fn _split_and_join<T>(
         slice: &[T],
         index: usize,
