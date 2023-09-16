@@ -101,6 +101,8 @@ impl Tensor {
         if let TensorInput::ExplicitInput(input) = self.data() {
             if let InputSpec::Raw(spec) = input {
                 return <&Tensor as RawFileLoader>::load(self, spec);
+            } else if let InputSpec::Safetensor(spec) = input {
+                return <&Tensor as SafetensorLoader>::load(self, spec);
             }
         }
 
