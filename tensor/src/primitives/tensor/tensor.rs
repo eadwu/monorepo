@@ -100,13 +100,7 @@ impl Tensor {
 
         if let TensorInput::ExplicitInput(input) = self.data() {
             if let InputSpec::Raw(spec) = input {
-                let data = FILE_MANAGER
-                    .lock()
-                    .unwrap()
-                    .open(&spec.file, spec.offset, spec.size)
-                    .unwrap();
-                let bytes = &data[..spec.size];
-                return bytes.to_vec();
+                return <&Tensor as RawFileLoader>::load(self, spec);
             }
         }
 

@@ -6,3 +6,6 @@ pub use view::*;
 
 mod ops;
 pub use ops::*;
+
+mod loaders;
+pub use loaders::*;
