@@ -74,4 +74,8 @@ impl Tensor {
 
         self.view_op(view)
     }
+
+    pub fn reshape_unsafe(&self, view: &TensorView) -> Tensor {
+        self.view_op(view)
+    }
 }
