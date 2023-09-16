@@ -16,7 +16,7 @@ impl FileManager {
         }
     }
 
-    pub fn open(&mut self, path: &Path, offset: usize, size: usize) -> io::Result<Mmap> {
+    pub fn open(&mut self, path: &Path, offset: usize) -> io::Result<Mmap> {
         if !self.cache.contains_key(path) {
             let file = File::open(&path)?;
             self.cache.insert(path.to_path_buf(), file);
@@ -26,7 +26,6 @@ impl FileManager {
         Ok(unsafe {
             MmapOptions::new()
                 .offset(offset as u64)
-                .len(size)
                 .map(file)
                 .unwrap()
         })
@@ -40,7 +39,7 @@ impl FileManager {
             self.cache.insert(path.to_path_buf(), file);
         }
 
-        self.open(path, offset, size)
+        self.open(path, offset)
     }
 
     pub fn create_with_bytes(&mut self, path: &Path, bytes: &[u8]) -> io::Result<Mmap> {

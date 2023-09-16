@@ -10,7 +10,7 @@ impl RawFileLoader for &Tensor {
         let data = FILE_MANAGER
             .lock()
             .unwrap()
-            .open(&spec.file, spec.offset, spec.size)
+            .open(&spec.file, spec.offset)
             .unwrap();
         let bytes = &data[..spec.size];
         return bytes.to_vec();
