@@ -97,6 +97,21 @@ impl Tensor {
         self.Multiply(&log_e_base_2).Exp2()
     }
 
+    pub fn Gelu(&self) -> Tensor {
+        // Approximation via Tanh
+        // https://pytorch.org/docs/stable/generated/torch.nn.GELU.html
+        let point_5 = Tensor::scalar(0.5);
+        let one = Tensor::scalar(1);
+
+        let sqrt_2_over_pi = Tensor::scalar((2.0 / std::f32::consts::PI).sqrt());
+        let constant = Tensor::scalar(0.044715);
+        let three = Tensor::scalar(3);
+
+        let tanh = sqrt_2_over_pi
+            .Multiply(&self.Add(&constant.Multiply(&self.Pow(&three))))
+            .Tanh();
+        point_5.Multiply(self).Multiply(&one.Add(&tanh))
+    }
 
     pub fn HardSigmoid(&self) -> Tensor {
         let half = Tensor::scalar(0.5);
