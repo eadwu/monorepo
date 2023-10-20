@@ -11,8 +11,8 @@ fn build_webgpu_operation<'a>(op: BinaryType) -> impl Fn(&'a str, &'a str) -> St
         BinaryType::MULTIPLY => |lhs, rhs| format!("{} * {}", lhs, rhs),
         BinaryType::MAX => |lhs, rhs| format!("max({}, {})", lhs, rhs),
         BinaryType::MOD => |lhs, rhs| format!("{} % {}", lhs, rhs),
-        BinaryType::EQUAL => |lhs, rhs| format!("{} == {}", lhs, rhs),
-        BinaryType::LESSTHAN => |lhs, rhs| format!("{} < {}", lhs, rhs),
+        BinaryType::EQUAL => |lhs, rhs| format!("f32({} == {})", lhs, rhs),
+        BinaryType::LESSTHAN => |lhs, rhs| format!("f32({} < {})", lhs, rhs),
     }
 }
 
