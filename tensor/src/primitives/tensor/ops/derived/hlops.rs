@@ -128,15 +128,22 @@ impl Tensor {
     }
 
     pub fn MatMul(&self, other: &Tensor) -> Tensor {
+        // m x k @ k x n
         let input = match self.view().dimension() {
+            // m -> [1, m]
             0 => self.broadcast_to(&TensorView::from_shape(&[1, 1])),
+            // [m] -> [m, 1]
             1 => self.unsqueeze(1),
+            // [..., m, k]
             _ => self.clone(),
         };
 
         let other = match other.view().dimension() {
+            // n -> [1, n]
             0 => other.broadcast_to(&TensorView::from_shape(&[1, 1])),
+            // [n] -> [1, n]
             1 => other.unsqueeze(0),
+            // [..., k, n]
             _ => other.clone(),
         };
 
@@ -162,8 +169,8 @@ impl Tensor {
         let other = other.unsqueeze(other_dimension - 2);
         // (..., n, k, m)
         let intermediate_result = input.Multiply(&other);
+        // (..., n, m) by summing along k
         let reduce_dimension = intermediate_result.view().dimension() - 2;
-        // (..., n, m)
         intermediate_result.Sum(&[reduce_dimension], false)
     }
 }
