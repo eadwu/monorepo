@@ -35,11 +35,6 @@ impl Tensor {
     }
 
     /* UnaryOp derivations */
-    pub fn Abs(&self) -> Tensor {
-        let zero = Tensor::scalar(0);
-        self.Greater(&zero).Multiply(&self)
-    }
-
     pub fn Celu<T: AsPrimitive<TensorType>>(&self, alpha: T) -> Tensor {
         let zero = Tensor::scalar(0);
         let one = Tensor::scalar(1);

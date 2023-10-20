@@ -53,4 +53,8 @@ impl Tensor {
     pub fn Recip(&self) -> Tensor {
         self.unary_op(UnaryType::RECIP)
     }
+
+    pub fn Abs(&self) -> Tensor {
+        self.unary_op(UnaryType::ABS)
+    }
 }
