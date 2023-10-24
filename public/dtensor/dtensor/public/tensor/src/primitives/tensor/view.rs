@@ -100,6 +100,11 @@ impl TensorView {
             .collect_vec();
 
         TensorView::from_shape(&expanded_shape)
+        // TensorView::new(
+        //     true,
+        //     expanded_shape.into_boxed_slice(),
+        //     self.stride.clone(),
+        // )
     }
 
     pub fn offset(&self, offsets: &[(ViewType, ViewType)]) -> TensorView {
@@ -181,6 +186,42 @@ impl TensorView {
 
         TensorView::new(
             self.contiguous,
+            shape.into_boxed_slice(),
+            stride.into_boxed_slice(),
+            offset.into_boxed_slice(),
+        )
+    }
+
+    pub fn transpose(&self, axes: &[ViewType]) -> TensorView {
+        let axis = if axes.len() == self.dimension() as usize {
+            axes.iter().map(|&x| x as usize).collect::<Vec<_>>()
+        } else {
+            self.shape
+                .iter()
+                .enumerate()
+                .rev()
+                .map(|(idx, _)| idx)
+                .collect::<Vec<_>>()
+        };
+
+        // Ensure inputs are within bounds
+        axis.iter()
+            .for_each(|&axis| assert!(axis < self.dimension() as usize));
+
+        let shape = axis
+            .iter()
+            .map(|&axis| self.shape[axis])
+            .collect::<Vec<_>>();
+        let stride = axis
+            .iter()
+            .map(|&axis| self.stride[axis])
+            .collect::<Vec<_>>();
+        let offset = axis
+            .iter()
+            .map(|&axis| self.offset[axis])
+            .collect::<Vec<_>>();
+        TensorView::new(
+            false,
             shape.into_boxed_slice(),
             stride.into_boxed_slice(),
             offset.into_boxed_slice(),
