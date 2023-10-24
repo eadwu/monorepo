@@ -10,6 +10,36 @@ pub enum ConvPadding<'a> {
 }
 
 impl Tensor {
+    pub fn ArgMax(&self, axis: ViewType, keep_dims: bool, select_last_index: bool) -> Tensor {
+        let max_along_axis = self.Max(&[axis], true);
+        let mask = self.Equal(&max_along_axis);
+
+        let (_, shape_per_batch) = self.view().shape.split_at(axis as usize);
+        let axis_size = self.view().shape[axis as usize];
+        let elements_per_batch = shape_per_batch[1..]
+            .iter()
+            .fold(1, |acc, &shape| acc * shape);
+        let indices = Tensor::arange(&self.view().shape[..])
+            .Divide(&Tensor::scalar(elements_per_batch))
+            .Mod(&Tensor::scalar(axis_size))
+            .Floor();
+
+        if select_last_index {
+            mask.Multiply(&indices).Max(&[axis], keep_dims)
+        } else {
+            let batch_normalizer = Tensor::scalar(axis_size - 1);
+            let adjusted_indices = batch_normalizer.Sub(&indices);
+            let masked_normalization = mask.Multiply(&batch_normalizer);
+            masked_normalization
+                .Sub(&mask.Multiply(&adjusted_indices))
+                .Max(&[axis], keep_dims)
+        }
+    }
+
+    pub fn ArgMin(&self, axis: ViewType, keep_dims: bool, select_last_index: bool) -> Tensor {
+        self.Neg().ArgMax(axis, keep_dims, select_last_index)
+    }
+
     pub fn Clip(&self, min: &Tensor, max: &Tensor) -> Tensor {
         self.Minimum(min).Maximum(max)
     }
