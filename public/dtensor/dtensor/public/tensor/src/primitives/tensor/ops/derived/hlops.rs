@@ -197,6 +197,23 @@ impl Tensor {
         convolver.Sum(&reduce_dimensions[..], false)
     }
 
+    pub fn InstanceNormalization(&self, epsilon: &Tensor) -> Tensor {
+        assert!(
+            self.view().dimension() == 4,
+            "InstanceNormalization is only defined for a NCHW tensor"
+        );
+
+        let feature_axes = self
+            .view()
+            .shape
+            .iter()
+            .enumerate()
+            .skip(2)
+            .map(|(axis, _)| axis as u32)
+            .collect::<Vec<_>>();
+        self.Normalization(&feature_axes[..], epsilon)
+    }
+
     pub fn MatMul(&self, other: &Tensor) -> Tensor {
         // m x k @ k x n
         let input = match self.view().dimension() {
