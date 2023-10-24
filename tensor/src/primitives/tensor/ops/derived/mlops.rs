@@ -268,7 +268,28 @@ impl Tensor {
     }
 
     /* ReduceOp derivations */
+    pub fn Mean(&self, axes: &[ViewType], keep_dims: bool) -> Tensor {
+        let one = Tensor::scalar(1);
+
+        let counter = one.reshape(self.view());
+        let n = counter.Sum(axes, keep_dims);
+        self.Sum(axes, keep_dims).Divide(&n)
+    }
+
     pub fn Min(&self, axes: &[ViewType], keep_dims: bool) -> Tensor {
         self.Neg().Max(axes, keep_dims).Neg()
+    }
+
+    pub fn Variance(&self, axes: &[ViewType], keep_dims: bool) -> Tensor {
+        let one = Tensor::scalar(1);
+        let two = Tensor::scalar(2);
+
+        let counter = one.reshape(self.view());
+        let n = counter.Sum(axes, keep_dims);
+        let mean = self.Mean(axes, keep_dims);
+        self.Sub(&mean)
+            .Pow(&two)
+            .Sum(axes, keep_dims)
+            .Divide(&n.Sub(&one))
     }
 }
