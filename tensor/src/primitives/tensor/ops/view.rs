@@ -60,6 +60,10 @@ impl Tensor {
         self.reshape(&self.view().squeeze(axis))
     }
 
+    pub fn transpose(&self, axes: &[ViewType]) -> Tensor {
+        self.reshape(&self.view().transpose(axes))
+    }
+
     pub fn unsqueeze(&self, axis: ViewType) -> Tensor {
         self.reshape(&self.view().unsqueeze(axis))
     }
