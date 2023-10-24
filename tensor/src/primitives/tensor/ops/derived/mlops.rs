@@ -87,6 +87,30 @@ impl Tensor {
         self.Relu().Add(&masked_leak)
     }
 
+    pub fn Erf(&self) -> Tensor {
+        let one = Tensor::scalar(1);
+
+        let a1 = Tensor::scalar(0.254829592);
+        let a2 = Tensor::scalar(-0.284496736);
+        let a3 = Tensor::scalar(1.421413741);
+        let a4 = Tensor::scalar(-1.453152027);
+        let a5 = Tensor::scalar(1.061405429);
+        let p = Tensor::scalar(0.3275911);
+
+        let x = self.Abs();
+        let sign = self.Divide(&x);
+
+        // A&S Formula 7.1.26
+        let t = one.Divide(&one.Add(&p.Multiply(&x)));
+        let y_p1 = a5.Multiply(&t).Add(&a4);
+        let y_p2 = y_p1.Multiply(&t).Add(&a3);
+        let y_p3 = y_p2.Multiply(&t).Add(&a2);
+        let y_p4 = y_p3.Multiply(&t).Add(&a1);
+        let y = y_p4.Multiply(&t).Multiply(&x.Neg().Multiply(&x).Exp());
+
+        sign.Multiply(&y)
+    }
+
     pub fn Exp(&self) -> Tensor {
         let log_e_base_2 = Tensor::scalar(std::f32::consts::E.log2());
         self.Multiply(&log_e_base_2).Exp2()
