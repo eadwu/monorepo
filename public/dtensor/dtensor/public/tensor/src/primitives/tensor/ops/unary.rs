@@ -11,6 +11,9 @@ pub enum UnaryType {
     SIN,
     SQRT,
     RECIP,
+    ABS,
+    FLOOR,
+    CEIL,
 }
 
 #[derive(Clone, Debug)]
@@ -56,5 +59,13 @@ impl Tensor {
 
     pub fn Abs(&self) -> Tensor {
         self.unary_op(UnaryType::ABS)
+    }
+
+    pub fn Floor(&self) -> Tensor {
+        self.unary_op(UnaryType::FLOOR)
+    }
+
+    pub fn Ceil(&self) -> Tensor {
+        self.unary_op(UnaryType::CEIL)
     }
 }
