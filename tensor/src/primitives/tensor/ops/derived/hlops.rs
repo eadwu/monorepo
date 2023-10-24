@@ -243,4 +243,13 @@ impl Tensor {
         let reduce_dimension = intermediate_result.view().dimension() - 2;
         intermediate_result.Sum(&[reduce_dimension], false)
     }
+
+    pub fn Normalization(&self, feature_axes: &[ViewType], epsilon: &Tensor) -> Tensor {
+        let mean = self.Mean(&feature_axes[..], true);
+        let variance = self.Variance(&feature_axes[..], true);
+
+        let centered_input = self.Sub(&mean);
+        let standard_deviation = variance.Add(epsilon).Sqrt();
+        centered_input.Divide(&standard_deviation)
+    }
 }
