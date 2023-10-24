@@ -12,6 +12,8 @@ fn build_webgpu_operation<'a>(op: UnaryType) -> impl Fn(&'a str) -> String {
         UnaryType::SIN => |input| format!("sin({input})", input = input),
         UnaryType::SQRT => |input| format!("sqrt({input})", input = input),
         UnaryType::ABS => |input| format!("abs({input})", input = input),
+        UnaryType::FLOOR => |input| format!("floor({input})", input = input),
+        UnaryType::CEIL => |input| format!("ceil({input})", input = input),
     }
 }
 
