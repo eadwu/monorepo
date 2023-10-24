@@ -280,6 +280,16 @@ impl Tensor {
         self.Neg().Max(axes, keep_dims).Neg()
     }
 
+    pub fn L1(&self, axes: &[ViewType], keep_dims: bool) -> Tensor {
+        self.Abs().Sum(axes, keep_dims)
+    }
+
+    pub fn L2(&self, axes: &[ViewType], keep_dims: bool) -> Tensor {
+        let two = Tensor::scalar(2);
+
+        self.Pow(&two).Sum(axes, keep_dims).Sqrt()
+    }
+
     pub fn Variance(&self, axes: &[ViewType], keep_dims: bool) -> Tensor {
         let one = Tensor::scalar(1);
         let two = Tensor::scalar(2);
