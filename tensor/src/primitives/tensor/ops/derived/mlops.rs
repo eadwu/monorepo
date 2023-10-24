@@ -266,4 +266,9 @@ impl Tensor {
     pub fn Tanh(&self) -> Tensor {
         self.Sinh().Divide(&self.Cosh())
     }
+
+    /* ReduceOp derivations */
+    pub fn Min(&self, axes: &[ViewType], keep_dims: bool) -> Tensor {
+        self.Neg().Max(axes, keep_dims).Neg()
+    }
 }
