@@ -290,6 +290,15 @@ impl Tensor {
         self.Pow(&two).Sum(axes, keep_dims).Sqrt()
     }
 
+    pub fn LogSumExp(&self, axes: &[ViewType], keep_dims: bool) -> Tensor {
+        let stabilizer = self.Max(axes, keep_dims);
+        self.Sub(&stabilizer)
+            .Exp()
+            .Sum(axes, keep_dims)
+            .Log()
+            .Add(&stabilizer)
+    }
+
     pub fn Variance(&self, axes: &[ViewType], keep_dims: bool) -> Tensor {
         let one = Tensor::scalar(1);
         let two = Tensor::scalar(2);
