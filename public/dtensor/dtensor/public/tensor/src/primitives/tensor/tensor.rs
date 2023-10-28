@@ -4,6 +4,7 @@ use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::Arc;
 
 use num_traits::AsPrimitive;
+use rand::Rng;
 use uuid::Uuid;
 
 use crate::FILE_MANAGER;
@@ -52,6 +53,20 @@ impl Tensor {
         let n = view.len() as usize;
         let data = (0..n).map(|x| x as TensorType).collect::<Vec<_>>();
         Tensor::with_shape(&data, view)
+    }
+
+    pub fn randn(shape: &[ViewType], mean: Option<f32>, std_dev: Option<f32>) -> Tensor {
+        let view = TensorView::from_shape(shape);
+        let n = view.len() as usize;
+
+        let mean = mean.unwrap_or(0.0);
+        let std_dev = std_dev.unwrap_or(1.0);
+        let distribution = rand_distr::Normal::new(mean, std_dev).unwrap();
+        let data = rand::thread_rng()
+            .sample_iter(distribution)
+            .take(n)
+            .collect::<Vec<_>>();
+        Tensor::with_shape(&data[..], view)
     }
 
     pub fn zeros_like(shape: &[ViewType]) -> Tensor {
