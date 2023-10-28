@@ -176,7 +176,10 @@ pub async fn webgpu_tensor_pipeline<'a>(
     let mut encoder =
         device.create_command_encoder(&wgpu::CommandEncoderDescriptor { label: None });
     {
-        let mut workload = encoder.begin_compute_pass(&wgpu::ComputePassDescriptor { label: None });
+        let mut workload = encoder.begin_compute_pass(&wgpu::ComputePassDescriptor {
+            label: None,
+            timestamp_writes: None,
+        });
         workload.set_pipeline(&pipeline);
 
         bind_groups
