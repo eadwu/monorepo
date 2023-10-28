@@ -1,4 +1,4 @@
-use std::{borrow::Cow, collections::HashMap};
+use std::{borrow::Cow, collections::HashMap, future::Future};
 
 use tensor::primitives::tensor::{
     GatherParams, IndexType, OperationSpec, ScatterParams, Tensor, TensorInput,
@@ -8,9 +8,8 @@ use crate::{webgpu::WORKGROUP_SIZE, GraphView};
 
 use super::{generators, ToWebGPUBindGroup, ToWebGPUTensorLayout, WebGPUDevice, WebGPUWorkGroup};
 
-#[async_trait::async_trait]
 pub trait WebGPUEvaluation {
-    async fn evaluate_webgpu(&self, wgpu_device: &WebGPUDevice) -> Tensor;
+    fn evaluate_webgpu(&self, wgpu_device: &WebGPUDevice) -> impl Future<Output = Tensor>;
 }
 
 #[derive(Debug)]
@@ -21,7 +20,6 @@ pub struct WebGPUPipeline<'a> {
     pub dispatch_workgroups: &'a WebGPUWorkGroup,
 }
 
-#[async_trait::async_trait]
 impl WebGPUEvaluation for Tensor {
     async fn evaluate_webgpu(&self, wgpu_device: &WebGPUDevice) -> Tensor {
         let runtime = self.as_runtime_graph();
