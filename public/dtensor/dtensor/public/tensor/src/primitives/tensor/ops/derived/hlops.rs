@@ -40,15 +40,27 @@ impl Tensor {
         self.Neg().ArgMax(axis, keep_dims, select_last_index)
     }
 
+    pub fn AvgPool<'a>(
+        &self,
+        kernel_size: &[ViewType],
+        kernel_strides: &[ViewType],
+        padding: ConvPadding<'a>,
+    ) -> Tensor {
+        let kernel = Tensor::scalar(1).reshape(&TensorView::from_shape(kernel_size));
+        let n = Tensor::scalar(kernel.view().len());
+        self.Conv(&kernel, kernel_strides, padding).Divide(&n)
+    }
+
     pub fn Clip(&self, min: &Tensor, max: &Tensor) -> Tensor {
         self.Minimum(min).Maximum(max)
     }
 
-    pub fn Conv<'a>(
+    pub fn Convolve<'a>(
         &self,
         kernel: &Tensor,
         kernel_strides: &[ViewType],
         padding: ConvPadding<'a>,
+        reduction: impl Fn(&Tensor, &[ViewType], bool) -> Tensor,
     ) -> Tensor {
         let input = self.contiguous();
         let kernel = kernel.contiguous();
@@ -194,7 +206,16 @@ impl Tensor {
             )
             .collect::<Vec<_>>();
 
-        convolver.Sum(&reduce_dimensions[..], false)
+        reduction(&convolver, &reduce_dimensions[..], false)
+    }
+
+    pub fn Conv<'a>(
+        &self,
+        kernel: &Tensor,
+        kernel_strides: &[ViewType],
+        padding: ConvPadding<'a>,
+    ) -> Tensor {
+        self.Convolve(kernel, kernel_strides, padding, Tensor::Sum)
     }
 
     pub fn InstanceNormalization(&self, epsilon: &Tensor) -> Tensor {
@@ -259,6 +280,16 @@ impl Tensor {
         // (..., n, m) by summing along k
         let reduce_dimension = intermediate_result.view().dimension() - 2;
         intermediate_result.Sum(&[reduce_dimension], false)
+    }
+
+    pub fn MaxPool<'a>(
+        &self,
+        kernel_size: &[ViewType],
+        kernel_strides: &[ViewType],
+        padding: ConvPadding<'a>,
+    ) -> Tensor {
+        let kernel = Tensor::scalar(1).reshape(&TensorView::from_shape(kernel_size));
+        self.Convolve(&kernel, kernel_strides, padding, Tensor::Max)
     }
 
     pub fn Normalization(&self, feature_axes: &[ViewType], epsilon: &Tensor) -> Tensor {
