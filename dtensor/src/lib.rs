@@ -1,14 +1,5 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
-}
+pub use tensor::*;
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+pub use nn;
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
-}
+pub use runtime;
