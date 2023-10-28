@@ -12,7 +12,7 @@ pub struct FileManager {
 impl FileManager {
     pub fn new(cache_size: usize) -> FileManager {
         FileManager {
-            cache: LinkedHashMap::new(),
+            cache: LinkedHashMap::with_capacity(cache_size),
         }
     }
 
