@@ -300,4 +300,31 @@ impl Tensor {
         let standard_deviation = variance.Add(epsilon).Sqrt();
         centered_input.Divide(&standard_deviation)
     }
+
+    pub fn Slice(
+        &self,
+        starts: &[ViewType],
+        ends: &[ViewType],
+        axes: &[ViewType],
+        steps: &[ViewType],
+    ) -> Tensor {
+        starts
+            .iter()
+            .zip(ends.iter())
+            .zip(axes.iter())
+            .zip(steps.iter())
+            .fold(self.clone(), |acc, (((&start, &end), &axis), &step)| {
+                let shape_at_axis = self.view().shape[axis as usize];
+                // `end` may exceed the shape of the axis, but does nothing special
+                // Although it is important for Gather for it to be within the bounds
+                let end = end.min(shape_at_axis);
+                let indices = (start..end)
+                    .step_by(step as usize)
+                    .map(|x| x as f32)
+                    .collect::<Vec<_>>();
+                let indices_tensor = Tensor::from_contiguous(&indices[..], &[indices.len() as u32]);
+                // Equivalent to slicing by one dimension each time
+                acc.Gather(axis, &indices_tensor)
+            })
+    }
 }
