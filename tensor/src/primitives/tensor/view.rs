@@ -3,6 +3,9 @@ use std::slice::Iter;
 use itertools::{EitherOrBoth::*, Itertools};
 use num_traits::AsPrimitive;
 
+mod passthrough;
+pub use passthrough::*;
+
 pub type ViewType = u32;
 
 #[derive(Clone, Debug, Eq, PartialEq)]

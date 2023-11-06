@@ -107,7 +107,7 @@ impl Tensor {
 
     pub fn Gather(&self, axis: ViewType, indices: &Tensor) -> Tensor {
         let indices_view = indices.view();
-        let (batch_shape, gather_element_shape) = self.view().shape.split_at(axis as usize);
+        let (batch_shape, gather_element_shape) = self.shape().split_at(axis as usize);
 
         let adjusted_shape = batch_shape
             .iter()

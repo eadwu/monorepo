@@ -239,8 +239,8 @@ pub async fn webgpu_tensor_pipeline<'a>(
                                 // It effectively frees the memory
 
         // Returns data from buffer
-        let n_tensor_elements = output.view().len() as usize;
-        Tensor::from_contiguous(&result[..n_tensor_elements], &output.view().shape)
+        let n_tensor_elements = output.len() as usize;
+        Tensor::from_contiguous(&result[..n_tensor_elements], &output.shape())
     } else {
         panic!("failed to run compute on gpu!")
     }

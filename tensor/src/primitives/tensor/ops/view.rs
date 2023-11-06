@@ -32,7 +32,7 @@ impl Tensor {
     }
 
     pub fn contiguous(&self) -> Tensor {
-        let view = TensorView::from_shape(&self.view().shape);
+        let view = TensorView::from_shape(&self.shape());
         self.eager_view_op(&view)
     }
 
@@ -45,7 +45,7 @@ impl Tensor {
     }
 
     pub fn pad(&self, padding: &[(ViewType, ViewType)]) -> Tensor {
-        let dimension = self.view().ndim() as usize;
+        let dimension = self.ndim() as usize;
         assert!(
             dimension == padding.len(),
             "Padding must be specified for every dimension"
@@ -70,9 +70,9 @@ impl Tensor {
 
     pub fn reshape(&self, view: &TensorView) -> Tensor {
         assert!(
-            view.len() % self.view().len() == 0,
+            view.len() % self.len() == 0,
             "Expected shapes to be multiples, got {} -> {} elements",
-            self.view().len(),
+            self.len(),
             view.len()
         );
 
