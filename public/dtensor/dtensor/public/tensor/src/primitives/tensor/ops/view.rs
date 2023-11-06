@@ -45,7 +45,7 @@ impl Tensor {
     }
 
     pub fn pad(&self, padding: &[(ViewType, ViewType)]) -> Tensor {
-        let dimension = self.view().dimension() as usize;
+        let dimension = self.view().ndim() as usize;
         assert!(
             dimension == padding.len(),
             "Padding must be specified for every dimension"

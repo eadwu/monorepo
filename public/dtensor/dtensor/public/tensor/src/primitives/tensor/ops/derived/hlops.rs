@@ -193,7 +193,7 @@ impl Tensor {
         let kernel = kernel;
 
         let convolver = input.Multiply(&kernel);
-        let convolver_dimensions = convolver.view().dimension();
+        let convolver_dimensions = convolver.view().ndim();
         // 2nd dimension is [n, c_out, c_in, ...]
         // Reduce the filter dimensions as well to make it [n, c_out, output_size]
         let reduce_dimensions = [2]
@@ -220,7 +220,7 @@ impl Tensor {
 
     pub fn InstanceNormalization(&self, epsilon: &Tensor) -> Tensor {
         assert!(
-            self.view().dimension() == 4,
+            self.view().ndim() == 4,
             "InstanceNormalization is only defined for a NCHW tensor"
         );
 
@@ -237,7 +237,7 @@ impl Tensor {
 
     pub fn MatMul(&self, other: &Tensor) -> Tensor {
         // m x k @ k x n
-        let input = match self.view().dimension() {
+        let input = match self.view().ndim() {
             // m -> [1, m]
             0 => self.broadcast_to(&TensorView::from_shape(&[1, 1])),
             // [m] -> [m, 1]
@@ -246,7 +246,7 @@ impl Tensor {
             _ => self.clone(),
         };
 
-        let other = match other.view().dimension() {
+        let other = match other.view().ndim() {
             // n -> [1, n]
             0 => other.broadcast_to(&TensorView::from_shape(&[1, 1])),
             // [n] -> [1, n]
@@ -255,8 +255,8 @@ impl Tensor {
             _ => other.clone(),
         };
 
-        let input_dimension = input.view().dimension();
-        let other_dimension = other.view().dimension();
+        let input_dimension = input.view().ndim();
+        let other_dimension = other.view().ndim();
         let [_batch_size @ .., _n, k] = &input.view().shape[..] else {
             panic!("MatMul requires input to be at least 2D");
         };
@@ -278,7 +278,7 @@ impl Tensor {
         // (..., n, k, m)
         let intermediate_result = input.Multiply(&other);
         // (..., n, m) by summing along k
-        let reduce_dimension = intermediate_result.view().dimension() - 2;
+        let reduce_dimension = intermediate_result.view().ndim() - 2;
         intermediate_result.Sum(&[reduce_dimension], false)
     }
 
