@@ -47,8 +47,8 @@ impl Tensor {
 
     pub fn Cos(&self) -> Tensor {
         // Defined as the complement of Sin
-        let pi = Tensor::scalar(std::f32::consts::FRAC_PI_2);
-        pi.Sub(&self).Sin()
+        let pi_2 = Tensor::scalar(std::f32::consts::FRAC_PI_2);
+        pi_2.Sub(&self).Sin()
     }
 
     pub fn Cosh(&self) -> Tensor {
