@@ -13,6 +13,13 @@ pub struct FileManager {
 
 impl FileManager {
     pub fn new(cache_size: usize) -> FileManager {
+        let cache_size = if cache_size == 0 {
+            log::warn!("FileManager cache size must not be 0, transparently increasing to 1");
+            1
+        } else {
+            cache_size
+        };
+
         FileManager {
             cache: LruCache::new(cache_size),
             history: LinkedHashMap::new(),
