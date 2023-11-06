@@ -14,12 +14,12 @@ impl Tensor {
         let max_along_axis = self.Max(&[axis], true);
         let mask = self.Equal(&max_along_axis);
 
-        let (_, shape_per_batch) = self.view().shape.split_at(axis as usize);
-        let axis_size = self.view().shape[axis as usize];
+        let (_, shape_per_batch) = self.shape().split_at(axis as usize);
+        let axis_size = self.shape()[axis as usize];
         let elements_per_batch = shape_per_batch[1..]
             .iter()
             .fold(1, |acc, &shape| acc * shape);
-        let indices = Tensor::arange(&self.view().shape[..])
+        let indices = Tensor::arange(&self.shape())
             .Divide(&Tensor::scalar(elements_per_batch))
             .Mod(&Tensor::scalar(axis_size))
             .Floor();
@@ -47,7 +47,7 @@ impl Tensor {
         padding: ConvPadding<'a>,
     ) -> Tensor {
         let kernel = Tensor::scalar(1).reshape(&TensorView::from_shape(kernel_size));
-        let n = Tensor::scalar(kernel.view().len());
+        let n = Tensor::scalar(kernel.len());
         self.Conv(&kernel, kernel_strides, padding).Divide(&n)
     }
 
@@ -65,10 +65,10 @@ impl Tensor {
         let input = self.contiguous();
         let kernel = kernel.contiguous();
 
-        let [input_batch_size, c_in, features @ ..] = &input.view().shape[..] else {
+        let [input_batch_size, c_in, features @ ..] = &input.shape() else {
             panic!("Conv expects an input signature of N x C x ...")
         };
-        let [_, in_channels, filters @ ..] = &kernel.view().shape[..] else {
+        let [_, in_channels, filters @ ..] = &kernel.shape() else {
             panic!("Conv expects an kernel signature of C_out x C_in x ...")
         };
 
@@ -95,7 +95,7 @@ impl Tensor {
 
         // Compute necessary padding for convolution
         let axis_padding = match padding {
-            ConvPadding::Valid => self.view().shape.iter().map(|_| (0, 0)).collect::<Vec<_>>(),
+            ConvPadding::Valid => self.shape().iter().map(|_| (0, 0)).collect::<Vec<_>>(),
             ConvPadding::Same | ConvPadding::SameLower | ConvPadding::SameUpper => {
                 kernel_strides.iter().for_each(|&stride| {
                     assert!(stride == 1, "Same padding expects strides of only 1")
@@ -134,7 +134,7 @@ impl Tensor {
         // Perform convolution after padding is done
         let input = input.pad(&axis_padding);
 
-        let [input_batch_size, c_in, features @ ..] = &input.view().shape[..] else {
+        let [input_batch_size, c_in, features @ ..] = &input.shape() else {
             panic!("Conv expects an input signature of N x C x ...")
         };
         let [batch_stride, c_in_stride, features_stride @ ..] = &input.view().stride[..] else {
@@ -193,7 +193,7 @@ impl Tensor {
         let kernel = kernel;
 
         let convolver = input.Multiply(&kernel);
-        let convolver_dimensions = convolver.view().ndim();
+        let convolver_dimensions = convolver.ndim();
         // 2nd dimension is [n, c_out, c_in, ...]
         // Reduce the filter dimensions as well to make it [n, c_out, output_size]
         let reduce_dimensions = [2]
@@ -220,7 +220,7 @@ impl Tensor {
 
     pub fn InstanceNormalization(&self, epsilon: &Tensor) -> Tensor {
         assert!(
-            self.view().ndim() == 4,
+            self.ndim() == 4,
             "InstanceNormalization is only defined for a NCHW tensor"
         );
 
@@ -237,7 +237,7 @@ impl Tensor {
 
     pub fn MatMul(&self, other: &Tensor) -> Tensor {
         // m x k @ k x n
-        let input = match self.view().ndim() {
+        let input = match self.ndim() {
             // m -> [1, m]
             0 => self.broadcast_to(&TensorView::from_shape(&[1, 1])),
             // [m] -> [m, 1]
@@ -246,7 +246,7 @@ impl Tensor {
             _ => self.clone(),
         };
 
-        let other = match other.view().ndim() {
+        let other = match other.ndim() {
             // n -> [1, n]
             0 => other.broadcast_to(&TensorView::from_shape(&[1, 1])),
             // [n] -> [1, n]
@@ -255,12 +255,12 @@ impl Tensor {
             _ => other.clone(),
         };
 
-        let input_dimension = input.view().ndim();
-        let other_dimension = other.view().ndim();
-        let [_batch_size @ .., _n, k] = &input.view().shape[..] else {
+        let input_dimension = input.ndim();
+        let other_dimension = other.ndim();
+        let [_batch_size @ .., _n, k] = &input.shape() else {
             panic!("MatMul requires input to be at least 2D");
         };
-        let [_batch_size @ .., other_k, _m] = &other.view().shape[..] else {
+        let [_batch_size @ .., other_k, _m] = &other.shape() else {
             panic!("MatMul requires tensor to be at least 2D");
         };
 
@@ -278,7 +278,7 @@ impl Tensor {
         // (..., n, k, m)
         let intermediate_result = input.Multiply(&other);
         // (..., n, m) by summing along k
-        let reduce_dimension = intermediate_result.view().ndim() - 2;
+        let reduce_dimension = intermediate_result.ndim() - 2;
         intermediate_result.Sum(&[reduce_dimension], false)
     }
 
@@ -314,7 +314,7 @@ impl Tensor {
             .zip(axes.iter())
             .zip(steps.iter())
             .fold(self.clone(), |acc, (((&start, &end), &axis), &step)| {
-                let shape_at_axis = self.view().shape[axis as usize];
+                let shape_at_axis = self.shape()[axis as usize];
                 // `end` may exceed the shape of the axis, but does nothing special
                 // Although it is important for Gather for it to be within the bounds
                 let end = end.min(shape_at_axis);
