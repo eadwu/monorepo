@@ -5,6 +5,10 @@ use super::{TensorLayout, TensorMetadata, WebGPUDevice};
 
 const WEBGPU_MINIMUM_BUFFER_SIZE: usize = 16;
 const WEBGPU_FLOAT4_ALIGNMENT: usize = std::mem::size_of::<TensorType>() * 4;
+const _: () = assert!(
+    WEBGPU_FLOAT4_ALIGNMENT & (WEBGPU_FLOAT4_ALIGNMENT - 1) == 0,
+    "WEBGPU_FLOAT4_ALIGNMENT must be a power of 2"
+);
 
 trait ToWebGPUBuffer {
     fn as_webgpu_buffer(&self, wgpu_device: &WebGPUDevice) -> wgpu::Buffer;
