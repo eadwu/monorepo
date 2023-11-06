@@ -66,6 +66,11 @@ impl Tensor {
             axes
         };
 
+        assert!(
+            axes.windows(2).all(|x| x[0] <= x[1]),
+            "Axes must be sorted for ReduceOp due to underlying assumptions"
+        );
+
         // Make sure axes are within 0 <= axis < rank
         axes.iter().for_each(|&dimension| {
             assert!(
