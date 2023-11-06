@@ -82,13 +82,13 @@ impl TensorView {
         self._container_shape.iter().product()
     }
 
-    pub fn dimension(&self) -> ViewType {
+    pub fn ndim(&self) -> ViewType {
         self.shape.len() as ViewType
     }
 
     pub fn pad(&self, padding: &[(ViewType, ViewType)]) -> TensorView {
         assert!(
-            (self.dimension() as usize) == padding.len(),
+            (self.ndim() as usize) == padding.len(),
             "Padding must be specified for all dimensions"
         );
 
@@ -109,7 +109,7 @@ impl TensorView {
 
     pub fn offset(&self, offsets: &[(ViewType, ViewType)]) -> TensorView {
         assert!(
-            (self.dimension() as usize) == offsets.len(),
+            (self.ndim() as usize) == offsets.len(),
             "Offsets must be specified for all dimensions"
         );
 
@@ -166,10 +166,10 @@ impl TensorView {
         let axis_rank = self.shape[axis as usize];
 
         assert!(
-            axis < self.dimension(),
+            axis < self.ndim(),
             "Squeeze axis {} is out of bounds, 0 <= axis < {}",
             axis,
-            self.dimension()
+            self.ndim()
         );
 
         assert!(
@@ -193,7 +193,7 @@ impl TensorView {
     }
 
     pub fn transpose(&self, axes: &[ViewType]) -> TensorView {
-        let axis = if axes.len() == self.dimension() as usize {
+        let axis = if axes.len() == self.ndim() as usize {
             axes.iter().map(|&x| x as usize).collect::<Vec<_>>()
         } else {
             self.shape
@@ -206,7 +206,7 @@ impl TensorView {
 
         // Ensure inputs are within bounds
         axis.iter()
-            .for_each(|&axis| assert!(axis < self.dimension() as usize));
+            .for_each(|&axis| assert!(axis < self.ndim() as usize));
 
         let shape = axis
             .iter()
@@ -230,10 +230,10 @@ impl TensorView {
 
     pub fn unsqueeze(&self, axis: ViewType) -> TensorView {
         assert!(
-            axis <= self.dimension(),
+            axis <= self.ndim(),
             "Unsqueeze axis {} is out of bounds, 0 <= axis <= {}",
             axis,
-            self.dimension()
+            self.ndim()
         );
 
         let axis = axis as usize;

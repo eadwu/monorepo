@@ -100,7 +100,7 @@ pub struct TensorMetadata {
 impl From<&TensorView> for TensorMetadata {
     fn from(view: &TensorView) -> Self {
         let length = view.len();
-        let dimension = view.dimension();
+        let dimension = view.ndim();
 
         let shape_offset = 0;
         let stride_offset = shape_offset + dimension;
