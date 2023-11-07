@@ -14,9 +14,6 @@ pub use view::*;
 mod load;
 pub use load::*;
 
-mod index;
-pub use index::*;
-
 mod derived;
 pub use derived::*;
 
@@ -36,7 +33,6 @@ pub enum OperationSpec {
     BinaryOp(BinarySpec),
     ReduceOp(ReduceSpec),
     ViewOp(ViewSpec),
-    IndexOp(IndexSpec),
 }
 
 impl TensorInput {

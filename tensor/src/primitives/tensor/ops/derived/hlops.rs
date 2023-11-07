@@ -9,6 +9,15 @@ pub enum ConvPadding<'a> {
     Custom(&'a [(ViewType, ViewType)]),
 }
 
+#[derive(Clone, Copy, Debug)]
+pub enum ScatterReduction {
+    None,
+    Add,
+    Mul,
+    Max,
+    Min,
+}
+
 impl Tensor {
     pub fn ArgMax(&self, axis: ViewType, keep_dims: bool, select_last_index: bool) -> Tensor {
         let max_along_axis = self.Max(&[axis], true);
@@ -235,6 +244,76 @@ impl Tensor {
         self.Normalization(&feature_axes[..], epsilon)
     }
 
+    pub fn Gather(&self, axis: ViewType, indices: &Tensor) -> Tensor {
+        let indices_view = indices.view();
+        let (batch_shape, gather_element_shape) = self.shape().split_at(axis as usize);
+
+        let adjusted_shape = batch_shape
+            .iter()
+            .chain(indices_view.shape.iter())
+            .chain(gather_element_shape.iter().skip(1))
+            .map(|&x| x)
+            .collect::<Vec<_>>();
+        let adjusted_view = TensorView::from_shape(&adjusted_shape);
+
+        // Could be done using a chain of squeeze/unsqueeze but explicitly construct the TensorView
+        // instead here
+        let transmuted_shape = batch_shape
+            .iter()
+            .map(|_| &1)
+            .chain(indices_view.shape.iter())
+            .chain(gather_element_shape.iter().skip(1).map(|_| &1))
+            .map(|&n| n)
+            .collect::<Vec<_>>();
+        let transmuted_indices = indices.reshape(&TensorView::from_shape(&transmuted_shape));
+        let broadcasted_indices = transmuted_indices.broadcast_to(&adjusted_view);
+
+        self.GatherElements(axis, &broadcasted_indices)
+    }
+
+    pub fn GatherElements(&self, axis: ViewType, indices: &Tensor) -> Tensor {
+        // Contrived literal implementation
+        // Reduce view to a 3-tuple, say (..batch, axis, gather..) and compute indices
+        let self_batch_shape = &self.shape()[axis as usize..];
+        let self_batch_nelements = self_batch_shape.iter().fold(1, |acc, &x| acc * x);
+
+        let gather_shape = &self.shape()[axis as usize + 1..];
+        let gather_shape_nelements = gather_shape.iter().fold(1, |acc, &x| acc * x);
+
+        let indices_batch_shape = &indices.shape()[axis as usize..];
+        let indices_batch_nelements = indices_batch_shape.iter().fold(1, |acc, &x| acc * x);
+
+        let self_batch_nelements_tensor = Tensor::scalar(self_batch_nelements);
+        let gather_shape_nelements_tensor = Tensor::scalar(gather_shape_nelements);
+        let indices_batch_nelements_tensor = Tensor::scalar(indices_batch_nelements);
+
+        let indices_index = Tensor::arange(indices.shape());
+        let indices_gather_index = indices_index.Mod(&gather_shape_nelements_tensor);
+        let indices_batch_index = indices_index
+            .Divide(&indices_batch_nelements_tensor)
+            .Floor();
+
+        let fixed_indices = indices_batch_index
+            // batch index of [..axis]
+            .Multiply(&self_batch_nelements_tensor)
+            // gather axis specified offset
+            .Add(&indices.Multiply(&gather_shape_nelements_tensor))
+            // index within the gather shape [axis+1..]
+            .Add(&indices_gather_index);
+        let fixed_indices = fixed_indices.reshape(&TensorView::from_shape(&[fixed_indices.len()]));
+
+        // Each index should get its own `mask` of self.view()
+        let fixed_indices = (0..self.ndim())
+            .into_iter()
+            .fold(fixed_indices, |acc, _| acc.unsqueeze(acc.ndim()));
+        let self_indices = Tensor::arange(self.shape());
+        let mask = fixed_indices.Equal(&self_indices);
+
+        self.Multiply(&mask)
+            .Sum(&(1..=self.ndim()).collect::<Vec<_>>()[..], false)
+            .reshape(indices.view())
+    }
+
     pub fn MatMul(&self, other: &Tensor) -> Tensor {
         // m x k @ k x n
         let input = match self.ndim() {
@@ -299,6 +378,69 @@ impl Tensor {
         let centered_input = self.Sub(&mean);
         let standard_deviation = variance.Add(epsilon).Sqrt();
         centered_input.Divide(&standard_deviation)
+    }
+
+    pub fn Scatter(&self, axis: ViewType, indices: &Tensor, updates: &Tensor) -> Tensor {
+        self.ScatterElements(axis, ScatterReduction::None, indices, updates)
+    }
+
+    pub fn ScatterElements(
+        &self,
+        axis: ViewType,
+        reduction: ScatterReduction,
+        indices: &Tensor,
+        updates: &Tensor,
+    ) -> Tensor {
+        // Simplify problem to a 3-tuple shape
+        // (batch.., axis, ..gather)
+        let self_batch_shape = &self.shape()[axis as usize..];
+        let self_batch_nelements = self_batch_shape.iter().fold(1, |acc, &x| acc * x);
+
+        let gather_shape = &self.shape()[axis as usize + 1..];
+        let gather_shape_nelements = gather_shape.iter().fold(1, |acc, &x| acc * x);
+
+        let indices_batch_shape = &indices.shape()[axis as usize..];
+        let indices_batch_nelements = indices_batch_shape.iter().fold(1, |acc, &x| acc * x);
+
+        let self_batch_nelements_tensor = Tensor::scalar(self_batch_nelements);
+        let gather_shape_nelements_tensor = Tensor::scalar(gather_shape_nelements);
+        let indices_batch_nelements_tensor = Tensor::scalar(indices_batch_nelements);
+
+        let indices_index = Tensor::arange(indices.shape());
+        let indices_gather_index = indices_index.Mod(&gather_shape_nelements_tensor);
+        let indices_batch_index = indices_index
+            .Divide(&indices_batch_nelements_tensor)
+            .Floor();
+
+        let fixed_indices = indices_batch_index
+            // batch index of [..axis]
+            .Multiply(&self_batch_nelements_tensor)
+            // gather axis specified offset
+            .Add(&indices.Multiply(&gather_shape_nelements_tensor))
+            // index within the gather shape [axis+1..]
+            .Add(&indices_gather_index);
+        let fixed_indices = fixed_indices.reshape(&TensorView::from_shape(&[fixed_indices.len()]));
+
+        // Each index should get its own `mask` of self.view()
+        let fixed_indices = (0..self.ndim())
+            .into_iter()
+            .fold(fixed_indices, |acc, _| acc.unsqueeze(acc.ndim()));
+        let self_indices = Tensor::arange(self.shape());
+        let mask = fixed_indices.Equal(&self_indices);
+
+        let fixed_updates = updates.reshape(&TensorView::from_shape(&[updates.len()]));
+        let fixed_updates = (0..self.ndim())
+            .into_iter()
+            .fold(fixed_updates, |acc, _| acc.unsqueeze(acc.ndim()));
+
+        let value_updates = fixed_updates.Multiply(&mask).Sum(&[0], false);
+        match reduction {
+            ScatterReduction::None => {
+                let inverted_mask = mask.Max(&[0], false).Not();
+                value_updates.Add(&self.Multiply(&inverted_mask))
+            }
+            _ => panic!("Only ScatterReduction::None is currently supported"),
+        }
     }
 
     pub fn Slice(
