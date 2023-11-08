@@ -1,6 +1,7 @@
 use num_traits::AsPrimitive;
 
-use crate::primitives::tensor::{Tensor, TensorType, ViewType};
+use crate::primitives::tensor::{Tensor, TensorType};
+use crate::primitives::tensorview::ViewType;
 
 impl Tensor {
     /* BinaryOp derivations */

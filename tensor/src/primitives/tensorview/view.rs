@@ -3,9 +3,6 @@ use std::slice::Iter;
 use itertools::{EitherOrBoth::*, Itertools};
 use num_traits::AsPrimitive;
 
-mod passthrough;
-pub use passthrough::*;
-
 pub type ViewType = u32;
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -103,11 +100,6 @@ impl TensorView {
             .collect_vec();
 
         TensorView::from_shape(&expanded_shape)
-        // TensorView::new(
-        //     true,
-        //     expanded_shape.into_boxed_slice(),
-        //     self.stride.clone(),
-        // )
     }
 
     pub fn offset(&self, offsets: &[(ViewType, ViewType)]) -> TensorView {

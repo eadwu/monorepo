@@ -1,6 +1,5 @@
 use crate::primitives::tensor::Tensor;
-
-use super::ViewType;
+use crate::primitives::tensorview::ViewType;
 
 impl Tensor {
     pub fn len(&self) -> ViewType {
