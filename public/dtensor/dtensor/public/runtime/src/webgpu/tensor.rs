@@ -1,4 +1,5 @@
-use tensor::primitives::tensor::{Tensor, TensorType, TensorView};
+use tensor::primitives::tensor::{Tensor, TensorType};
+use tensor::primitives::tensorview::TensorView;
 use wgpu::util::DeviceExt;
 
 use super::{TensorLayout, TensorMetadata, WebGPUDevice};

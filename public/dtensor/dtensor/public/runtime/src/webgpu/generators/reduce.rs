@@ -1,5 +1,5 @@
 use tensor::primitives::tensor::ReduceType;
-use tensor::primitives::tensor::ViewType;
+use tensor::primitives::tensorview::ViewType;
 
 use crate::webgpu::generators::*;
 use crate::webgpu::WORKGROUP_SIZE;

@@ -8,6 +8,7 @@ use rand::Rng;
 use uuid::Uuid;
 
 use crate::FILE_MANAGER;
+use crate::primitives::tensorview::{TensorView, ViewType};
 
 use super::*;
 

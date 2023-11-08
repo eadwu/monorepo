@@ -1,4 +1,5 @@
-use crate::primitives::tensor::{Tensor, TensorView, ViewType};
+use crate::primitives::tensor::Tensor;
+use crate::primitives::tensorview::{TensorView, ViewType};
 
 use super::{OperationSpec, TensorInput};
 

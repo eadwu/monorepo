@@ -1,6 +1,6 @@
 use std::iter::once;
 
-use ::tensor::primitives::tensor::{TensorView, ViewType};
+use ::tensor::primitives::tensorview::{TensorView, ViewType};
 use num::integer::Roots;
 
 pub mod generators;
