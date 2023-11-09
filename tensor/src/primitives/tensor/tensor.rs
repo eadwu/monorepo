@@ -3,7 +3,6 @@ use std::path::Path;
 use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::Arc;
 
-use num_traits::AsPrimitive;
 use rand::Rng;
 use uuid::Uuid;
 
@@ -41,8 +40,8 @@ impl Tensor {
         Tensor(Arc::new(TensorInternals::new(view, data, datatype)))
     }
 
-    pub fn scalar<T: AsPrimitive<f32>>(data: T) -> Tensor {
-        Tensor::from_contiguous(&[data.as_()], &[])
+    pub fn scalar<T: TensorDataElement>(data: T) -> Tensor {
+        Tensor::from_contiguous(&[data], &[])
     }
 
     pub fn from_contiguous<T: TensorDataElement>(data: &[T], shape: &[ViewType]) -> Tensor {
@@ -52,7 +51,7 @@ impl Tensor {
     pub fn arange(shape: &[ViewType]) -> Tensor {
         let view = TensorView::from_shape(shape);
         let n = view.len();
-        let data = (0..n).map(|x| x as f32).collect::<Vec<_>>();
+        let data = (0..n).collect::<Vec<u32>>();
         Tensor::with_shape(&data[..], view)
     }
 
@@ -66,7 +65,7 @@ impl Tensor {
         let data = rand::thread_rng()
             .sample_iter(distribution)
             .take(n)
-            .collect::<Vec<_>>();
+            .collect::<Vec<f32>>();
         Tensor::with_shape(&data[..], view)
     }
 
