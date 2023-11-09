@@ -45,18 +45,18 @@ impl Tensor {
     }
 
     pub fn from_contiguous<T: TensorDataElement>(data: &[T], shape: &[ViewType]) -> Tensor {
-        Tensor::with_shape(data, TensorView::from_shape(shape))
+        Tensor::with_shape(data, TensorView::from_contiguous_shape(shape))
     }
 
     pub fn arange(shape: &[ViewType]) -> Tensor {
-        let view = TensorView::from_shape(shape);
+        let view = TensorView::from_contiguous_shape(shape);
         let n = view.len();
         let data = (0..n).collect::<Vec<u32>>();
         Tensor::with_shape(&data[..], view)
     }
 
     pub fn randn(shape: &[ViewType], mean: Option<f32>, std_dev: Option<f32>) -> Tensor {
-        let view = TensorView::from_shape(shape);
+        let view = TensorView::from_contiguous_shape(shape);
         let n = view.len() as usize;
 
         let mean = mean.unwrap_or(0.0);
@@ -70,7 +70,7 @@ impl Tensor {
     }
 
     pub fn zeros_like(shape: &[ViewType]) -> Tensor {
-        let view = TensorView::from_shape(shape);
+        let view = TensorView::from_contiguous_shape(shape);
         Tensor::scalar(0).broadcast_to(&view)
     }
 
