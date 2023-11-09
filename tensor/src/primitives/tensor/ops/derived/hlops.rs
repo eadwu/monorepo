@@ -246,29 +246,33 @@ impl Tensor {
     }
 
     pub fn Gather(&self, axis: ViewType, indices: &Tensor) -> Tensor {
-        let indices_view = indices.view();
-        let (batch_shape, gather_element_shape) = self.shape().split_at(axis as usize);
+        let indices_shape = indices.shape();
+        let batch_shape = &self.shape()[..axis as usize];
+        let gather_element_shape = &self.shape()[axis as usize + 1..];
 
+        // Gather is GatherElements after expanding it to the entire length of the origin tensor
+        let transmuted_shape = batch_shape
+            .iter()
+            .map(|_| &1)
+            .chain(indices_shape.iter())
+            .chain(gather_element_shape.iter().map(|_| &1))
+            .map(|&n| n)
+            .collect::<Vec<_>>();
+        let transmuted_view = TensorView::from_shape(&transmuted_shape);
+
+        // For every element in the batch
+        // Gather the requested index at axis
+        // Which consists of some array of elements of the gather_shape
         let adjusted_shape = batch_shape
             .iter()
-            .chain(indices_view.shape.iter())
-            .chain(gather_element_shape.iter().skip(1))
+            .chain(indices_shape.iter())
+            .chain(gather_element_shape.iter())
             .map(|&x| x)
             .collect::<Vec<_>>();
         let adjusted_view = TensorView::from_shape(&adjusted_shape);
 
-        // Could be done using a chain of squeeze/unsqueeze but explicitly construct the TensorView
-        // instead here
-        let transmuted_shape = batch_shape
-            .iter()
-            .map(|_| &1)
-            .chain(indices_view.shape.iter())
-            .chain(gather_element_shape.iter().skip(1).map(|_| &1))
-            .map(|&n| n)
-            .collect::<Vec<_>>();
-        let transmuted_indices = indices.reshape(&TensorView::from_shape(&transmuted_shape));
+        let transmuted_indices = indices.reshape(&transmuted_view);
         let broadcasted_indices = transmuted_indices.broadcast_to(&adjusted_view);
-
         self.GatherElements(axis, &broadcasted_indices)
     }
 
