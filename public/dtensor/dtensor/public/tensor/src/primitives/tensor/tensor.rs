@@ -41,7 +41,8 @@ impl Tensor {
     }
 
     pub fn scalar<T: TensorDataElement>(data: T) -> Tensor {
-        Tensor::from_contiguous(&[data], &[])
+        let view = TensorView::from_contiguous_shape(&[]);
+        Tensor::new(view, TensorInput::from_scalar(data), data.into())
     }
 
     pub fn from_contiguous<T: TensorDataElement>(data: &[T], shape: &[ViewType]) -> Tensor {
@@ -128,11 +129,11 @@ impl Tensor {
         assert!(self.has_data(), "Tensor does not contain any data");
 
         if let TensorInput::ExplicitInput(input) = self.data() {
-            if let InputSpec::Raw(spec) = input {
-                return <&Tensor as RawFileLoader>::load(self, spec);
-            } else if let InputSpec::Safetensor(spec) = input {
-                return <&Tensor as SafetensorLoader>::load(self, spec);
-            }
+            return match input {
+                InputSpec::Scalar(stream) => stream.clone(),
+                InputSpec::Raw(spec) => <&Tensor as RawFileLoader>::load(self, spec),
+                InputSpec::Safetensor(spec) => <&Tensor as SafetensorLoader>::load(self, spec),
+            };
         }
 
         unreachable!("Reached unreachable path for Tensor.load()");

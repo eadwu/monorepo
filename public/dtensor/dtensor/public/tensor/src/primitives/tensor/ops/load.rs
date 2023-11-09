@@ -1,9 +1,12 @@
 use std::path::{Path, PathBuf};
 
+use crate::primitives::tensor::TensorDataElement;
+
 use super::TensorInput;
 
 #[derive(Clone, Debug)]
 pub enum InputSpec {
+    Scalar(Vec<u8>),
     Raw(RawSpec),
     Safetensor(SafetensorSpec),
 }
@@ -22,6 +25,12 @@ pub struct SafetensorSpec {
 }
 
 impl TensorInput {
+    pub fn from_scalar<T: TensorDataElement>(value: T) -> TensorInput {
+        let slice = [value];
+        let bytes = bytemuck::cast_slice(&slice);
+        TensorInput::ExplicitInput(InputSpec::Scalar(bytes.to_vec()))
+    }
+
     pub fn from_raw(file: &Path, size: usize, offset: usize) -> TensorInput {
         TensorInput::ExplicitInput(InputSpec::Raw(RawSpec {
             file: file.to_path_buf(),
