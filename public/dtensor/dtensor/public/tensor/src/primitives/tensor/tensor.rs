@@ -7,14 +7,12 @@ use num_traits::AsPrimitive;
 use rand::Rng;
 use uuid::Uuid;
 
-use crate::FILE_MANAGER;
 use crate::primitives::tensorview::{TensorView, ViewType};
+use crate::FILE_MANAGER;
 
 use super::*;
 
 static ID_GENERATOR: AtomicU32 = AtomicU32::new(0);
-
-pub type TensorType = f32;
 
 #[derive(Clone, Debug)]
 pub struct Tensor(Arc<TensorInternals>);
@@ -24,36 +22,38 @@ pub struct TensorInternals {
     id: u32,
     view: TensorView,
     data: TensorInput,
+    datatype: TensorType,
 }
 
 impl TensorInternals {
-    pub fn new(view: TensorView, data: TensorInput) -> TensorInternals {
+    pub fn new(view: TensorView, data: TensorInput, datatype: TensorType) -> TensorInternals {
         TensorInternals {
             id: ID_GENERATOR.fetch_add(1, Ordering::Relaxed),
             view: view,
             data: data,
+            datatype: datatype,
         }
     }
 }
 
 impl Tensor {
-    pub fn new(view: TensorView, data: TensorInput) -> Tensor {
-        Tensor(Arc::new(TensorInternals::new(view, data)))
+    pub fn new(view: TensorView, data: TensorInput, datatype: TensorType) -> Tensor {
+        Tensor(Arc::new(TensorInternals::new(view, data, datatype)))
     }
 
-    pub fn scalar<T: AsPrimitive<TensorType>>(data: T) -> Tensor {
+    pub fn scalar<T: AsPrimitive<f32>>(data: T) -> Tensor {
         Tensor::from_contiguous(&[data.as_()], &[])
     }
 
-    pub fn from_contiguous(data: &[TensorType], shape: &[ViewType]) -> Tensor {
+    pub fn from_contiguous<T: TensorDataElement>(data: &[T], shape: &[ViewType]) -> Tensor {
         Tensor::with_shape(data, TensorView::from_shape(shape))
     }
 
     pub fn arange(shape: &[ViewType]) -> Tensor {
         let view = TensorView::from_shape(shape);
-        let n = view.len() as usize;
-        let data = (0..n).map(|x| x as TensorType).collect::<Vec<_>>();
-        Tensor::with_shape(&data, view)
+        let n = view.len();
+        let data = (0..n).map(|x| x as f32).collect::<Vec<_>>();
+        Tensor::with_shape(&data[..], view)
     }
 
     pub fn randn(shape: &[ViewType], mean: Option<f32>, std_dev: Option<f32>) -> Tensor {
@@ -75,7 +75,16 @@ impl Tensor {
         Tensor::scalar(0).broadcast_to(&view)
     }
 
-    pub fn with_shape(data: &[TensorType], view: TensorView) -> Tensor {
+    pub fn with_shape<T: TensorDataElement>(data: &[T], view: TensorView) -> Tensor {
+        let inferred_datatype = data
+            .first()
+            .map(|&x| x)
+            .map(Into::<TensorType>::into)
+            .unwrap();
+        Tensor::from_raw_bytes(bytemuck::cast_slice(data), view, inferred_datatype)
+    }
+
+    pub fn from_raw_bytes(data: &[u8], view: TensorView, datatype: TensorType) -> Tensor {
         let identifier = Uuid::new_v4().to_string();
         let path = Path::new(&identifier);
         FILE_MANAGER
@@ -87,6 +96,7 @@ impl Tensor {
         Tensor::new(
             view,
             TensorInput::from_raw(path, std::mem::size_of_val(data), 0),
+            datatype,
         )
     }
 }
@@ -109,6 +119,10 @@ impl Tensor {
 
     pub fn data(&self) -> &TensorInput {
         &self.0.data
+    }
+
+    pub fn datatype(&self) -> TensorType {
+        self.0.datatype
     }
 
     pub fn load(&self) -> Vec<u8> {

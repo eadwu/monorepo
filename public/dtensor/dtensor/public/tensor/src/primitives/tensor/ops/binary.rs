@@ -31,8 +31,12 @@ impl Tensor {
     fn binary_op(&self, op: BinaryType, rhs: &Tensor) -> Tensor {
         let lhs = self.broadcast(&rhs);
         let rhs = rhs.broadcast(&self);
-
-        Tensor::new(lhs.view().clone(), TensorInput::binary(op, lhs, rhs))
+        let datatype = lhs.datatype().agreeable_type(rhs.datatype());
+        Tensor::new(
+            lhs.view().clone(),
+            TensorInput::binary(op, lhs, rhs),
+            datatype,
+        )
     }
 
     pub fn Add(&self, rhs: &Tensor) -> Tensor {
