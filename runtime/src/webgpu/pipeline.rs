@@ -1,6 +1,7 @@
 use std::{borrow::Cow, collections::HashMap, future::Future};
 
-use tensor::primitives::tensor::{OperationSpec, Tensor, TensorInput};
+use tensor::primitives::tensor::{OperationSpec, Tensor, TensorInput, TensorType};
+use tensor::primitives::tensorview::TensorView;
 
 use crate::{webgpu::WORKGROUP_SIZE, GraphView};
 
@@ -27,7 +28,7 @@ impl WebGPUEvaluation for Tensor {
             if let TensorInput::NoOp(input) = tensor.data() {
                 let input: &Tensor = intermediate_results.get(&input.id()).unwrap();
                 let clone =
-                    Tensor::with_shape(bytemuck::cast_slice(&input.load()), tensor.view().clone());
+                    Tensor::from_raw_bytes(&input.load(), tensor.view().clone(), tensor.datatype());
                 intermediate_results.insert(tensor.id(), clone);
             } else if let TensorInput::ExplicitInput(_) = tensor.data() {
                 intermediate_results.insert(tensor.id(), tensor.clone());
@@ -190,8 +191,14 @@ pub async fn webgpu_tensor_pipeline<'a>(
     if let Some(Ok(())) = receiver.receive().await {
         // Gets contents of buffer
         let data = buffer_slice.get_mapped_range();
-        // Since contents are got in bytes, this converts these bytes back to u32
-        let result = bytemuck::cast_slice(&data).to_vec();
+
+        // Returns data from buffer
+        let len_bytes = output.len() as usize * output.datatype().byte_size();
+        // NOTE: This can not clone the TensorView, for example if the output is some
+        // noncontiguous view, it would not be correct since the pipeline
+        // output is ALWAYS contiguous, consider this Tensor as a computed `checkpoint`
+        let view = TensorView::from_shape(output.shape());
+        let output_tensor = Tensor::from_raw_bytes(&data[..len_bytes], view, output.datatype());
 
         // With the current interface, we have to make sure all mapped views are
         // dropped before we unmap the buffer.
@@ -202,9 +209,7 @@ pub async fn webgpu_tensor_pipeline<'a>(
                                 //   myPointer = NULL;
                                 // It effectively frees the memory
 
-        // Returns data from buffer
-        let n_tensor_elements = output.len() as usize;
-        Tensor::from_contiguous(&result[..n_tensor_elements], &output.shape())
+        output_tensor
     } else {
         panic!("failed to run compute on gpu!")
     }

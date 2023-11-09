@@ -43,6 +43,7 @@ impl Tensor {
         let result = Tensor::new(
             TensorView::from_shape(&output_shape),
             TensorInput::reduce(op, self.clone(), axis),
+            self.datatype(),
         );
 
         if keep_dim {

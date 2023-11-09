@@ -5,9 +5,9 @@ use wgpu::util::DeviceExt;
 use super::{TensorLayout, TensorMetadata, WebGPUDevice};
 
 const WEBGPU_MINIMUM_BUFFER_SIZE: usize = 16;
-const WEBGPU_FLOAT4_ALIGNMENT: usize = std::mem::size_of::<TensorType>() * 4;
+const WEBGPU_VEC4_ALIGNMENT: usize = TensorType::F32.byte_size() * 4;
 const _: () = assert!(
-    WEBGPU_FLOAT4_ALIGNMENT & (WEBGPU_FLOAT4_ALIGNMENT - 1) == 0,
+    WEBGPU_VEC4_ALIGNMENT & (WEBGPU_VEC4_ALIGNMENT - 1) == 0,
     "WEBGPU_FLOAT4_ALIGNMENT must be a power of 2"
 );
 
@@ -19,10 +19,10 @@ impl ToWebGPUBuffer for Tensor {
     fn as_webgpu_buffer(&self, wgpu_device: &WebGPUDevice) -> wgpu::Buffer {
         let WebGPUDevice { device, queue: _ } = wgpu_device;
 
-        let data_len = (self.len() as usize) * std::mem::size_of::<TensorType>();
-        let minimum_size = data_len.max(WEBGPU_MINIMUM_BUFFER_SIZE);
+        let data_len_bytes = self.len() as usize * self.datatype().byte_size();
+        let minimum_size = data_len_bytes.max(WEBGPU_MINIMUM_BUFFER_SIZE);
         let aligned_size =
-            minimum_size + (WEBGPU_FLOAT4_ALIGNMENT - 1) & !(WEBGPU_FLOAT4_ALIGNMENT - 1);
+            minimum_size + (WEBGPU_VEC4_ALIGNMENT - 1) & !(WEBGPU_VEC4_ALIGNMENT - 1);
 
         let buffer = device.create_buffer(&wgpu::BufferDescriptor {
             label: None,

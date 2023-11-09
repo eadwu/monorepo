@@ -1,4 +1,4 @@
-use crate::primitives::tensor::Tensor;
+use crate::primitives::tensor::{Tensor, TensorType};
 
 use super::{OperationSpec, TensorInput};
 
@@ -30,7 +30,11 @@ impl TensorInput {
 
 impl Tensor {
     fn unary_op(&self, op: UnaryType) -> Tensor {
-        Tensor::new(self.view().clone(), TensorInput::unary(op, self.clone()))
+        Tensor::new(
+            self.view().clone(),
+            TensorInput::unary(op, self.clone()),
+            TensorType::F32,
+        )
     }
 
     pub fn Identity(&self) -> Tensor {
