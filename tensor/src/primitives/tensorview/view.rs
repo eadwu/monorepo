@@ -1,7 +1,6 @@
 use std::slice::Iter;
 
 use itertools::{EitherOrBoth::*, Itertools};
-use num_traits::AsPrimitive;
 
 pub type ViewType = u32;
 
@@ -134,13 +133,13 @@ impl TensorView {
         merge_function(left_exclusive.iter(), right_inclusive.iter(), default)
     }
 
-    fn _join_squeeze<T: AsPrimitive<usize>>(
+    fn _join_squeeze<T: Copy>(
         left_exclusive: Iter<'_, T>,
         right_inclusive: Iter<'_, T>,
-        default: T,
+        _: T,
     ) -> Vec<T> {
         left_exclusive
-            .chain(right_inclusive.skip(default.as_()))
+            .chain(right_inclusive.skip(1))
             .map(|&x| x)
             .collect_vec()
     }
@@ -176,7 +175,7 @@ impl TensorView {
 
         let axis = axis as usize;
         let shape = TensorView::_split_and_join(&self.shape, axis, 1, TensorView::_join_squeeze);
-        let stride = TensorView::_split_and_join(&self.stride, axis, 1, TensorView::_join_squeeze);
+        let stride = TensorView::_split_and_join(&self.stride, axis, 0, TensorView::_join_squeeze);
         let offset = TensorView::_split_and_join(&self.offset, axis, 0, TensorView::_join_squeeze);
 
         TensorView::new(
