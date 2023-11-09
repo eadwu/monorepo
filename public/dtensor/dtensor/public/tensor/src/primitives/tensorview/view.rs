@@ -43,7 +43,7 @@ impl TensorView {
         )
     }
 
-    pub fn from_container(
+    pub fn from_view_subset(
         view: &TensorView,
         shape: Box<[ViewType]>,
         offset: Box<[ViewType]>,
@@ -120,7 +120,7 @@ impl TensorView {
             .map(|(previous_offset, (pre, _))| previous_offset + pre)
             .collect_vec();
 
-        TensorView::from_container(self, shape.into_boxed_slice(), offset.into_boxed_slice())
+        TensorView::from_view_subset(self, shape.into_boxed_slice(), offset.into_boxed_slice())
     }
 
     fn _split_and_join<T>(
