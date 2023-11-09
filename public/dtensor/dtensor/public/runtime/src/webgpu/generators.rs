@@ -1,3 +1,5 @@
+use tensor::primitives::tensor::TensorType;
+
 use super::TensorMetadata;
 
 pub mod binary;
@@ -12,6 +14,15 @@ pub fn shader_header() -> String {
 ",
         TensorMetadata = TensorMetadata::serialize_definition(),
     )
+}
+
+pub fn wgsl_from_tensortype(datatype: TensorType) -> String {
+    match datatype {
+        TensorType::F16 => "f16",
+        TensorType::F32 => "f32",
+        TensorType::I32 => "i32",
+        TensorType::U32 => "u32",
+    }.to_string()
 }
 
 pub fn tensor_interface(

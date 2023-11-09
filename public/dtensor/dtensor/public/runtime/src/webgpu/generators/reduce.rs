@@ -11,7 +11,17 @@ fn build_webgpu_operation<'a>(op: ReduceType) -> impl Fn(&'a str, &'a str) -> St
     }
 }
 
-pub fn build_shader(op: ReduceType, axis: ViewType) -> String {
+pub fn build_shader(
+    op: ReduceType,
+    axis: ViewType,
+    datatype: TensorType,
+) -> String {
+    let element_type = wgsl_from_tensortype(datatype);
+    let container_type = format!(
+        "array<{datatype}>",
+        datatype = element_type
+    );
+
     format!(
         "
 {header}
@@ -45,7 +55,7 @@ fn {entry_point}(
 
     let axis_rank = input_metadata.metadata[input_metadata.shape_offset + AXIS];
     let axis_stride = input_metadata.metadata[input_metadata.stride_offset + AXIS];
-    var reduction: f32 = f32(0);
+    var reduction: {element_type} = {element_type}(0);
     for (var i = 0u; i < axis_rank; i++) {{
         let mapped_axis_index = mapped_index + i * axis_stride;
         reduction = {operation};
@@ -56,9 +66,9 @@ fn {entry_point}(
 ",
         header = shader_header(),
         workgroup_stride = WORKGROUP_SIZE.serialize_strides("WORKGROUP_STRIDE"),
-        input_interface = tensor_interface("0", "read", "input", "array<f32>", "input_metadata"),
+        input_interface = tensor_interface("0", "read", "input", &container_type, "input_metadata"),
         output_interface =
-            tensor_interface("1", "read_write", "output", "array<f32>", "output_metadata"),
+            tensor_interface("1", "read_write", "output", &container_type, "output_metadata"),
         workgroup_size = WORKGROUP_SIZE.serialize_decorator(),
         entry_point = "main",
         index = compute_index("index", "global_id", "WORKGROUP_STRIDE"),
@@ -78,6 +88,7 @@ fn {entry_point}(
             "output_metadata",
             "input_metadata"
         ),
+        element_type = element_type,
         operation = build_webgpu_operation(op)("reduction", "input[mapped_axis_index]"),
     )
 }

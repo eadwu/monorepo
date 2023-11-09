@@ -34,23 +34,41 @@ impl WebGPUEvaluation for Tensor {
                 intermediate_results.insert(tensor.id(), tensor.clone());
             } else if let TensorInput::OperationResult(operation) = tensor.data() {
                 let (shader, inputs, output) = match operation {
-                    OperationSpec::UnaryOp(op) => (
-                        generators::unary::build_shader(op.op),
-                        vec![op.input.id()],
-                        tensor,
-                    ),
-                    OperationSpec::BinaryOp(op) => (
-                        generators::binary::build_shader(op.op),
-                        vec![op.lhs.id(), op.rhs.id()],
-                        tensor,
-                    ),
+                    OperationSpec::UnaryOp(op) => {
+                        let input = intermediate_results.get(&op.input.id()).unwrap();
+
+                        (
+                            generators::unary::build_shader(
+                                op.op,
+                                input.datatype(),
+                                tensor.datatype(),
+                            ),
+                            vec![op.input.id()],
+                            tensor,
+                        )
+                    }
+                    OperationSpec::BinaryOp(op) => {
+                        let lhs = intermediate_results.get(&op.lhs.id()).unwrap();
+                        let rhs = intermediate_results.get(&op.rhs.id()).unwrap();
+
+                        (
+                            generators::binary::build_shader(
+                                op.op,
+                                lhs.datatype(),
+                                rhs.datatype(),
+                                tensor.datatype(),
+                            ),
+                            vec![op.lhs.id(), op.rhs.id()],
+                            tensor,
+                        )
+                    }
                     OperationSpec::ReduceOp(op) => (
-                        generators::reduce::build_shader(op.op, op.axis),
+                        generators::reduce::build_shader(op.op, op.axis, tensor.datatype()),
                         vec![op.input.id()],
                         tensor,
                     ),
                     OperationSpec::ViewOp(op) => (
-                        generators::view::build_shader(),
+                        generators::view::build_shader(tensor.datatype()),
                         vec![op.input.id()],
                         tensor,
                     ),
