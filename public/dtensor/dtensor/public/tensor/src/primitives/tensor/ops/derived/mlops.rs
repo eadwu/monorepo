@@ -1,6 +1,4 @@
-use num_traits::AsPrimitive;
-
-use crate::primitives::tensor::{Tensor, TensorType};
+use crate::primitives::tensor::{Tensor, TensorDataElement};
 use crate::primitives::tensorview::ViewType;
 
 impl Tensor {
@@ -36,7 +34,7 @@ impl Tensor {
     }
 
     /* UnaryOp derivations */
-    pub fn Celu<T: AsPrimitive<f32>>(&self, alpha: T) -> Tensor {
+    pub fn Celu<T: TensorDataElement>(&self, alpha: T) -> Tensor {
         let zero = Tensor::scalar(0);
         let one = Tensor::scalar(1);
         let alpha = Tensor::scalar(alpha);
@@ -74,7 +72,7 @@ impl Tensor {
         one.Divide(&self.Sinh())
     }
 
-    pub fn Elu<T: AsPrimitive<f32>>(&self, alpha: T) -> Tensor {
+    pub fn Elu<T: TensorDataElement>(&self, alpha: T) -> Tensor {
         let zero = Tensor::scalar(0);
         let one = Tensor::scalar(1);
         let alpha = Tensor::scalar(alpha);
@@ -162,7 +160,7 @@ impl Tensor {
             .Add(&self.Multiply(&hard_pos_mask))
     }
 
-    pub fn LeakyRelu<T: AsPrimitive<f32>>(&self, alpha: T) -> Tensor {
+    pub fn LeakyRelu<T: TensorDataElement>(&self, alpha: T) -> Tensor {
         let zero = Tensor::scalar(0);
         let alpha = Tensor::scalar(alpha);
 
@@ -184,7 +182,7 @@ impl Tensor {
         self.Softmax(axis).Log()
     }
 
-    pub fn Mish<T: AsPrimitive<f32>>(&self, beta: T, threshold: T) -> Tensor {
+    pub fn Mish<T: TensorDataElement>(&self, beta: T, threshold: T) -> Tensor {
         self.Multiply(&self.Softplus(beta, threshold).Tanh())
     }
 
@@ -198,7 +196,7 @@ impl Tensor {
         one.Sub(self)
     }
 
-    pub fn PRelu<T: AsPrimitive<f32>>(&self, alpha: T) -> Tensor {
+    pub fn PRelu<T: TensorDataElement>(&self, alpha: T) -> Tensor {
         let zero = Tensor::scalar(0);
         let alpha = Tensor::scalar(alpha);
 
@@ -216,7 +214,7 @@ impl Tensor {
         one.Divide(&self.Cos())
     }
 
-    pub fn Selu<T: AsPrimitive<f32>>(&self, alpha: T, scale: T) -> Tensor {
+    pub fn Selu<T: TensorDataElement>(&self, alpha: T, scale: T) -> Tensor {
         let scale = Tensor::scalar(scale);
         self.Elu(alpha).Multiply(&scale)
     }
@@ -247,7 +245,7 @@ impl Tensor {
         stablized.Divide(&sum)
     }
 
-    pub fn Softplus<T: AsPrimitive<f32>>(&self, beta: T, threshold: T) -> Tensor {
+    pub fn Softplus<T: TensorDataElement>(&self, beta: T, threshold: T) -> Tensor {
         let one = Tensor::scalar(1);
         let beta = Tensor::scalar(beta);
         let threshold = Tensor::scalar(threshold);

@@ -461,10 +461,7 @@ impl Tensor {
                 // `end` may exceed the shape of the axis, but does nothing special
                 // Although it is important for Gather for it to be within the bounds
                 let end = end.min(shape_at_axis);
-                let indices = (start..end)
-                    .step_by(step as usize)
-                    .map(|x| x as f32)
-                    .collect::<Vec<_>>();
+                let indices = (start..end).step_by(step as usize).collect::<Vec<u32>>();
                 let indices_tensor = Tensor::from_contiguous(&indices[..], &[indices.len() as u32]);
                 // Equivalent to slicing by one dimension each time
                 acc.Gather(axis, &indices_tensor)
