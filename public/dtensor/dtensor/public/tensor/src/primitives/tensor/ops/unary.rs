@@ -4,7 +4,7 @@ use super::{OperationSpec, TensorInput};
 
 #[derive(Clone, Copy, Debug)]
 pub enum UnaryType {
-    IDENTITY, // NOOP,
+    IDENTITY,
     EXP2,
     LOG2,
     // CAST,
