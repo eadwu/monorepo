@@ -72,7 +72,6 @@ impl WebGPUEvaluation for Tensor {
                         vec![op.input.id()],
                         tensor,
                     ),
-                    _ => panic!("Unsupported Operation {:?}", operation),
                 };
 
                 let dependencies = inputs
