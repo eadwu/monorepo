@@ -41,7 +41,7 @@ impl Tensor {
     }
 
     pub fn contiguous(&self) -> Tensor {
-        let view = TensorView::from_shape(&self.shape());
+        let view = TensorView::from_contiguous_shape(&self.shape());
         self.eager_view_op(&view)
     }
 

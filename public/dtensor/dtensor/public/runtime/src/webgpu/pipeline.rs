@@ -214,7 +214,7 @@ pub async fn webgpu_tensor_pipeline<'a>(
         // NOTE: This can not clone the TensorView, for example if the output is some
         // noncontiguous view, it would not be correct since the pipeline
         // output is ALWAYS contiguous, consider this Tensor as a computed `checkpoint`
-        let view = TensorView::from_shape(output.shape());
+        let view = TensorView::from_contiguous_shape(output.shape());
         let output_tensor = Tensor::from_raw_bytes(&data[..len_bytes], view, output.datatype());
 
         // With the current interface, we have to make sure all mapped views are

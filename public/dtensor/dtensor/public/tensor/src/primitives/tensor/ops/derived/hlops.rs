@@ -56,7 +56,7 @@ impl Tensor {
         kernel_strides: &[ViewType],
         padding: ConvPadding<'a>,
     ) -> Tensor {
-        let kernel = Tensor::scalar(1).reshape(&TensorView::from_shape(kernel_size));
+        let kernel = Tensor::scalar(1).reshape(&TensorView::from_contiguous_shape(kernel_size));
         let n = Tensor::scalar(kernel.len());
         self.Conv(&kernel, kernel_strides, padding).Divide(&n)
     }
@@ -258,7 +258,7 @@ impl Tensor {
             .chain(gather_element_shape.iter().map(|_| &1))
             .map(|&n| n)
             .collect::<Vec<_>>();
-        let transmuted_view = TensorView::from_shape(&transmuted_shape);
+        let transmuted_view = TensorView::from_contiguous_shape(&transmuted_shape);
 
         // For every element in the batch
         // Gather the requested index at axis
@@ -269,7 +269,7 @@ impl Tensor {
             .chain(gather_element_shape.iter())
             .map(|&x| x)
             .collect::<Vec<_>>();
-        let adjusted_view = TensorView::from_shape(&adjusted_shape);
+        let adjusted_view = TensorView::from_contiguous_shape(&adjusted_shape);
 
         let transmuted_indices = indices.reshape(&transmuted_view);
         let broadcasted_indices = transmuted_indices.broadcast_to(&adjusted_view);
@@ -305,7 +305,8 @@ impl Tensor {
             .Add(&indices.Multiply(&gather_shape_nelements_tensor))
             // index within the gather shape [axis+1..]
             .Add(&indices_gather_index);
-        let fixed_indices = fixed_indices.reshape(&TensorView::from_shape(&[fixed_indices.len()]));
+        let fixed_indices =
+            fixed_indices.reshape(&TensorView::from_contiguous_shape(&[fixed_indices.len()]));
 
         // Each index should get its own `mask` of self.view()
         let fixed_indices = (0..self.ndim())
@@ -323,7 +324,7 @@ impl Tensor {
         // m x k @ k x n
         let input = match self.ndim() {
             // m -> [1, m]
-            0 => self.broadcast_to(&TensorView::from_shape(&[1, 1])),
+            0 => self.broadcast_to(&TensorView::from_contiguous_shape(&[1, 1])),
             // [m] -> [m, 1]
             1 => self.unsqueeze(1),
             // [..., m, k]
@@ -332,7 +333,7 @@ impl Tensor {
 
         let other = match other.ndim() {
             // n -> [1, n]
-            0 => other.broadcast_to(&TensorView::from_shape(&[1, 1])),
+            0 => other.broadcast_to(&TensorView::from_contiguous_shape(&[1, 1])),
             // [n] -> [1, n]
             1 => other.unsqueeze(0),
             // [..., k, n]
@@ -372,7 +373,7 @@ impl Tensor {
         kernel_strides: &[ViewType],
         padding: ConvPadding<'a>,
     ) -> Tensor {
-        let kernel = Tensor::scalar(1).reshape(&TensorView::from_shape(kernel_size));
+        let kernel = Tensor::scalar(1).reshape(&TensorView::from_contiguous_shape(kernel_size));
         self.Convolve(&kernel, kernel_strides, padding, Tensor::Max)
     }
 
@@ -424,7 +425,8 @@ impl Tensor {
             .Add(&indices.Multiply(&gather_shape_nelements_tensor))
             // index within the gather shape [axis+1..]
             .Add(&indices_gather_index);
-        let fixed_indices = fixed_indices.reshape(&TensorView::from_shape(&[fixed_indices.len()]));
+        let fixed_indices =
+            fixed_indices.reshape(&TensorView::from_contiguous_shape(&[fixed_indices.len()]));
 
         // Each index should get its own `mask` of self.view()
         let fixed_indices = (0..self.ndim())
@@ -433,7 +435,7 @@ impl Tensor {
         let self_indices = Tensor::arange(self.shape());
         let mask = fixed_indices.Equal(&self_indices);
 
-        let fixed_updates = updates.reshape(&TensorView::from_shape(&[updates.len()]));
+        let fixed_updates = updates.reshape(&TensorView::from_contiguous_shape(&[updates.len()]));
         let fixed_updates = (0..self.ndim())
             .into_iter()
             .fold(fixed_updates, |acc, _| acc.unsqueeze(acc.ndim()));

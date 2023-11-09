@@ -32,7 +32,7 @@ impl TensorView {
         }
     }
 
-    pub fn from_shape(shape: &[ViewType]) -> TensorView {
+    pub fn from_contiguous_shape(shape: &[ViewType]) -> TensorView {
         let stride = TensorView::compute_contiguous_stride(shape);
         let offset = shape.iter().map(|_| 0).collect::<Vec<_>>();
         TensorView::new(
@@ -98,7 +98,7 @@ impl TensorView {
             .map(|(rank, (padding_pre, padding_post))| padding_pre + rank + padding_post)
             .collect_vec();
 
-        TensorView::from_shape(&expanded_shape)
+        TensorView::from_contiguous_shape(&expanded_shape)
     }
 
     pub fn offset(&self, offsets: &[(ViewType, ViewType)]) -> TensorView {
