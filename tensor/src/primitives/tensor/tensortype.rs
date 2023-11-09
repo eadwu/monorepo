@@ -27,6 +27,18 @@ impl TensorType {
     }
 }
 
+impl From<i32> for TensorType {
+    fn from(_: i32) -> Self {
+        TensorType::I32
+    }
+}
+
+impl From<u32> for TensorType {
+    fn from(_: u32) -> Self {
+        TensorType::U32
+    }
+}
+
 impl From<f32> for TensorType {
     fn from(_: f32) -> Self {
         TensorType::F32

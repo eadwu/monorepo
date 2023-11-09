@@ -29,9 +29,10 @@ impl TensorInput {
 
 impl Tensor {
     fn binary_op(&self, op: BinaryType, rhs: &Tensor) -> Tensor {
-        let lhs = self.broadcast(&rhs);
-        let rhs = rhs.broadcast(&self);
-        let datatype = lhs.datatype().agreeable_type(rhs.datatype());
+        let datatype = self.datatype().agreeable_type(rhs.datatype());
+        let lhs = self.broadcast(&rhs).Cast(datatype);
+        let rhs = rhs.broadcast(&self).Cast(datatype);
+
         Tensor::new(
             lhs.view().clone(),
             TensorInput::binary(op, lhs, rhs),

@@ -7,7 +7,7 @@ pub enum UnaryType {
     IDENTITY,
     EXP2,
     LOG2,
-    // CAST,
+    CAST,
     SIN,
     SQRT,
     RECIP,
@@ -29,47 +29,59 @@ impl TensorInput {
 }
 
 impl Tensor {
-    fn unary_op(&self, op: UnaryType) -> Tensor {
+    fn unary_op(&self, op: UnaryType, datatype: TensorType) -> Tensor {
         Tensor::new(
             self.view().clone(),
             TensorInput::unary(op, self.clone()),
-            TensorType::F32,
+            datatype,
         )
     }
 
+    fn upgradable_unary_op(&self, op: UnaryType, datatype: TensorType) -> Tensor {
+        self.Cast(datatype).unary_op(op, datatype)
+    }
+
     pub fn Identity(&self) -> Tensor {
-        self.unary_op(UnaryType::IDENTITY)
+        self.unary_op(UnaryType::IDENTITY, self.datatype())
     }
 
     pub fn Exp2(&self) -> Tensor {
-        self.unary_op(UnaryType::EXP2)
+        self.upgradable_unary_op(UnaryType::EXP2, TensorType::F32)
     }
 
     pub fn Log2(&self) -> Tensor {
-        self.unary_op(UnaryType::LOG2)
+        self.upgradable_unary_op(UnaryType::LOG2, TensorType::F32)
+    }
+
+    pub fn Cast(&self, datatype: TensorType) -> Tensor {
+        if self.datatype() == datatype {
+            self.clone()
+        } else {
+            self.unary_op(UnaryType::CAST, datatype)
+        }
     }
 
     pub fn Sin(&self) -> Tensor {
-        self.unary_op(UnaryType::SIN)
+        self.upgradable_unary_op(UnaryType::SIN, TensorType::F32)
     }
 
     pub fn Sqrt(&self) -> Tensor {
-        self.unary_op(UnaryType::SIN)
+        self.upgradable_unary_op(UnaryType::SQRT, TensorType::F32)
     }
 
     pub fn Recip(&self) -> Tensor {
-        self.unary_op(UnaryType::RECIP)
+        self.upgradable_unary_op(UnaryType::RECIP, TensorType::F32)
     }
 
     pub fn Abs(&self) -> Tensor {
-        self.unary_op(UnaryType::ABS)
+        self.unary_op(UnaryType::ABS, self.datatype())
     }
 
     pub fn Floor(&self) -> Tensor {
-        self.unary_op(UnaryType::FLOOR)
+        self.upgradable_unary_op(UnaryType::FLOOR, TensorType::F32)
     }
 
     pub fn Ceil(&self) -> Tensor {
-        self.unary_op(UnaryType::CEIL)
+        self.upgradable_unary_op(UnaryType::CEIL, TensorType::F32)
     }
 }
