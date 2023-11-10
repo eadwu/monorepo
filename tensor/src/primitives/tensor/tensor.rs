@@ -6,7 +6,7 @@ use std::sync::Arc;
 use rand::Rng;
 use uuid::Uuid;
 
-use crate::primitives::tensorview::{TensorView, ViewType};
+use crate::primitives::tensorview::{TensorView, TensorViewTracker, ViewType};
 use crate::FILE_MANAGER;
 
 use super::*;
@@ -19,13 +19,17 @@ pub struct Tensor(Arc<TensorInternals>);
 #[derive(Clone, Debug)]
 pub struct TensorInternals {
     id: u32,
-    view: TensorView,
+    view: TensorViewTracker,
     data: TensorInput,
     datatype: TensorType,
 }
 
 impl TensorInternals {
-    pub fn new(view: TensorView, data: TensorInput, datatype: TensorType) -> TensorInternals {
+    pub fn new(
+        view: TensorViewTracker,
+        data: TensorInput,
+        datatype: TensorType,
+    ) -> TensorInternals {
         TensorInternals {
             id: ID_GENERATOR.fetch_add(1, Ordering::Relaxed),
             view: view,
@@ -36,8 +40,12 @@ impl TensorInternals {
 }
 
 impl Tensor {
-    pub fn new(view: TensorView, data: TensorInput, datatype: TensorType) -> Tensor {
-        Tensor(Arc::new(TensorInternals::new(view, data, datatype)))
+    pub fn new<T: Into<TensorViewTracker>>(
+        view: T,
+        data: TensorInput,
+        datatype: TensorType,
+    ) -> Tensor {
+        Tensor(Arc::new(TensorInternals::new(view.into(), data, datatype)))
     }
 
     pub fn scalar<T: TensorDataElement>(data: T) -> Tensor {
