@@ -60,9 +60,9 @@ impl FileManager {
     }
 
     pub fn close(&mut self, path: &Path) {
+        self.cache.remove(path);
         if let Some(temp_path) = self.history.remove(path) {
             let _ = temp_path.close();
         };
-        self.cache.remove(path);
     }
 }
