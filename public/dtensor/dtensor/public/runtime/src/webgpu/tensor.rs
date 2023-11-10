@@ -77,17 +77,6 @@ pub trait ToWebGPUBindGroup {
     ) -> wgpu::BindGroup;
 }
 
-impl ToWebGPUBindGroup for Tensor {
-    fn as_webgpu_bind_group(
-        &self,
-        bind_group_layout: &wgpu::BindGroupLayout,
-        wgpu_device: &WebGPUDevice,
-    ) -> wgpu::BindGroup {
-        self.as_webgpu_tensor(wgpu_device)
-            .as_webgpu_bind_group(bind_group_layout, wgpu_device)
-    }
-}
-
 impl ToWebGPUBindGroup for TensorLayout {
     fn as_webgpu_bind_group(
         &self,
