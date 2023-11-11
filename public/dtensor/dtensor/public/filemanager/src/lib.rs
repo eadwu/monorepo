@@ -28,12 +28,7 @@ impl FileManager {
 
     pub fn open(&mut self, path: &Path, offset: usize) -> io::Result<Mmap> {
         if !self.cache.contains_key(path) {
-            let file_path = if self.history.contains_key(path) {
-                self.history.get(path).unwrap()
-            } else {
-                path
-            };
-
+            let file_path = self.history.get(path).unwrap();
             let file = File::options().read(true).write(true).open(&file_path)?;
             self.cache.insert(path.to_path_buf(), file);
         }
@@ -42,21 +37,22 @@ impl FileManager {
         Ok(unsafe { MmapOptions::new().offset(offset as u64).map(file).unwrap() })
     }
 
-    pub fn create(&mut self, path: &Path, size: usize, offset: usize) -> io::Result<Mmap> {
-        if !self.cache.contains_key(path) {
-            let file = NamedTempFile::new()?;
-            file.as_file().set_len(size as u64)?;
-            self.history
-                .insert(path.to_path_buf(), file.into_temp_path());
-        }
-        self.open(path, offset)
+    pub fn create(&mut self, size: usize) -> io::Result<PathBuf> {
+        let file = NamedTempFile::new()?;
+        file.as_file().set_len(size as u64)?;
+
+        let file_path = file.into_temp_path();
+        let path = file_path.to_path_buf();
+        self.history.insert(path.clone(), file_path);
+        Ok(path)
     }
 
-    pub fn create_with_bytes(&mut self, path: &Path, bytes: &[u8]) -> io::Result<Mmap> {
-        let mmap = self.create(path, bytes.len(), 0)?;
+    pub fn create_with_bytes(&mut self, bytes: &[u8]) -> io::Result<PathBuf> {
+        let file_path = self.create(bytes.len())?;
+        let mmap = self.open(&file_path, 0)?;
         let mut mmap = mmap.make_mut()?;
         mmap[..].copy_from_slice(bytes);
-        mmap.make_read_only()
+        Ok(file_path)
     }
 
     pub fn close(&mut self, path: &Path) {

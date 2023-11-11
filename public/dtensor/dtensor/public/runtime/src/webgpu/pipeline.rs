@@ -27,8 +27,11 @@ impl WebGPUEvaluation for Tensor {
         for tensor in &runtime.graph {
             if let TensorInput::NoOp(input) = tensor.data() {
                 let input: &Tensor = intermediate_results.get(&input.id()).unwrap();
-                let clone =
-                    Tensor::from_raw_bytes(&input.load(), tensor.view().clone(), tensor.datatype());
+                let clone = Tensor::new(
+                    tensor.view().clone(),
+                    input.data().clone(),
+                    tensor.datatype(),
+                );
                 intermediate_results.insert(tensor.id(), clone);
             } else if let TensorInput::ExplicitInput(_) = tensor.data() {
                 intermediate_results.insert(tensor.id(), tensor.clone());

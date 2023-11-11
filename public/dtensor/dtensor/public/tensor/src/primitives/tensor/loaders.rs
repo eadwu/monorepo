@@ -1,5 +1,5 @@
-mod raw;
-pub use raw::*;
+mod internal;
+pub use internal::*;
 
 mod safetensor;
 pub use safetensor::*;
