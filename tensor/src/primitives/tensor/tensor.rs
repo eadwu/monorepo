@@ -1,10 +1,9 @@
+use std::borrow::BorrowMut;
 use std::mem::replace;
-use std::path::Path;
 use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::Arc;
 
 use rand::Rng;
-use uuid::Uuid;
 
 use crate::primitives::tensorview::{TensorView, TensorViewTracker, ViewType};
 use crate::FILE_MANAGER;
@@ -93,19 +92,12 @@ impl Tensor {
     }
 
     pub fn from_raw_bytes(data: &[u8], view: TensorView, datatype: TensorType) -> Tensor {
-        let identifier = Uuid::new_v4().to_string();
-        let path = Path::new(&identifier);
-        FILE_MANAGER
+        let path = FILE_MANAGER
             .lock()
             .unwrap()
-            .create_with_bytes(path, bytemuck::cast_slice(data))
+            .create_with_bytes(data)
             .unwrap();
-
-        Tensor::new(
-            view,
-            TensorInput::from_raw(path, std::mem::size_of_val(data), 0),
-            datatype,
-        )
+        Tensor::new(view, TensorInput::from_internal(&path), datatype)
     }
 }
 
@@ -139,7 +131,7 @@ impl Tensor {
         if let TensorInput::ExplicitInput(input) = self.data() {
             return match input {
                 InputSpec::Scalar(stream) => stream.clone(),
-                InputSpec::Raw(spec) => <&Tensor as RawFileLoader>::load(self, spec),
+                InputSpec::Internal(spec) => <&Tensor as InternalLoader>::load(self, spec),
                 InputSpec::Safetensor(spec) => <&Tensor as SafetensorLoader>::load(self, spec),
             };
         }
@@ -153,8 +145,10 @@ impl Drop for Tensor {
         fn consume_to(value: &mut Tensor, dest: &mut Vec<Tensor>) {
             if let Some(tensor) = Arc::get_mut(&mut value.0) {
                 if let TensorInput::ExplicitInput(ref mut input) = tensor.data {
-                    if let InputSpec::Raw(ref mut spec) = input {
-                        FILE_MANAGER.lock().unwrap().close(&spec.file);
+                    if let InputSpec::Internal(ref mut spec) = input {
+                        if let Some(path) = Arc::get_mut(spec.path.borrow_mut()) {
+                            FILE_MANAGER.lock().unwrap().close(path);
+                        }
                     }
                 }
 

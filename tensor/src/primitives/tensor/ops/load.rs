@@ -1,4 +1,4 @@
-use std::path::{Path, PathBuf};
+use std::{path::{Path, PathBuf}, sync::Arc};
 
 use crate::primitives::tensor::TensorDataElement;
 
@@ -7,15 +7,13 @@ use super::TensorInput;
 #[derive(Clone, Debug)]
 pub enum InputSpec {
     Scalar(Vec<u8>),
-    Raw(RawSpec),
+    Internal(InternalSpec),
     Safetensor(SafetensorSpec),
 }
 
 #[derive(Clone, Debug)]
-pub struct RawSpec {
-    pub file: PathBuf,
-    pub size: usize,
-    pub offset: usize,
+pub struct InternalSpec {
+    pub path: Arc<PathBuf>,
 }
 
 #[derive(Clone, Debug)]
@@ -31,11 +29,9 @@ impl TensorInput {
         TensorInput::ExplicitInput(InputSpec::Scalar(bytes.to_vec()))
     }
 
-    pub fn from_raw(file: &Path, size: usize, offset: usize) -> TensorInput {
-        TensorInput::ExplicitInput(InputSpec::Raw(RawSpec {
-            file: file.to_path_buf(),
-            size: size,
-            offset: offset,
+    pub fn from_internal(file: &Path) -> TensorInput {
+        TensorInput::ExplicitInput(InputSpec::Internal(InternalSpec {
+            path: Arc::new(file.to_path_buf()),
         }))
     }
 
