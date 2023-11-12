@@ -143,10 +143,20 @@ pub async fn webgpu_tensor_pipeline<'a>(
         entry_point: "main",
     });
 
-    let tensor_layouts = inputs
+    let tensors = inputs
         .iter()
         .chain(std::iter::once(output))
-        .map(|tensor| tensor.as_webgpu_tensor(wgpu_device))
+        .collect::<Vec<_>>();
+
+    let min_dim_alignment = tensors
+        .iter()
+        .map(|tensor| tensor.ndim())
+        .max()
+        .unwrap_or(0);
+
+    let tensor_layouts = tensors
+        .iter()
+        .map(|tensor| tensor.as_webgpu_tensor(min_dim_alignment, wgpu_device))
         .collect::<Vec<_>>();
 
     let bind_groups = tensor_layouts

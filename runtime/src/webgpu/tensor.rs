@@ -1,5 +1,5 @@
 use tensor::primitives::tensor::{Tensor, TensorType};
-use tensor::primitives::tensorview::TensorView;
+use tensor::primitives::tensorview::{TensorView, ViewType};
 use wgpu::util::DeviceExt;
 
 use super::{TensorLayout, TensorMetadata, WebGPUDevice};
@@ -57,13 +57,21 @@ impl ToWebGPUBuffer for TensorView {
 }
 
 pub trait ToWebGPUTensorLayout {
-    fn as_webgpu_tensor(&self, wgpu_device: &WebGPUDevice) -> TensorLayout;
+    fn as_webgpu_tensor(
+        &self,
+        min_dim_alignment: ViewType,
+        wgpu_device: &WebGPUDevice,
+    ) -> TensorLayout;
 }
 
 impl ToWebGPUTensorLayout for Tensor {
-    fn as_webgpu_tensor(&self, wgpu_device: &WebGPUDevice) -> TensorLayout {
+    fn as_webgpu_tensor(
+        &self,
+        min_dim_alignment: ViewType,
+        wgpu_device: &WebGPUDevice,
+    ) -> TensorLayout {
         TensorLayout {
-            metadata: self.view().as_webgpu_buffer(wgpu_device),
+            metadata: self.view().at_least_ndim(min_dim_alignment).as_webgpu_buffer(wgpu_device),
             data: self.as_webgpu_buffer(wgpu_device),
         }
     }
