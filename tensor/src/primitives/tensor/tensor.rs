@@ -117,6 +117,10 @@ impl Tensor {
         &self.0.view
     }
 
+    pub fn viewtracker(&self) -> &TensorViewTracker {
+        &self.0.view
+    }
+
     pub fn data(&self) -> &TensorInput {
         &self.0.data
     }

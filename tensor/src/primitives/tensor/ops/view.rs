@@ -17,32 +17,16 @@ impl TensorInput {
 
 impl Tensor {
     fn view_op(&self, view: &TensorView) -> Tensor {
-        if self.view() == view {
-            self.clone()
-        } else {
-            Tensor::new(
-                view.clone(),
-                TensorInput::no_op(self.clone()),
-                self.datatype(),
-            )
-        }
-    }
-
-    fn eager_view_op(&self, view: &TensorView) -> Tensor {
-        if self.view() == view {
-            self.clone()
-        } else {
-            Tensor::new(
-                view.clone(),
-                TensorInput::view(view.clone(), self.clone()),
-                self.datatype(),
-            )
-        }
+        Tensor::new(
+            self.viewtracker().track_view(view),
+            TensorInput::no_op(self.clone()),
+            self.datatype(),
+        )
     }
 
     pub fn contiguous(&self) -> Tensor {
         let view = TensorView::from_contiguous_shape(&self.shape());
-        self.eager_view_op(&view)
+        self.reshape(&view)
     }
 
     pub fn broadcast(&self, other: &Tensor) -> Tensor {
@@ -62,7 +46,7 @@ impl Tensor {
 
         let padded_view = self.view().pad(padding);
         let copy_view = padded_view.offset(padding);
-        self.eager_view_op(&copy_view).reshape_unsafe(&padded_view)
+        self.reshape(&copy_view).reshape(&padded_view)
     }
 
     pub fn squeeze(&self, axis: ViewType) -> Tensor {
@@ -78,17 +62,6 @@ impl Tensor {
     }
 
     pub fn reshape(&self, view: &TensorView) -> Tensor {
-        assert!(
-            view.len() % self.len() == 0,
-            "Expected shapes to be multiples, got {} -> {} elements",
-            self.len(),
-            view.len()
-        );
-
-        self.view_op(view)
-    }
-
-    pub fn reshape_unsafe(&self, view: &TensorView) -> Tensor {
         self.view_op(view)
     }
 }

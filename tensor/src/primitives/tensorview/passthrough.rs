@@ -6,6 +6,10 @@ impl Tensor {
         self.view().len()
     }
 
+    pub fn data_len(&self) -> ViewType {
+        self.viewtracker().root_view().len()
+    }
+
     pub fn ndim(&self) -> ViewType {
         self.view().ndim()
     }

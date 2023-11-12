@@ -187,7 +187,7 @@ impl Tensor {
             .chain(features_stride.iter().map(|&x| x))
             .collect::<Vec<_>>();
         let input_offset_trick = input_shape_trick.iter().map(|_| 0).collect::<Vec<_>>();
-        let input = input.reshape_unsafe(&TensorView::new(
+        let input = input.reshape(&TensorView::new(
             false,
             input_shape_trick.into_boxed_slice(),
             input_stride_trick.into_boxed_slice(),

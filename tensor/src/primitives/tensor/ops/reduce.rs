@@ -40,8 +40,9 @@ impl Tensor {
             )
             .collect::<Vec<_>>();
 
+        let output_view = TensorView::from_contiguous_shape(&output_shape[..]);
         let result = Tensor::new(
-            TensorView::from_contiguous_shape(&output_shape),
+            output_view,
             TensorInput::reduce(op, self.clone(), axis),
             self.datatype(),
         );
