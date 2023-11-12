@@ -79,9 +79,10 @@ const {variable_name}: vec3u = vec3u({stride_x}u, {stride_y}u, {stride_z}u);
 impl From<&TensorView> for WebGPUWorkGroup {
     fn from(value: &TensorView) -> Self {
         let length = value.len();
-        let x = length.cbrt();
-        let y = ((length / x) + 1).sqrt();
-        let z = length / (x * y) + 1;
+        let z = length.cbrt();
+        let y = ((length / z) + 1).sqrt();
+        let x = length / (y * z) + 1;
+        assert!(x as u64 * y as u64 * z as u64 >= length as u64);
         WebGPUWorkGroup { x, y, z }
     }
 }
