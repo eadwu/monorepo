@@ -1,4 +1,5 @@
 use crate::primitives::tensor::Tensor;
+use crate::primitives::tensorview::TensorView;
 
 use super::{OperationSpec, TensorInput};
 
@@ -32,12 +33,8 @@ impl Tensor {
         let datatype = self.datatype().agreeable_type(rhs.datatype());
         let lhs = self.broadcast(&rhs).Cast(datatype);
         let rhs = rhs.broadcast(&self).Cast(datatype);
-
-        Tensor::new(
-            lhs.view().clone(),
-            TensorInput::binary(op, lhs, rhs),
-            datatype,
-        )
+        let output_view = TensorView::from_contiguous_shape(&lhs.shape());
+        Tensor::new(output_view, TensorInput::binary(op, lhs, rhs), datatype)
     }
 
     pub fn Add(&self, rhs: &Tensor) -> Tensor {

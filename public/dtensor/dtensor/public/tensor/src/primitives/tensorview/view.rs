@@ -8,10 +8,9 @@ pub type ViewType = u32;
 pub struct TensorView {
     pub contiguous: bool,
     pub shape: Box<[ViewType]>,
-    pub _container_shape: Box<[ViewType]>,
     pub stride: Box<[ViewType]>,
-    pub contiguous_stride: Box<[ViewType]>,
     pub offset: Box<[ViewType]>,
+    pub contiguous_stride: Box<[ViewType]>,
 }
 
 impl TensorView {
@@ -21,14 +20,13 @@ impl TensorView {
         stride: Box<[ViewType]>,
         offset: Box<[ViewType]>,
     ) -> TensorView {
-        let contiguous_shape = TensorView::compute_contiguous_stride(&shape);
+        let contiguous_stride = TensorView::compute_contiguous_stride(&shape);
         TensorView {
             contiguous: contiguous,
-            shape: shape.clone(),
-            _container_shape: shape,
+            shape: shape,
             stride: stride,
-            contiguous_stride: contiguous_shape.into_boxed_slice(),
             offset: offset,
+            contiguous_stride: contiguous_stride.into_boxed_slice(),
         }
     }
 
@@ -43,22 +41,7 @@ impl TensorView {
         )
     }
 
-    pub fn from_view_subset(
-        view: &TensorView,
-        shape: Box<[ViewType]>,
-        offset: Box<[ViewType]>,
-    ) -> TensorView {
-        TensorView {
-            contiguous: false,
-            shape: shape,
-            _container_shape: view._container_shape.clone(),
-            stride: view.stride.clone(),
-            contiguous_stride: view.contiguous_stride.clone(),
-            offset: offset,
-        }
-    }
-
-    pub fn compute_contiguous_stride(contiguous_shape: &[ViewType]) -> Vec<ViewType> {
+    fn compute_contiguous_stride(contiguous_shape: &[ViewType]) -> Vec<ViewType> {
         // When it is stored contiguously, the stride is the product of the size
         // of the dimension before it
         contiguous_shape
@@ -78,7 +61,7 @@ impl TensorView {
 
 impl TensorView {
     pub fn len(&self) -> ViewType {
-        self._container_shape.iter().product()
+        self.shape.iter().product()
     }
 
     pub fn ndim(&self) -> ViewType {
@@ -120,7 +103,12 @@ impl TensorView {
             .map(|(previous_offset, (pre, _))| previous_offset + pre)
             .collect_vec();
 
-        TensorView::from_view_subset(self, shape.into_boxed_slice(), offset.into_boxed_slice())
+        TensorView::new(
+            true,
+            shape.into_boxed_slice(),
+            self.stride.clone(),
+            offset.into_boxed_slice(),
+        )
     }
 
     fn _split_and_join<T>(

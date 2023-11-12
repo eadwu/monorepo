@@ -1,4 +1,5 @@
 use crate::primitives::tensor::{Tensor, TensorType};
+use crate::primitives::tensorview::TensorView;
 
 use super::{OperationSpec, TensorInput};
 
@@ -31,7 +32,7 @@ impl TensorInput {
 impl Tensor {
     fn unary_op(&self, op: UnaryType, datatype: TensorType) -> Tensor {
         Tensor::new(
-            self.view().clone(),
+            TensorView::from_contiguous_shape(self.shape()),
             TensorInput::unary(op, self.clone()),
             datatype,
         )

@@ -29,4 +29,20 @@ impl TensorViewTracker {
             history: history.to_vec(),
         }
     }
+
+    pub fn root_view(&self) -> &TensorView {
+        self.history.first().unwrap_or(&self.current)
+    }
+
+    pub fn track_view(&self, view: &TensorView) -> TensorViewTracker {
+        TensorViewTracker::new(view, &self.seralized_history_lilo()[..])
+    }
+
+    pub fn seralized_history_lilo(&self) -> Vec<TensorView> {
+        self.history
+            .iter()
+            .chain(std::iter::once(&self.current))
+            .map(|view| view.clone())
+            .collect::<Vec<_>>()
+    }
 }
