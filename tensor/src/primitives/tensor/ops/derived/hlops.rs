@@ -384,6 +384,24 @@ impl Tensor {
         centered_input.Divide(&standard_deviation)
     }
 
+    pub fn Offset(&self, offset: &[(ViewType, ViewType)]) -> Tensor {
+        let dimension = self.ndim() as usize;
+        assert!(
+            dimension == offset.len(),
+            "Offsets must be specified for every dimension"
+        );
+
+        offset
+            .iter()
+            .enumerate()
+            .fold(self.clone(), |acc, (axis, &(offset_pre, offset_post))| {
+                let shape = acc.shape()[axis];
+                let indices = (offset_pre..shape - offset_post).collect::<Vec<_>>();
+                let indices_tensor = Tensor::from_contiguous(&indices[..], &[indices.len() as u32]);
+                acc.Gather(axis as u32, &indices_tensor)
+            })
+    }
+
     pub fn Pad(&self, padding: &[(ViewType, ViewType)]) -> Tensor {
         let dimension = self.ndim() as usize;
         assert!(
