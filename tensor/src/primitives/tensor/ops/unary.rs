@@ -42,6 +42,22 @@ impl Tensor {
         self.Cast(datatype).unary_op(op, datatype)
     }
 
+    fn noop_unary_op(
+        &self,
+        op: UnaryType,
+        datatype: TensorType,
+        noop_datatypes: &[TensorType],
+    ) -> Tensor {
+        if noop_datatypes
+            .iter()
+            .any(|&datatype| datatype == self.datatype())
+        {
+            self.clone()
+        } else {
+            self.upgradable_unary_op(op, datatype)
+        }
+    }
+
     pub fn Identity(&self) -> Tensor {
         self.unary_op(UnaryType::IDENTITY, self.datatype())
     }
@@ -79,10 +95,18 @@ impl Tensor {
     }
 
     pub fn Floor(&self) -> Tensor {
-        self.upgradable_unary_op(UnaryType::FLOOR, TensorType::F32)
+        self.noop_unary_op(
+            UnaryType::FLOOR,
+            TensorType::F32,
+            &[TensorType::I32, TensorType::U32],
+        )
     }
 
     pub fn Ceil(&self) -> Tensor {
-        self.upgradable_unary_op(UnaryType::CEIL, TensorType::F32)
+        self.noop_unary_op(
+            UnaryType::CEIL,
+            TensorType::F32,
+            &[TensorType::I32, TensorType::U32],
+        )
     }
 }
