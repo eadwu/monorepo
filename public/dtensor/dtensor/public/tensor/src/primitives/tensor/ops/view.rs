@@ -38,18 +38,6 @@ impl Tensor {
         self.reshape(&self.view().broadcast(view))
     }
 
-    pub fn pad(&self, padding: &[(ViewType, ViewType)]) -> Tensor {
-        let dimension = self.ndim() as usize;
-        assert!(
-            dimension == padding.len(),
-            "Padding must be specified for every dimension"
-        );
-
-        let padded_view = self.view().pad(padding);
-        let copy_view = padded_view.offset(padding);
-        self.reshape(&copy_view).reshape(&padded_view)
-    }
-
     pub fn squeeze(&self, axis: ViewType) -> Tensor {
         self.reshape(&self.view().squeeze(axis))
     }

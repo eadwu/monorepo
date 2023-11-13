@@ -142,7 +142,7 @@ impl Tensor {
         };
 
         // Perform convolution after padding is done
-        let input = input.pad(&axis_padding);
+        let input = input.Pad(&axis_padding);
 
         let [input_batch_size, c_in, features @ ..] = &input.shape() else {
             panic!("Conv expects an input signature of N x C x ...")
@@ -384,6 +384,49 @@ impl Tensor {
         let centered_input = self.Sub(&mean);
         let standard_deviation = variance.Add(epsilon).Sqrt();
         centered_input.Divide(&standard_deviation)
+    }
+
+    pub fn Pad(&self, padding: &[(ViewType, ViewType)]) -> Tensor {
+        let dimension = self.ndim() as usize;
+        assert!(
+            dimension == padding.len(),
+            "Padding must be specified for every dimension"
+        );
+
+        padding.iter().enumerate().fold(
+            self.clone(),
+            |updates, (axis, &(padding_pre, padding_post))| {
+                let axis = axis as u32;
+                let piecewise_padding = (0..updates.ndim())
+                    .map(|i| {
+                        if i == axis {
+                            (padding_pre, padding_post)
+                        } else {
+                            (0, 0)
+                        }
+                    })
+                    .collect::<Vec<_>>();
+
+                let offset_tensor = Tensor::scalar(padding_pre);
+                let axis_shape_tensor = Tensor::scalar(updates.shape()[axis as usize]);
+
+                let batch_elements = updates.shape()[axis as usize + 1..]
+                    .iter()
+                    .fold(1, |acc, shape| acc * shape);
+                let batch_elements_tensor = Tensor::scalar(batch_elements);
+
+                let padded_view = updates.view().pad(&piecewise_padding[..]);
+                let data = Tensor::zeros_like(&padded_view.shape[..]);
+
+                let indices = Tensor::arange(updates.shape())
+                    .Divide(&batch_elements_tensor)
+                    .Floor()
+                    .Mod(&axis_shape_tensor)
+                    .Add(&offset_tensor);
+
+                data.Scatter(axis, &indices, &updates)
+            },
+        )
     }
 
     pub fn Scatter(&self, axis: ViewType, indices: &Tensor, updates: &Tensor) -> Tensor {
