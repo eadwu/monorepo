@@ -94,7 +94,6 @@ pub struct TensorMetadata {
     pub shape_offset: ViewType,
     pub stride_offset: ViewType,
     pub contiguous_stride_offset: ViewType,
-    pub offset_offset: ViewType,
     pub metadata: Vec<ViewType>,
 }
 
@@ -106,18 +105,15 @@ impl From<&TensorView> for TensorMetadata {
         let shape_offset = 0;
         let stride_offset = shape_offset + dimension;
         let contiguous_stride_offset = stride_offset + dimension;
-        let offset_offset = contiguous_stride_offset + dimension;
 
         let metadata = once(&length)
             .chain(once(&dimension))
             .chain(once(&shape_offset))
             .chain(once(&stride_offset))
             .chain(once(&contiguous_stride_offset))
-            .chain(once(&offset_offset))
             .chain(view.shape.iter())
             .chain(view.stride.iter())
             .chain(view.contiguous_stride.iter())
-            .chain(view.offset.iter())
             .map(|&x| x)
             // If it is a scalar then the metadata is 0 bytes
             // WebGPU does not like 0-length arrays, so append an extra 0
@@ -130,7 +126,6 @@ impl From<&TensorView> for TensorMetadata {
             shape_offset,
             stride_offset,
             contiguous_stride_offset,
-            offset_offset,
             metadata,
         )
     }
@@ -143,7 +138,6 @@ impl TensorMetadata {
         shape_offset: ViewType,
         stride_offset: ViewType,
         contiguous_stride_offset: ViewType,
-        offset_offset: ViewType,
         metadata: Vec<ViewType>,
     ) -> TensorMetadata {
         TensorMetadata {
@@ -152,7 +146,6 @@ impl TensorMetadata {
             shape_offset,
             stride_offset,
             contiguous_stride_offset,
-            offset_offset,
             metadata,
         }
     }
@@ -166,7 +159,6 @@ struct TensorMetadata {{
     shape_offset: {ViewType},
     stride_offset: {ViewType},
     contiguous_stride_offset: {ViewType},
-    offset_offset: {ViewType},
     metadata: {Vec}<{ViewType}>,
 }}
 ",

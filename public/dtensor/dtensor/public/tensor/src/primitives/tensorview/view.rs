@@ -9,35 +9,26 @@ pub struct TensorView {
     pub contiguous: bool,
     pub shape: Box<[ViewType]>,
     pub stride: Box<[ViewType]>,
-    pub offset: Box<[ViewType]>,
     pub contiguous_stride: Box<[ViewType]>,
 }
 
 impl TensorView {
-    pub fn new(
-        contiguous: bool,
-        shape: Box<[ViewType]>,
-        stride: Box<[ViewType]>,
-        offset: Box<[ViewType]>,
-    ) -> TensorView {
+    pub fn new(contiguous: bool, shape: Box<[ViewType]>, stride: Box<[ViewType]>) -> TensorView {
         let contiguous_stride = TensorView::compute_contiguous_stride(&shape);
         TensorView {
             contiguous: contiguous,
             shape: shape,
             stride: stride,
-            offset: offset,
             contiguous_stride: contiguous_stride.into_boxed_slice(),
         }
     }
 
     pub fn from_contiguous_shape(shape: &[ViewType]) -> TensorView {
         let stride = TensorView::compute_contiguous_stride(shape);
-        let offset = shape.iter().map(|_| 0).collect::<Vec<_>>();
         TensorView::new(
             true,
             shape.to_vec().into_boxed_slice(),
             stride.into_boxed_slice(),
-            offset.into_boxed_slice(),
         )
     }
 
@@ -82,33 +73,6 @@ impl TensorView {
             .collect_vec();
 
         TensorView::from_contiguous_shape(&expanded_shape)
-    }
-
-    pub fn offset(&self, offsets: &[(ViewType, ViewType)]) -> TensorView {
-        assert!(
-            (self.ndim() as usize) == offsets.len(),
-            "Offsets must be specified for all dimensions"
-        );
-
-        let shape = self
-            .shape
-            .iter()
-            .zip(offsets.iter())
-            .map(|(shape, (pre, post))| shape - pre - post)
-            .collect_vec();
-        let offset = self
-            .offset
-            .iter()
-            .zip(offsets.iter())
-            .map(|(previous_offset, (pre, _))| previous_offset + pre)
-            .collect_vec();
-
-        TensorView::new(
-            true,
-            shape.into_boxed_slice(),
-            self.stride.clone(),
-            offset.into_boxed_slice(),
-        )
     }
 
     fn _split_and_join<T>(
@@ -164,13 +128,11 @@ impl TensorView {
         let axis = axis as usize;
         let shape = TensorView::_split_and_join(&self.shape, axis, 1, TensorView::_join_squeeze);
         let stride = TensorView::_split_and_join(&self.stride, axis, 0, TensorView::_join_squeeze);
-        let offset = TensorView::_split_and_join(&self.offset, axis, 0, TensorView::_join_squeeze);
 
         TensorView::new(
             self.contiguous,
             shape.into_boxed_slice(),
             stride.into_boxed_slice(),
-            offset.into_boxed_slice(),
         )
     }
 
@@ -198,16 +160,7 @@ impl TensorView {
             .iter()
             .map(|&axis| self.stride[axis])
             .collect::<Vec<_>>();
-        let offset = axis
-            .iter()
-            .map(|&axis| self.offset[axis])
-            .collect::<Vec<_>>();
-        TensorView::new(
-            false,
-            shape.into_boxed_slice(),
-            stride.into_boxed_slice(),
-            offset.into_boxed_slice(),
-        )
+        TensorView::new(false, shape.into_boxed_slice(), stride.into_boxed_slice())
     }
 
     pub fn unsqueeze(&self, axis: ViewType) -> TensorView {
@@ -222,14 +175,11 @@ impl TensorView {
         let shape = TensorView::_split_and_join(&self.shape, axis, 1, TensorView::_join_unsqueeze);
         let stride =
             TensorView::_split_and_join(&self.stride, axis, 0, TensorView::_join_unsqueeze);
-        let offset =
-            TensorView::_split_and_join(&self.offset, axis, 0, TensorView::_join_unsqueeze);
 
         TensorView::new(
             self.contiguous,
             shape.into_boxed_slice(),
             stride.into_boxed_slice(),
-            offset.into_boxed_slice(),
         )
     }
 
@@ -306,26 +256,13 @@ impl TensorView {
             .rev()
             .collect_vec();
 
-        let my_offset_rev = self.offset.iter().map(|&x| x).rev().collect_vec();
-        let adjusted_offset = my_offset_rev
-            .iter()
-            .zip_longest(my_expanded_shape_rev)
-            .map(|element| match element {
-                Left(&offset) => offset,
-                Right(_) => 0,
-                Both(&offset, _) => offset,
-            })
-            .rev()
-            .collect_vec();
-
         let shape = broadcasted_shape.into_boxed_slice();
         let stride = adjusted_stride.into_boxed_slice();
-        let offset = adjusted_offset.into_boxed_slice();
 
         if shape == self.shape {
             self.clone()
         } else {
-            TensorView::new(false, shape, stride, offset)
+            TensorView::new(false, shape, stride)
         }
     }
 
