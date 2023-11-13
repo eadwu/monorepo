@@ -22,6 +22,7 @@ impl Tensor {
             TensorInput::no_op(self.clone()),
             self.datatype(),
         )
+        .Identity()
     }
 
     pub fn contiguous(&self) -> Tensor {
