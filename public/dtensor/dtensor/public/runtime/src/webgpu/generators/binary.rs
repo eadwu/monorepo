@@ -1,6 +1,7 @@
 use tensor::primitives::tensor::BinaryType;
 
 use crate::webgpu::generators::*;
+use crate::webgpu::WebGPUWorkGroup;
 use crate::webgpu::WORKGROUP_SIZE;
 
 fn build_webgpu_operation<'a>(op: BinaryType) -> impl Fn(&'a str, &'a str, &'a str) -> String {
@@ -23,6 +24,7 @@ pub fn build_shader(
     lhs_type: TensorType,
     rhs_type: TensorType,
     output_type: TensorType,
+    workgroups: &WebGPUWorkGroup,
 ) -> String {
     let lhs_type = format!(
         "array<{datatype}>",
@@ -68,7 +70,7 @@ fn {entry_point}(
 }}
 ",
         header = shader_header(),
-        workgroup_stride = WORKGROUP_SIZE.serialize_strides("WORKGROUP_STRIDE"),
+        workgroup_stride = workgroups.serialize_strides("WORKGROUP_STRIDE"),
         lhs_interface = tensor_interface("0", "read", "lhs", &lhs_type, "lhs_metadata"),
         rhs_interface = tensor_interface("1", "read", "rhs", &rhs_type, "rhs_metadata"),
         output_interface =

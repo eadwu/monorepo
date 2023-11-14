@@ -35,6 +35,8 @@ impl WebGPUEvaluation for Tensor {
             } else if let TensorInput::ExplicitInput(_) = tensor.data() {
                 intermediate_results.insert(tensor.id(), tensor.clone());
             } else if let TensorInput::OperationResult(operation) = tensor.data() {
+                let workgroups = Into::<WebGPUWorkGroup>::into(tensor.view());
+
                 let (shader, inputs, output) = match operation {
                     OperationSpec::UnaryOp(op) => {
                         let input = intermediate_results.get(&op.input.id()).unwrap();
@@ -44,6 +46,7 @@ impl WebGPUEvaluation for Tensor {
                                 op.op,
                                 input.datatype(),
                                 tensor.datatype(),
+                                &workgroups,
                             ),
                             vec![op.input.id()],
                             tensor,
@@ -59,18 +62,24 @@ impl WebGPUEvaluation for Tensor {
                                 lhs.datatype(),
                                 rhs.datatype(),
                                 tensor.datatype(),
+                                &workgroups,
                             ),
                             vec![op.lhs.id(), op.rhs.id()],
                             tensor,
                         )
                     }
                     OperationSpec::ReduceOp(op) => (
-                        generators::reduce::build_shader(op.op, op.axis, tensor.datatype()),
+                        generators::reduce::build_shader(
+                            op.op,
+                            op.axis,
+                            tensor.datatype(),
+                            &workgroups,
+                        ),
                         vec![op.input.id()],
                         tensor,
                     ),
                     OperationSpec::ViewOp(op) => (
-                        generators::view::build_shader(tensor.datatype()),
+                        generators::view::build_shader(tensor.datatype(), &workgroups),
                         vec![op.input.id()],
                         tensor,
                     ),
@@ -95,7 +104,7 @@ impl WebGPUEvaluation for Tensor {
                         shader: &shader,
                         inputs: &dependencies,
                         output,
-                        dispatch_workgroups: &tensor.view().into(),
+                        dispatch_workgroups: &workgroups,
                     },
                     &wgpu_device,
                 )
@@ -186,7 +195,7 @@ pub async fn webgpu_tensor_pipeline<'a>(
         workload.dispatch_workgroups(
             dispatch_workgroups.x / WORKGROUP_SIZE.x + 1,
             dispatch_workgroups.y / WORKGROUP_SIZE.y + 1,
-            dispatch_workgroups.z / dispatch_workgroups.z + 1,
+            dispatch_workgroups.z / WORKGROUP_SIZE.z + 1,
         );
     }
 
