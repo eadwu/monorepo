@@ -270,6 +270,6 @@ impl TensorView {
         // If self.dim() > ndim, then it is capped to ndim
         // Prevent negative numbers, which don't exist for unsigned integers
         let missing_axis = ndim - ndim.min(self.ndim());
-        (0..missing_axis).fold(self.clone(), |acc, _| acc.unsqueeze(0))
+        (0..missing_axis).fold(self.clone(), |acc, _| acc.unsqueeze(acc.ndim()))
     }
 }
