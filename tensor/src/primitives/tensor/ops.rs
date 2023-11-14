@@ -32,7 +32,6 @@ pub enum OperationSpec {
     UnaryOp(UnarySpec),
     BinaryOp(BinarySpec),
     ReduceOp(ReduceSpec),
-    ViewOp(ViewSpec),
 }
 
 impl TensorInput {

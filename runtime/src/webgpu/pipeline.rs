@@ -78,11 +78,6 @@ impl WebGPUEvaluation for Tensor {
                         vec![op.input.id()],
                         tensor,
                     ),
-                    OperationSpec::ViewOp(op) => (
-                        generators::view::build_shader(tensor.datatype(), &workgroups),
-                        vec![op.input.id()],
-                        tensor,
-                    ),
                 };
 
                 let dependencies = inputs
