@@ -42,15 +42,13 @@ impl GraphView for Tensor {
             }
 
             if let TensorInput::OperationResult(operation) = current.data() {
-                if let OperationSpec::UnaryOp(op) = operation {
-                    queue.push(op.input.clone());
-                } else if let OperationSpec::BinaryOp(op) = operation {
-                    queue.push(op.lhs.clone());
-                    queue.push(op.rhs.clone());
-                } else if let OperationSpec::ReduceOp(op) = operation {
-                    queue.push(op.input.clone());
-                } else if let OperationSpec::ViewOp(op) = operation {
-                    queue.push(op.input.clone());
+                match operation {
+                    OperationSpec::UnaryOp(op) => queue.push(op.input.clone()),
+                    OperationSpec::BinaryOp(op) => {
+                        queue.push(op.lhs.clone());
+                        queue.push(op.rhs.clone());
+                    }
+                    OperationSpec::ReduceOp(op) => queue.push(op.input.clone()),
                 }
             }
         }
@@ -68,15 +66,13 @@ impl GraphView for Tensor {
             }
 
             if let TensorInput::OperationResult(operation) = current.data() {
-                if let OperationSpec::UnaryOp(op) = operation {
-                    parents.push(op.input.clone());
-                } else if let OperationSpec::BinaryOp(op) = operation {
-                    parents.push(op.lhs.clone());
-                    parents.push(op.rhs.clone());
-                } else if let OperationSpec::ReduceOp(op) = operation {
-                    parents.push(op.input.clone());
-                } else if let OperationSpec::ViewOp(op) = operation {
-                    parents.push(op.input.clone());
+                match operation {
+                    OperationSpec::UnaryOp(op) => parents.push(op.input.clone()),
+                    OperationSpec::BinaryOp(op) => {
+                        parents.push(op.lhs.clone());
+                        parents.push(op.rhs.clone());
+                    }
+                    OperationSpec::ReduceOp(op) => parents.push(op.input.clone())
                 }
             };
 
@@ -99,15 +95,17 @@ impl GraphView for Tensor {
             }
 
             if let TensorInput::OperationResult(operation) = tensor.data() {
-                if let OperationSpec::UnaryOp(op) = operation {
-                    dependencies.insert(op.input.id(), tensor.id());
-                } else if let OperationSpec::BinaryOp(op) = operation {
-                    dependencies.insert(op.lhs.id(), tensor.id());
-                    dependencies.insert(op.rhs.id(), tensor.id());
-                } else if let OperationSpec::ReduceOp(op) = operation {
-                    dependencies.insert(op.input.id(), tensor.id());
-                } else if let OperationSpec::ViewOp(op) = operation {
-                    dependencies.insert(op.input.id(), tensor.id());
+                match operation {
+                    OperationSpec::UnaryOp(op) => {
+                        dependencies.insert(op.input.id(), tensor.id());
+                    }
+                    OperationSpec::BinaryOp(op) => {
+                        dependencies.insert(op.lhs.id(), tensor.id());
+                        dependencies.insert(op.rhs.id(), tensor.id());
+                        }
+                    OperationSpec::ReduceOp(op) => {
+                        dependencies.insert(op.input.id(), tensor.id());
+                    }
                 }
             }
         }

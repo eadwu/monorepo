@@ -173,10 +173,6 @@ impl Drop for Tensor {
                     if let OperationSpec::ReduceOp(ref mut op) = result {
                         dest.push(op.input.clone());
                     }
-
-                    if let OperationSpec::ViewOp(ref mut op) = result {
-                        dest.push(op.input.clone());
-                    }
                 }
 
                 let _ = replace(&mut tensor.data, TensorInput::Invalidated);
