@@ -28,8 +28,7 @@ fn {entry_point}(
         return;
     }}
 
-    var mapped_index_temp = index;
-    var mapped_index = 0u;
+    var mapped_index = index;
     {map_index}
 
     output[index] = input[mapped_index];
@@ -43,13 +42,6 @@ fn {entry_point}(
         workgroup_size = WORKGROUP_SIZE.serialize_decorator(),
         entry_point = "main",
         index = compute_index("index", "global_id", "WORKGROUP_STRIDE"),
-        map_index = compute_strided_offset(
-            "mapped_index_temp",
-            "mapped_index",
-            "0u",
-            "output_metadata.dimension",
-            "output_metadata",
-            "input_metadata"
-        ),
+        map_index = map_index("mapped_index", "input_metadata"),
     )
 }

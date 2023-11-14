@@ -1,6 +1,4 @@
-use std::iter::once;
-
-use ::tensor::primitives::tensorview::{TensorView, ViewType};
+use ::tensor::primitives::tensorview::{TensorView, TensorViewTracker, ViewType};
 use num::integer::Roots;
 
 pub mod generators;
@@ -90,30 +88,47 @@ impl From<&TensorView> for WebGPUWorkGroup {
 #[derive(Debug)]
 pub struct TensorMetadata {
     pub length: ViewType,
-    pub dimension: ViewType,
+    pub ndim: ViewType,
+    pub nviews: ViewType,
+    pub view_size: ViewType,
     pub shape_offset: ViewType,
     pub stride_offset: ViewType,
     pub contiguous_stride_offset: ViewType,
     pub metadata: Vec<ViewType>,
 }
 
-impl From<&TensorView> for TensorMetadata {
-    fn from(view: &TensorView) -> Self {
-        let length = view.len();
-        let dimension = view.ndim();
+impl From<&TensorViewTracker> for TensorMetadata {
+    fn from(viewtracker: &TensorViewTracker) -> Self {
+        let length = viewtracker.len();
+        let ndim = viewtracker.ndim();
+
+        let view_history = viewtracker.serialized_history_fifo();
+        let nviews = view_history.len() as ViewType;
 
         let shape_offset = 0;
-        let stride_offset = shape_offset + dimension;
-        let contiguous_stride_offset = stride_offset + dimension;
+        let stride_offset = shape_offset + ndim;
+        let contiguous_stride_offset = stride_offset + ndim;
+        let view_size = contiguous_stride_offset + ndim; // dimension * 3
 
-        let metadata = once(&length)
-            .chain(once(&dimension))
-            .chain(once(&shape_offset))
-            .chain(once(&stride_offset))
-            .chain(once(&contiguous_stride_offset))
-            .chain(view.shape.iter())
-            .chain(view.stride.iter())
-            .chain(view.contiguous_stride.iter())
+        let static_metadata = [
+            length,
+            ndim,
+            nviews,
+            view_size,
+            shape_offset,
+            stride_offset,
+            contiguous_stride_offset,
+        ];
+        let view_metadata = view_history.iter().flat_map(|view| {
+            view.shape
+                .iter()
+                .chain(view.stride.iter())
+                .chain(view.contiguous_stride.iter())
+        });
+
+        let metadata = static_metadata
+            .iter()
+            .chain(view_metadata)
             .map(|&x| x)
             // If it is a scalar then the metadata is 0 bytes
             // WebGPU does not like 0-length arrays, so append an extra 0
@@ -122,7 +137,9 @@ impl From<&TensorView> for TensorMetadata {
 
         TensorMetadata::new(
             length,
-            dimension,
+            ndim,
+            nviews,
+            view_size,
             shape_offset,
             stride_offset,
             contiguous_stride_offset,
@@ -134,7 +151,9 @@ impl From<&TensorView> for TensorMetadata {
 impl TensorMetadata {
     pub fn new(
         length: ViewType,
-        dimension: ViewType,
+        ndim: ViewType,
+        nviews: ViewType,
+        view_size: ViewType,
         shape_offset: ViewType,
         stride_offset: ViewType,
         contiguous_stride_offset: ViewType,
@@ -142,7 +161,9 @@ impl TensorMetadata {
     ) -> TensorMetadata {
         TensorMetadata {
             length,
-            dimension,
+            ndim,
+            nviews,
+            view_size,
             shape_offset,
             stride_offset,
             contiguous_stride_offset,
@@ -155,7 +176,9 @@ impl TensorMetadata {
             "
 struct TensorMetadata {{
     length: {ViewType},
-    dimension: {ViewType},
+    ndim: {ViewType},
+    nviews: {ViewType},
+    view_size: {ViewType},
     shape_offset: {ViewType},
     stride_offset: {ViewType},
     contiguous_stride_offset: {ViewType},

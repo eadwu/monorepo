@@ -58,12 +58,10 @@ fn {entry_point}(
         return;
     }}
 
-    var lhs_mapped_index_temp = index;
-    var lhs_mapped_index = 0u;
+    var lhs_mapped_index = index;
     {map_lhs_index}
 
-    var rhs_mapped_index_temp = index;
-    var rhs_mapped_index = 0u;
+    var rhs_mapped_index = index;
     {map_rhs_index}
 
     output[index] = {output};
@@ -78,22 +76,8 @@ fn {entry_point}(
         workgroup_size = WORKGROUP_SIZE.serialize_decorator(),
         entry_point = "main",
         index = compute_index("index", "global_id", "WORKGROUP_STRIDE"),
-        map_lhs_index = compute_strided_offset(
-            "lhs_mapped_index_temp",
-            "lhs_mapped_index",
-            "0u",
-            "output_metadata.dimension",
-            "output_metadata",
-            "lhs_metadata",
-        ),
-        map_rhs_index = compute_strided_offset(
-            "rhs_mapped_index_temp",
-            "rhs_mapped_index",
-            "0u",
-            "output_metadata.dimension",
-            "output_metadata",
-            "rhs_metadata",
-        ),
+        map_lhs_index = map_index("lhs_mapped_index", "lhs_metadata"),
+        map_rhs_index = map_index("rhs_mapped_index", "rhs_metadata"),
         output = build_webgpu_operation(op)(
             "lhs[lhs_mapped_index]",
             "rhs[rhs_mapped_index]",
