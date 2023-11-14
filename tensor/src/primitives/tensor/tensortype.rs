@@ -1,4 +1,4 @@
-pub trait TensorDataElement = Into<TensorType> + bytemuck::Pod;
+pub trait TensorDataElement = Into<TensorType> + bytemuck::Pod + Copy + ToString;
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub enum TensorType {
