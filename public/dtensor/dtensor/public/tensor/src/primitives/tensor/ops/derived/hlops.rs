@@ -34,15 +34,14 @@ impl Tensor {
             .Mod(&Tensor::scalar(axis_size))
             .Floor();
 
+        let matched_indices = mask.Multiply(&indices);
         if select_last_index {
-            mask.Multiply(&indices).Max(&[axis], keep_dims)
+            matched_indices.Max(&[axis], keep_dims)
         } else {
-            let batch_normalizer = Tensor::scalar(axis_size - 1);
-            let adjusted_indices = batch_normalizer.Sub(&indices);
+            let batch_normalizer = Tensor::scalar(axis_size);
             let masked_normalization = mask.Multiply(&batch_normalizer);
-            masked_normalization
-                .Sub(&mask.Multiply(&adjusted_indices))
-                .Max(&[axis], keep_dims)
+            let adjusted_indices = masked_normalization.Sub(&matched_indices);
+            batch_normalizer.Sub(&adjusted_indices.Max(&[axis], keep_dims))
         }
     }
 
