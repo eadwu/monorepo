@@ -6,7 +6,7 @@ use super::TensorInput;
 
 #[derive(Clone, Debug)]
 pub enum InputSpec {
-    Scalar(Vec<u8>),
+    Scalar(String),
     Internal(InternalSpec),
     Safetensor(SafetensorSpec),
 }
@@ -24,9 +24,7 @@ pub struct SafetensorSpec {
 
 impl TensorInput {
     pub fn from_scalar<T: TensorDataElement>(value: T) -> TensorInput {
-        let slice = [value];
-        let bytes = bytemuck::cast_slice(&slice);
-        TensorInput::ExplicitInput(InputSpec::Scalar(bytes.to_vec()))
+        TensorInput::ExplicitInput(InputSpec::Scalar(value.to_string()))
     }
 
     pub fn from_internal(file: &Path) -> TensorInput {
