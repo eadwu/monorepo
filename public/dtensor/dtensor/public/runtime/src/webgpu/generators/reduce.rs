@@ -16,10 +16,9 @@ pub fn build_shader(
     axis: ViewType,
     datatype: TensorType,
 ) -> String {
-    let element_type = wgsl_from_tensortype(datatype);
     let container_type = format!(
         "array<{datatype}>",
-        datatype = element_type
+        datatype = wgsl_from_tensortype(datatype)
     );
 
     format!(
@@ -48,16 +47,30 @@ fn {entry_point}(
     // Essentially map indices without AXIS
     var mapped_index_temp = index;
     var mapped_index = 0u;
-    {map_pre_axis_index}
+    // Coordinates are the same from output to input, except with one dimension flattened
+    // Meaning [..AXIS] strides are different
+    for (var i = 0u; i < AXIS; i++) {{
+        let output_continguous_stride = output_metadata.metadata[output_metadata.contiguous_stride_offset + i];
+        let input_continguous_stride = input_metadata.metadata[input_metadata.contiguous_stride_offset + i];
 
-    // Assumption is keep_dims is always true for computation, then squeezed out later if needed
-    {map_post_axis_index}
+        let index_at_dimension = mapped_index_temp / output_continguous_stride;
+        mapped_index_temp %= output_continguous_stride;
+        mapped_index += index_at_dimension * input_continguous_stride;
+    }}
+    // While [AXIS+1..] are the same
+    mapped_index += mapped_index_temp;
 
     let axis_rank = input_metadata.metadata[input_metadata.shape_offset + AXIS];
-    let axis_stride = input_metadata.metadata[input_metadata.stride_offset + AXIS];
-    var reduction: {element_type} = {element_type}(0);
-    for (var i = 0u; i < axis_rank; i++) {{
-        let mapped_axis_index = mapped_index + i * axis_stride;
+    let axis_stride = input_metadata.metadata[input_metadata.contiguous_stride_offset + AXIS];
+
+    var mapped_axis_index = mapped_index;
+    {map_axis_index}
+
+    var reduction = input[mapped_index];
+    for (var i = 1u; i < axis_rank; i++) {{
+        mapped_axis_index = mapped_index + i * axis_stride;
+        {map_axis_index}
+
         reduction = {operation};
     }}
 
@@ -67,28 +80,20 @@ fn {entry_point}(
         header = shader_header(),
         workgroup_stride = WORKGROUP_SIZE.serialize_strides("WORKGROUP_STRIDE"),
         input_interface = tensor_interface("0", "read", "input", &container_type, "input_metadata"),
-        output_interface =
-            tensor_interface("1", "read_write", "output", &container_type, "output_metadata"),
+        output_interface = tensor_interface(
+            "1",
+            "read_write",
+            "output",
+            &container_type,
+            "output_metadata"
+        ),
         workgroup_size = WORKGROUP_SIZE.serialize_decorator(),
         entry_point = "main",
         index = compute_index("index", "global_id", "WORKGROUP_STRIDE"),
-        map_pre_axis_index = compute_strided_offset(
-            "mapped_index_temp",
-            "mapped_index",
-            "0u",
-            "AXIS",
-            "output_metadata",
+        map_axis_index = map_index(
+            "mapped_axis_index",
             "input_metadata"
         ),
-        map_post_axis_index = compute_strided_offset(
-            "mapped_index_temp",
-            "mapped_index",
-            "AXIS + 1u",
-            "output_metadata.dimension",
-            "output_metadata",
-            "input_metadata"
-        ),
-        element_type = element_type,
         operation = build_webgpu_operation(op)("reduction", "input[mapped_axis_index]"),
     )
 }

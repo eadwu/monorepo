@@ -1,7 +1,6 @@
 use std::{borrow::Cow, collections::HashMap, future::Future};
 
-use tensor::primitives::tensor::{OperationSpec, Tensor, TensorInput, TensorType};
-use tensor::primitives::tensorview::TensorView;
+use tensor::primitives::tensor::{OperationSpec, Tensor, TensorInput};
 
 use crate::{webgpu::WORKGROUP_SIZE, GraphView};
 
@@ -28,7 +27,7 @@ impl WebGPUEvaluation for Tensor {
             if let TensorInput::NoOp(input) = tensor.data() {
                 let input: &Tensor = intermediate_results.get(&input.id()).unwrap();
                 let clone = Tensor::new(
-                    tensor.view().clone(),
+                    tensor.viewtracker().clone(),
                     input.data().clone(),
                     tensor.datatype(),
                 );
@@ -150,7 +149,7 @@ pub async fn webgpu_tensor_pipeline<'a>(
 
     let min_dim_alignment = tensors
         .iter()
-        .map(|tensor| tensor.ndim())
+        .map(|tensor| tensor.viewtracker().max_ndim())
         .max()
         .unwrap_or(0);
 
@@ -224,11 +223,8 @@ pub async fn webgpu_tensor_pipeline<'a>(
 
         // Returns data from buffer
         let len_bytes = output.len() as usize * output.datatype().byte_size();
-        // NOTE: This can not clone the TensorView, for example if the output is some
-        // noncontiguous view, it would not be correct since the pipeline
-        // output is ALWAYS contiguous, consider this Tensor as a computed `checkpoint`
-        let view = TensorView::from_contiguous_shape(output.shape());
-        let output_tensor = Tensor::from_raw_bytes(&data[..len_bytes], view, output.datatype());
+        let output_tensor =
+            Tensor::from_raw_bytes(&data[..len_bytes], output.view().clone(), output.datatype());
 
         // With the current interface, we have to make sure all mapped views are
         // dropped before we unmap the buffer.

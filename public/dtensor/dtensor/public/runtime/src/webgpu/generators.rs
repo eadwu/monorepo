@@ -22,7 +22,8 @@ pub fn wgsl_from_tensortype(datatype: TensorType) -> String {
         TensorType::F32 => "f32",
         TensorType::I32 => "i32",
         TensorType::U32 => "u32",
-    }.to_string()
+    }
+    .to_string()
 }
 
 pub fn tensor_interface(
@@ -58,44 +59,51 @@ pub fn compute_index(
     )
 }
 
-pub fn compute_strided_offset(
-    origin_index_var: &str,
-    mapped_index_var: &str,
-    start_axis_var: &str,
-    end_axis_var: &str,
-    origin_metadata_variable: &str,
-    mapped_metadata_variable: &str,
+pub fn translate_index_as_strided(
+    index_variable: &str,
+    metadata_variable: &str,
+    strided_field: &str,
 ) -> String {
     format!(
         "
-for (var i = {start_axis_var}; i < {end_axis_var}; i++) {{
-    let origin_stride = {origin_metadata_variable}.metadata[{origin_metadata_variable}.contiguous_stride_offset + i];
-    let origin_shape = {origin_metadata_variable}.metadata[{origin_metadata_variable}.shape_offset + i];
-    let origin_offset = {origin_metadata_variable}.metadata[{origin_metadata_variable}.offset_offset + i];
-    let origin_end_offset = origin_offset + origin_shape;
+{{
+    var translate_index_as_strided__index = {index_variable};
+    var translate_index_as_strided__mapped = 0u;
 
-    let mapped_stride = {mapped_metadata_variable}.metadata[{mapped_metadata_variable}.stride_offset + i];
-    let mapped_shape = {mapped_metadata_variable}.metadata[{mapped_metadata_variable}.shape_offset + i];
-    let mapped_offset = {mapped_metadata_variable}.metadata[{mapped_metadata_variable}.offset_offset + i];
+    for (var i = 0u; i < {metadata_variable}.ndim; i++) {{
+        let shape = {metadata_variable}.metadata[{metadata_variable}.shape_offset + i];
+        let stride = {metadata_variable}.metadata[{metadata_variable}.{strided_field} + i];
+        let contiguous_stride = {metadata_variable}.metadata[{metadata_variable}.contiguous_stride_offset + i];
 
-    let index_at_dimension = {origin_index_var} / origin_stride;
+        let data_index = translate_index_as_strided__index / contiguous_stride;
+        let mapped_index = data_index % shape;
 
-    // Skip if not within bounds of View
-    if index_at_dimension < origin_offset || index_at_dimension >= origin_end_offset {{
-        return;
+        translate_index_as_strided__index %= contiguous_stride;
+        translate_index_as_strided__mapped += mapped_index * stride;
     }}
 
-    let origin_index_at_dimension = index_at_dimension;
-    let mapped_index_at_dimension = ((index_at_dimension - origin_offset) % mapped_shape) + mapped_offset;
-    {origin_index_var} -= origin_index_at_dimension * origin_stride;
-    {mapped_index_var} += mapped_index_at_dimension * mapped_stride;
+    {index_variable} = translate_index_as_strided__mapped;
 }}
 ",
-        origin_index_var = origin_index_var,
-        mapped_index_var = mapped_index_var,
-        start_axis_var = start_axis_var,
-        end_axis_var = end_axis_var,
-        origin_metadata_variable = origin_metadata_variable,
-        mapped_metadata_variable = mapped_metadata_variable,
+        index_variable=index_variable,
+        metadata_variable=metadata_variable,
+        strided_field=strided_field,
+    )
+}
+
+pub fn map_index(index_variable: &str, metadata_variable: &str) -> String {
+    format!(
+        "
+{{
+    var map_index__index = {index_variable};
+
+    {map_as_strided}
+
+    {index_variable} = map_index__index;
+}}
+",
+        index_variable = index_variable,
+        map_as_strided =
+            translate_index_as_strided("map_index__index", metadata_variable, "stride_offset"),
     )
 }

@@ -1,5 +1,5 @@
 use tensor::primitives::tensor::{Tensor, TensorType};
-use tensor::primitives::tensorview::{TensorView, ViewType};
+use tensor::primitives::tensorview::{TensorViewTracker, ViewType};
 use wgpu::util::DeviceExt;
 
 use super::{TensorLayout, TensorMetadata, WebGPUDevice};
@@ -19,7 +19,7 @@ impl ToWebGPUBuffer for Tensor {
     fn as_webgpu_buffer(&self, wgpu_device: &WebGPUDevice) -> wgpu::Buffer {
         let WebGPUDevice { device, queue: _ } = wgpu_device;
 
-        let data_len_bytes = self.len() as usize * self.datatype().byte_size();
+        let data_len_bytes = self.data_len() as usize * self.datatype().byte_size();
         let minimum_size = data_len_bytes.max(WEBGPU_MINIMUM_BUFFER_SIZE);
         let aligned_size =
             minimum_size + (WEBGPU_VEC4_ALIGNMENT - 1) & !(WEBGPU_VEC4_ALIGNMENT - 1);
@@ -43,7 +43,7 @@ impl ToWebGPUBuffer for Tensor {
     }
 }
 
-impl ToWebGPUBuffer for TensorView {
+impl ToWebGPUBuffer for TensorViewTracker {
     fn as_webgpu_buffer(&self, wgpu_device: &WebGPUDevice) -> wgpu::Buffer {
         let WebGPUDevice { device, queue: _ } = wgpu_device;
         device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
@@ -71,7 +71,10 @@ impl ToWebGPUTensorLayout for Tensor {
         wgpu_device: &WebGPUDevice,
     ) -> TensorLayout {
         TensorLayout {
-            metadata: self.view().at_least_ndim(min_dim_alignment).as_webgpu_buffer(wgpu_device),
+            metadata: self
+                .viewtracker()
+                .align_to_ndim(min_dim_alignment)
+                .as_webgpu_buffer(wgpu_device),
             data: self.as_webgpu_buffer(wgpu_device),
         }
     }

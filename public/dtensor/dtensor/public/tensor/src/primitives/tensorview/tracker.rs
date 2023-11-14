@@ -1,6 +1,6 @@
 use std::ops::Deref;
 
-use super::TensorView;
+use super::{TensorView, ViewType};
 
 #[derive(Clone, Debug)]
 pub struct TensorViewTracker {
@@ -44,5 +44,34 @@ impl TensorViewTracker {
             .chain(std::iter::once(&self.current))
             .map(|view| view.clone())
             .collect::<Vec<_>>()
+    }
+
+    pub fn serialized_history_fifo(&self) -> Vec<TensorView> {
+        self.seralized_history_lilo()
+            .into_iter()
+            .rev()
+            .collect::<Vec<_>>()
+    }
+
+    pub fn max_ndim(&self) -> ViewType {
+        self.seralized_history_lilo()
+            .iter()
+            .map(TensorView::ndim)
+            .max()
+            .unwrap_or(0)
+    }
+
+    pub fn align_to_ndim(&self, ndim: ViewType) -> TensorViewTracker {
+        let aligned_views = self
+            .seralized_history_lilo()
+            .into_iter()
+            .map(|view| view.at_least_ndim(ndim))
+            .collect::<Vec<_>>();
+        let last_view_index = aligned_views.len() - 1;
+
+        TensorViewTracker::new(
+            &aligned_views[last_view_index],
+            &aligned_views[..last_view_index],
+        )
     }
 }
