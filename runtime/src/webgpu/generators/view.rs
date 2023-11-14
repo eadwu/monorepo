@@ -1,7 +1,8 @@
 use crate::webgpu::generators::*;
+use crate::webgpu::WebGPUWorkGroup;
 use crate::webgpu::WORKGROUP_SIZE;
 
-pub fn build_shader(datatype: TensorType) -> String {
+pub fn build_shader(datatype: TensorType, workgroups: &WebGPUWorkGroup) -> String {
     let datatype = format!(
         "array<{datatype}>",
         datatype = wgsl_from_tensortype(datatype)
@@ -35,7 +36,7 @@ fn {entry_point}(
 }}
 ",
         header = shader_header(),
-        workgroup_stride = WORKGROUP_SIZE.serialize_strides("WORKGROUP_STRIDE"),
+        workgroup_stride = workgroups.serialize_strides("WORKGROUP_STRIDE"),
         input_interface = tensor_interface("0", "read", "input", &datatype, "input_metadata"),
         output_interface =
             tensor_interface("1", "read_write", "output", &datatype, "output_metadata"),

@@ -2,6 +2,7 @@ use tensor::primitives::tensor::ReduceType;
 use tensor::primitives::tensorview::ViewType;
 
 use crate::webgpu::generators::*;
+use crate::webgpu::WebGPUWorkGroup;
 use crate::webgpu::WORKGROUP_SIZE;
 
 fn build_webgpu_operation<'a>(op: ReduceType) -> impl Fn(&'a str, &'a str) -> String {
@@ -15,6 +16,7 @@ pub fn build_shader(
     op: ReduceType,
     axis: ViewType,
     datatype: TensorType,
+    workgroups: &WebGPUWorkGroup,
 ) -> String {
     let container_type = format!(
         "array<{datatype}>",
@@ -78,7 +80,7 @@ fn {entry_point}(
 }}
 ",
         header = shader_header(),
-        workgroup_stride = WORKGROUP_SIZE.serialize_strides("WORKGROUP_STRIDE"),
+        workgroup_stride = workgroups.serialize_strides("WORKGROUP_STRIDE"),
         input_interface = tensor_interface("0", "read", "input", &container_type, "input_metadata"),
         output_interface = tensor_interface(
             "1",

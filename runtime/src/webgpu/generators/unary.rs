@@ -1,6 +1,7 @@
 use tensor::primitives::tensor::{TensorType, UnaryType};
 
 use crate::webgpu::generators::*;
+use crate::webgpu::WebGPUWorkGroup;
 use crate::webgpu::WORKGROUP_SIZE;
 
 fn build_webgpu_operation<'a>(
@@ -26,7 +27,12 @@ fn build_webgpu_operation<'a>(
     }
 }
 
-pub fn build_shader(op: UnaryType, input_type: TensorType, output_datatype: TensorType) -> String {
+pub fn build_shader(
+    op: UnaryType,
+    input_type: TensorType,
+    output_datatype: TensorType,
+    workgroups: &WebGPUWorkGroup,
+) -> String {
     let input_type = format!(
         "array<{datatype}>",
         datatype = wgsl_from_tensortype(input_type)
@@ -64,7 +70,7 @@ fn {entry_point}(
 }}
 ",
         header = shader_header(),
-        workgroup_stride = WORKGROUP_SIZE.serialize_strides("WORKGROUP_STRIDE"),
+        workgroup_stride = workgroups.serialize_strides("WORKGROUP_STRIDE"),
         input_interface = tensor_interface("0", "read", "input", &input_type, "input_metadata"),
         output_interface =
             tensor_interface("1", "read_write", "output", &output_type, "output_metadata"),
