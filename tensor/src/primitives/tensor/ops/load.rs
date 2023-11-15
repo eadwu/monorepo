@@ -1,12 +1,15 @@
-use std::{path::{Path, PathBuf}, sync::Arc};
+use std::path::{Path, PathBuf};
+use std::sync::Arc;
 
 use crate::primitives::tensor::TensorDataElement;
+use crate::primitives::tensorview::ViewType;
 
 use super::TensorInput;
 
 #[derive(Clone, Debug)]
 pub enum InputSpec {
     Scalar(String),
+    Arange(Vec<ViewType>),
     Internal(InternalSpec),
     Safetensor(SafetensorSpec),
 }
@@ -25,6 +28,10 @@ pub struct SafetensorSpec {
 impl TensorInput {
     pub fn from_scalar<T: TensorDataElement>(value: T) -> TensorInput {
         TensorInput::ExplicitInput(InputSpec::Scalar(value.to_string()))
+    }
+
+    pub fn from_arange(shape: &[ViewType]) -> TensorInput {
+        TensorInput::ExplicitInput(InputSpec::Arange(shape.to_vec()))
     }
 
     pub fn from_internal(file: &Path) -> TensorInput {
