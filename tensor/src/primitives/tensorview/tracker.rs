@@ -6,13 +6,14 @@ use super::{TensorView, ViewType};
 pub struct TensorViewTracker {
     current: TensorView,
     history: Vec<TensorView>,
+    public: TensorView,
 }
 
 impl Deref for TensorViewTracker {
     type Target = TensorView;
 
     fn deref(&self) -> &Self::Target {
-        &self.current
+        &self.public
     }
 }
 
@@ -27,11 +28,16 @@ impl TensorViewTracker {
         TensorViewTracker {
             current: view.clone(),
             history: history.to_vec(),
+            public: TensorView::from_contiguous_shape(&view.shape[..]),
         }
     }
 
     pub fn root_view(&self) -> &TensorView {
         self.history.first().unwrap_or(&self.current)
+    }
+
+    pub fn swap_view(&self, view: &TensorView) -> TensorViewTracker {
+        TensorViewTracker::new(view, &self.history[..])
     }
 
     pub fn track_view(&self, view: &TensorView) -> TensorViewTracker {

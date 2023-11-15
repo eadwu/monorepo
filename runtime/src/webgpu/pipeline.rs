@@ -20,7 +20,10 @@ pub struct WebGPUPipeline<'a> {
 
 impl WebGPUEvaluation for Tensor {
     async fn evaluate_webgpu(&self, wgpu_device: &WebGPUDevice) -> Tensor {
-        let runtime = self.as_runtime_graph();
+        // Ensure output is a contiguous Tensor
+        let output = self.Identity();
+
+        let runtime = output.as_runtime_graph();
         let mut intermediate_results = HashMap::new();
 
         for tensor in &runtime.graph {
@@ -118,7 +121,7 @@ impl WebGPUEvaluation for Tensor {
             }
         }
 
-        intermediate_results.remove(&self.id()).unwrap()
+        intermediate_results.remove(&output.id()).unwrap()
     }
 }
 

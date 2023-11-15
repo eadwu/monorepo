@@ -62,6 +62,7 @@ pub fn translate_index_as_strided(
     index_variable: &str,
     metadata_variable: &str,
     strided_field: &str,
+    view_offset_variable: &str,
 ) -> String {
     format!(
         "
@@ -70,9 +71,13 @@ pub fn translate_index_as_strided(
     var translate_index_as_strided__mapped = 0u;
 
     for (var i = 0u; i < {metadata_variable}.ndim; i++) {{
-        let shape = {metadata_variable}.metadata[{metadata_variable}.shape_offset + i];
-        let stride = {metadata_variable}.metadata[{metadata_variable}.{strided_field} + i];
-        let contiguous_stride = {metadata_variable}.metadata[{metadata_variable}.contiguous_stride_offset + i];
+        let shape_offset = {view_offset_variable} + {metadata_variable}.shape_offset + i;
+        let stride_offset = {view_offset_variable} + {metadata_variable}.{strided_field} + i;
+        let contiguous_stride_offset = {view_offset_variable} + {metadata_variable}.contiguous_stride_offset + i;
+
+        let shape = {metadata_variable}.metadata[shape_offset];
+        let stride = {metadata_variable}.metadata[stride_offset];
+        let contiguous_stride = {metadata_variable}.metadata[contiguous_stride_offset];
 
         let data_index = translate_index_as_strided__index / contiguous_stride;
         let mapped_index = data_index % shape;
@@ -84,9 +89,10 @@ pub fn translate_index_as_strided(
     {index_variable} = translate_index_as_strided__mapped;
 }}
 ",
-        index_variable=index_variable,
-        metadata_variable=metadata_variable,
-        strided_field=strided_field,
+        index_variable = index_variable,
+        metadata_variable = metadata_variable,
+        strided_field = strided_field,
+        view_offset_variable = view_offset_variable,
     )
 }
 
@@ -96,13 +102,20 @@ pub fn map_index(index_variable: &str, metadata_variable: &str) -> String {
 {{
     var map_index__index = {index_variable};
 
-    {map_as_strided}
+    for (var view = 0u; view < {metadata_variable}.nviews; view++) {{
+        let base_view_offset = view * {metadata_variable}.view_size;
+        {map_as_strided}
+    }}
 
     {index_variable} = map_index__index;
 }}
 ",
         index_variable = index_variable,
-        map_as_strided =
-            translate_index_as_strided("map_index__index", metadata_variable, "stride_offset"),
+        map_as_strided = translate_index_as_strided(
+            "map_index__index",
+            metadata_variable,
+            "stride_offset",
+            "base_view_offset"
+        ),
     )
 }
