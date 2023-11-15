@@ -1,3 +1,6 @@
+mod arange;
+pub use arange::*;
+
 mod internal;
 pub use internal::*;
 
