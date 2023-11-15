@@ -34,8 +34,13 @@ impl From<i32> for TensorType {
 }
 
 impl From<u32> for TensorType {
-    fn from(_: u32) -> Self {
-        TensorType::U32
+    fn from(value: u32) -> Self {
+        assert!(
+            TryInto::<i32>::try_into(value).is_ok(),
+            "Unsigned integers are not supported"
+        );
+
+        TensorType::I32
     }
 }
 
@@ -44,4 +49,3 @@ impl From<f32> for TensorType {
         TensorType::F32
     }
 }
-
