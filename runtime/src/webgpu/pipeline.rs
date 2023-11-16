@@ -1,8 +1,9 @@
 use std::{borrow::Cow, collections::HashMap, future::Future};
 
 use tensor::primitives::tensor::{OperationSpec, Tensor, TensorInput};
+use tensor::topograph::GraphView;
 
-use crate::{webgpu::WORKGROUP_SIZE, GraphView};
+use crate::webgpu::WORKGROUP_SIZE;
 
 use super::{generators, ToWebGPUBindGroup, ToWebGPUTensorLayout, WebGPUDevice, WebGPUWorkGroup};
 
