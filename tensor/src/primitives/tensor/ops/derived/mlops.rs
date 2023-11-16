@@ -97,7 +97,7 @@ impl Tensor {
         let p = Tensor::scalar(0.3275911);
 
         let x = self.Abs();
-        let sign = self.Divide(&x);
+        let sign = self.Sign();
 
         // A&S Formula 7.1.26
         let t = one.Divide(&one.Add(&p.Multiply(&x)));
@@ -223,6 +223,13 @@ impl Tensor {
         let one = Tensor::scalar(1);
         let denominator = one.Add(&self.Neg().Exp());
         one.Divide(&denominator)
+    }
+
+    pub fn Sign(&self) -> Tensor {
+        let abs = self.Abs();
+        let pos = self.Equal(&abs);
+        let neg = pos.Not().Neg();
+        pos.Add(&neg)
     }
 
     pub fn Sech(&self) -> Tensor {
