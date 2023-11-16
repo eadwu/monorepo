@@ -5,6 +5,7 @@ use filemanager::FileManager;
 use once_cell::sync::Lazy;
 
 pub mod primitives;
+pub mod topograph;
 
 const FILE_CACHE_SIZE: usize = 64;
 static FILE_MANAGER: Lazy<Mutex<FileManager>> =
