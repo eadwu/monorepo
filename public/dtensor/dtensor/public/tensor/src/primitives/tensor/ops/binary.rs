@@ -57,7 +57,7 @@ impl Tensor {
         self.binary_op(BinaryType::MAX, rhs)
     }
 
-    pub fn Mod(&self, rhs: &Tensor) -> Tensor {
+    pub(crate) fn Mod(&self, rhs: &Tensor) -> Tensor {
         self.binary_op(BinaryType::MOD, rhs)
     }
 
