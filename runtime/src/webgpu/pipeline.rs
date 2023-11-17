@@ -46,12 +46,7 @@ impl WebGPUEvaluation for Tensor {
                         let input = intermediate_results.get(&op.input.id()).unwrap();
 
                         (
-                            generators::unary::build_shader(
-                                op.op,
-                                input.datatype(),
-                                tensor.datatype(),
-                                &workgroups,
-                            ),
+                            generators::unary::build_shader(op.op, input, tensor, &workgroups),
                             vec![op.input.id()],
                             tensor,
                         )
@@ -61,27 +56,26 @@ impl WebGPUEvaluation for Tensor {
                         let rhs = intermediate_results.get(&op.rhs.id()).unwrap();
 
                         (
-                            generators::binary::build_shader(
-                                op.op,
-                                lhs.datatype(),
-                                rhs.datatype(),
-                                tensor.datatype(),
-                                &workgroups,
-                            ),
+                            generators::binary::build_shader(op.op, lhs, rhs, tensor, &workgroups),
                             vec![op.lhs.id(), op.rhs.id()],
                             tensor,
                         )
                     }
-                    OperationSpec::ReduceOp(op) => (
-                        generators::reduce::build_shader(
-                            op.op,
-                            op.axis,
-                            tensor.datatype(),
-                            &workgroups,
-                        ),
-                        vec![op.input.id()],
-                        tensor,
-                    ),
+                    OperationSpec::ReduceOp(op) => {
+                        let input = intermediate_results.get(&op.input.id()).unwrap();
+
+                        (
+                            generators::reduce::build_shader(
+                                op.op,
+                                op.axis,
+                                input,
+                                tensor,
+                                &workgroups,
+                            ),
+                            vec![op.input.id()],
+                            tensor,
+                        )
+                    }
                 };
 
                 let dependencies = inputs

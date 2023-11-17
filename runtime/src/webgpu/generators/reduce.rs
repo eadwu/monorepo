@@ -1,4 +1,4 @@
-use tensor::primitives::tensor::ReduceType;
+use tensor::primitives::tensor::{ReduceType, Tensor};
 use tensor::primitives::tensorview::ViewType;
 
 use crate::webgpu::generators::*;
@@ -15,12 +15,13 @@ fn build_webgpu_operation<'a>(op: ReduceType) -> impl Fn(&'a str, &'a str) -> St
 pub fn build_shader(
     op: ReduceType,
     axis: ViewType,
-    datatype: TensorType,
+    input: &Tensor,
+    output: &Tensor,
     workgroups: &WebGPUWorkGroup,
 ) -> String {
     let container_type = format!(
         "array<{datatype}>",
-        datatype = wgsl_from_tensortype(datatype)
+        datatype = wgsl_from_tensortype(output.datatype())
     );
 
     format!(
