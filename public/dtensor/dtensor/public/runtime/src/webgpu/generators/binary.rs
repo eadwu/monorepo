@@ -1,4 +1,4 @@
-use tensor::primitives::tensor::BinaryType;
+use tensor::primitives::tensor::{BinaryType, Tensor};
 
 use crate::webgpu::generators::*;
 use crate::webgpu::WebGPUWorkGroup;
@@ -21,20 +21,20 @@ fn build_webgpu_operation<'a>(op: BinaryType) -> impl Fn(&'a str, &'a str, &'a s
 
 pub fn build_shader(
     op: BinaryType,
-    lhs_type: TensorType,
-    rhs_type: TensorType,
-    output_type: TensorType,
+    lhs: &Tensor,
+    rhs: &Tensor,
+    output: &Tensor,
     workgroups: &WebGPUWorkGroup,
 ) -> String {
     let lhs_type = format!(
         "array<{datatype}>",
-        datatype = wgsl_from_tensortype(lhs_type)
+        datatype = wgsl_from_tensortype(lhs.datatype())
     );
     let rhs_type = format!(
         "array<{datatype}>",
-        datatype = wgsl_from_tensortype(rhs_type)
+        datatype = wgsl_from_tensortype(rhs.datatype())
     );
-    let output_element_type = wgsl_from_tensortype(output_type);
+    let output_element_type = wgsl_from_tensortype(output.datatype());
     let output_type = format!("array<{datatype}>", datatype = output_element_type);
 
     format!(
