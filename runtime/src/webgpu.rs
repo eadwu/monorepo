@@ -119,20 +119,22 @@ impl From<&TensorViewTracker> for TensorMetadata {
             stride_offset,
             contiguous_stride_offset,
         ];
-        let view_metadata = view_history.iter().flat_map(|view| {
-            view.shape
-                .iter()
-                .chain(view.stride.iter())
-                .chain(view.contiguous_stride.iter())
-        });
-
-        let metadata = static_metadata
+        let view_metadata = view_history
             .iter()
-            .chain(view_metadata)
+            .flat_map(|view| {
+                view.shape
+                    .iter()
+                    .chain(view.stride.iter())
+                    .chain(view.contiguous_stride.iter())
+            })
             .map(|&x| x)
             // If it is a scalar then the metadata is 0 bytes
             // WebGPU does not like 0-length arrays, so append an extra 0
-            .chain(std::iter::once(0))
+            .chain(std::iter::once(0));
+
+        let metadata = static_metadata
+            .into_iter()
+            .chain(view_metadata)
             .collect::<Vec<_>>();
 
         TensorMetadata::new(
