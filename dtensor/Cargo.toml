@@ -6,6 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+autodiff = { version = "0.1.0", path = "../autodiff" }
 nn = { version = "0.1.0", path = "../nn" }
 runtime = { version = "0.1.0", path = "../runtime" }
 tensor = { version = "0.1.0", path = "../tensor" }
