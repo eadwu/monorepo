@@ -28,9 +28,13 @@ impl FileManager {
 
     pub fn open(&mut self, path: &Path, offset: usize) -> io::Result<Mmap> {
         if !self.cache.contains_key(path) {
-            let file_path = self.history.get(path).unwrap();
+            let file_path = self
+                .history
+                .get(path)
+                .map(|x| x.to_path_buf())
+                .unwrap_or(path.to_path_buf());
             let file = File::options().read(true).write(true).open(&file_path)?;
-            self.cache.insert(path.to_path_buf(), file);
+            self.cache.insert(file_path, file);
         }
 
         let file = self.cache.get(path).unwrap();
