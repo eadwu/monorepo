@@ -106,28 +106,20 @@ impl ToWebGPUBindGroup for TensorLayout {
 
 impl From<&Tensor> for WebGPUTensor {
     fn from(value: &Tensor) -> Self {
-        let viewtracker = value
-            .viewtracker()
-            .align_to_ndim(value.viewtracker().max_ndim());
-        let length = viewtracker.len();
-        let ndim = viewtracker.ndim();
-
-        let view_history = viewtracker.serialized_history_fifo();
-        let nviews = view_history.len() as ViewType;
+        let length = value.len();
+        let ndim = value.ndim();
 
         let shape_offset = 0;
         let stride_offset = shape_offset + ndim;
         let contiguous_stride_offset = stride_offset + ndim;
         let view_size = contiguous_stride_offset + ndim; // dimension * 3
 
-        let view_metadata = view_history
+        let view = value.view();
+        let view_metadata = view
+            .shape
             .iter()
-            .flat_map(|view| {
-                view.shape
-                    .iter()
-                    .chain(view.stride.iter())
-                    .chain(view.contiguous_stride.iter())
-            })
+            .chain(view.stride.iter())
+            .chain(view.contiguous_stride.iter())
             .map(|&x| x)
             // If it is a scalar then the metadata is 0 bytes
             // WebGPU does not like 0-length arrays, so append an extra 0
@@ -138,8 +130,6 @@ impl From<&Tensor> for WebGPUTensor {
             &value.id().to_string(),
             length,
             ndim,
-            nviews,
-            view_size,
             shape_offset,
             stride_offset,
             contiguous_stride_offset,
