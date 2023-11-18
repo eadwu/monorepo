@@ -83,10 +83,7 @@ fn {entry_point}(
         index = compute_index("index", "global_id", "WORKGROUP_STRIDE"),
         output_tensor_name = output_wgpu.name(),
         input_tensor_name = input_wgpu.name(),
-        map_axis_index = map_index(
-            "mapped_axis_index",
-            &input_wgpu.name()
-        ),
+        map_axis_index = map_index("mapped_axis_index", input.viewtracker()),
         operation = {
             let input_data = format!("{}.data[mapped_axis_index]", input_wgpu.name());
             let output = build_webgpu_operation(op)("reduction", &input_data);

@@ -70,8 +70,8 @@ fn {entry_point}(
         entry_point = "main",
         index = compute_index("index", "global_id", "WORKGROUP_STRIDE"),
         output_tensor_name = output_wgpu.name(),
-        map_lhs_index = map_index("lhs_mapped_index", &lhs_wgpu.name()),
-        map_rhs_index = map_index("rhs_mapped_index", &rhs_wgpu.name()),
+        map_lhs_index = map_index("lhs_mapped_index", lhs.viewtracker()),
+        map_rhs_index = map_index("rhs_mapped_index", rhs.viewtracker()),
         output = {
             let mapped_lhs_data = format!("{}.data[lhs_mapped_index]", lhs_wgpu.name());
             let mapped_rhs_data = format!("{}.data[rhs_mapped_index]", rhs_wgpu.name());
