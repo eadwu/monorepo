@@ -205,42 +205,52 @@ pub async fn webgpu_tensor_pipeline<'a>(
 
     // Note that we're not calling `.await` here.
     let buffer_slice = staging_buffer.slice(..);
-    // Sets the buffer up for mapping, sending over the result of the mapping back to us when it is finished.
-    let (sender, receiver) = futures_intrusive::channel::shared::oneshot_channel();
-    buffer_slice.map_async(wgpu::MapMode::Read, move |v| sender.send(v).unwrap());
 
-    // Poll the device in a blocking manner so that our future resolves.
-    // In an actual application, `device.poll(...)` should
-    // be called in an event loop 1or on another thread.
-    device.poll(wgpu::Maintain::Wait);
+    #[cfg(target_arch = "wasm32")]
+    {
+        // Sets the buffer up for mapping, sending over the result of the mapping back to us when it is finished.
+        // buffer_slice.map_async(wgpu::MapMode::Read, |_| {});
+        let (sender, receiver) = futures_intrusive::channel::shared::oneshot_channel();
+        buffer_slice.map_async(wgpu::MapMode::Read, move |v| sender.send(v).unwrap());
 
-    // Awaits until `buffer_future` can be read from
-    if let Some(Ok(())) = receiver.receive().await {
-        // Gets contents of buffer
-        let data = buffer_slice.get_mapped_range();
+        // Poll the device in a blocking manner so that our future resolves.
+        // In an actual application, `device.poll(...)` should
+        // be called in an event loop 1or on another thread.
+        device.poll(wgpu::Maintain::Wait);
 
-        // Returns data from buffer
-        let output_wgpu = Into::<WebGPUTensor>::into(*output);
-        let metadata_len_bytes = output_wgpu.bytes().len();
-        let data_len_bytes = output.len() as usize * output.datatype().byte_size();
-        let end = data_len_bytes + output_wgpu.bytes().len();
-        let output_tensor = Tensor::from_raw_bytes(
-            &data[metadata_len_bytes..end],
-            output.view().clone(),
-            output.datatype(),
-        );
-
-        // With the current interface, we have to make sure all mapped views are
-        // dropped before we unmap the buffer.
-        drop(data);
-        staging_buffer.unmap(); // Unmaps buffer from memory
-                                // If you are familiar with C++ these 2 lines can be thought of similarly to:
-                                //   delete myPointer;
-                                //   myPointer = NULL;
-                                // It effectively frees the memory
-
-        output_tensor
-    } else {
-        panic!("failed to run compute on gpu!")
+        // Awaits until `buffer_future` can be read from
+        if receiver.receive().await.is_none() {
+            panic!("failed to run compute on gpu!")
+        }
     }
+    #[cfg(not(target_arch = "wasm32"))]
+    {
+        buffer_slice.map_async(wgpu::MapMode::Read, |_| {});
+        device.poll(wgpu::Maintain::Wait);
+    }
+
+    // Gets contents of buffer
+    let data = buffer_slice.get_mapped_range();
+
+    // Returns data from buffer
+    let output_wgpu = Into::<WebGPUTensor>::into(*output);
+    let metadata_len_bytes = output_wgpu.bytes().len();
+    let data_len_bytes = output.len() as usize * output.datatype().byte_size();
+    let end = data_len_bytes + output_wgpu.bytes().len();
+    let output_tensor = Tensor::from_raw_bytes(
+        &data[metadata_len_bytes..end],
+        output.view().clone(),
+        output.datatype(),
+    );
+
+    // With the current interface, we have to make sure all mapped views are
+    // dropped before we unmap the buffer.
+    drop(data);
+    staging_buffer.unmap(); // Unmaps buffer from memory
+                            // If you are familiar with C++ these 2 lines can be thought of similarly to:
+                            //   delete myPointer;
+                            //   myPointer = NULL;
+                            // It effectively frees the memory
+
+    output_tensor
 }
