@@ -29,49 +29,41 @@ pub fn compute_index(
 }
 
 pub fn map_index(index_variable: &str, viewtracker: &TensorViewTracker) -> String {
-    let view_history = viewtracker.serialized_history_fifo();
-    let index_transformations = {
-        view_history
+    let index_transformation = {
+        viewtracker
+            .serialized_history_fifo()
             .iter()
-            .enumerate()
-            .map(|(i, view)| {
-                let last_index = format!("index{}", i);
-                let this_index = format!("index{}", i + 1);
-                if view.ndim() == 0 {
-                    format!("let {} = 0u;", this_index)
+            .fold(index_variable.to_string(), |previous_index, view| {
+                let mapped_index = if view.ndim() == 0 {
+                    format!("0u")
                 } else {
-                    let assignment = view
-                        .shape
+                    view.shape
                         .iter()
                         .zip(view.stride.iter().zip(view.contiguous_stride.iter()))
                         .map(|(&shape, (&stride, &contiguous_stride))| {
                             format!(
-                                "((({index} / {contiguous_stride}u) % {shape}u) * {stride}u)",
-                                index = last_index,
+                                "((({previous_index} / {contiguous_stride}u) % {shape}u) * {stride}u)",
+                                previous_index = previous_index,
                                 contiguous_stride = contiguous_stride,
                                 shape = shape,
                                 stride = stride,
                             )
                         })
                         .collect::<Vec<_>>()
-                        .join("+");
-                    format!("let {} = {};", this_index, assignment)
-                }
+                        .join("+")
+                };
+
+                format!("({})", mapped_index)
             })
-            .collect::<Vec<_>>()
-            .join("\n")
     };
 
     format!(
         "
 {{
-    let index0 = {index_variable};
-    {index_transformations}
-    {index_variable} = index{view_len};
+    {index_variable} = {singular_map};
 }}
 ",
         index_variable = index_variable,
-        index_transformations = index_transformations,
-        view_len = view_history.len(),
+        singular_map = index_transformation,
     )
 }
