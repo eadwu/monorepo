@@ -1,6 +1,7 @@
 use tensor::primitives::tensor::{Tensor, TensorType, UnaryType};
 
 use crate::webgpu::generators::*;
+use crate::webgpu::WebGPUTensor;
 use crate::webgpu::WebGPUWorkGroup;
 use crate::webgpu::WORKGROUP_SIZE;
 
@@ -33,25 +34,16 @@ pub fn build_shader(
     output: &Tensor,
     workgroups: &WebGPUWorkGroup,
 ) -> String {
-    let input_type = format!(
-        "array<{datatype}>",
-        datatype = wgsl_from_tensortype(input.datatype())
-    );
-    let output_type = format!(
-        "array<{datatype}>",
-        datatype = wgsl_from_tensortype(output.datatype())
-    );
+    let input_wgpu = Into::<WebGPUTensor>::into(input);
+    let output_wgpu = Into::<WebGPUTensor>::into(output);
 
     format!(
         "
-{header}
-
-{workgroup_stride}
-
 {input_interface}
 
 {output_interface}
 
+{workgroup_stride}
 @compute {workgroup_size}
 fn {entry_point}(
     @builtin(global_invocation_id) global_id: vec3u
@@ -59,25 +51,30 @@ fn {entry_point}(
     {index}
 
     // Guard against out-of-bounds work group sizes
-    if index >= output_metadata.length {{
+    if index >= {output_tensor_name}.length {{
         return;
     }}
 
     var mapped_index = index;
     {map_index}
 
-    output[index] = {output};
+    {output_tensor_name}.data[index] = {output};
 }}
 ",
-        header = shader_header(),
         workgroup_stride = workgroups.serialize_strides("WORKGROUP_STRIDE"),
-        input_interface = tensor_interface("0", "read", "input", &input_type, "input_metadata"),
+        input_interface =
+            input_wgpu.serialize_type(&wgsl_from_tensortype(input.datatype()), "0", "read"),
         output_interface =
-            tensor_interface("1", "read_write", "output", &output_type, "output_metadata"),
+            output_wgpu.serialize_type(&wgsl_from_tensortype(output.datatype()), "1", "read_write"),
         workgroup_size = WORKGROUP_SIZE.serialize_decorator(),
         entry_point = "main",
         index = compute_index("index", "global_id", "WORKGROUP_STRIDE"),
-        map_index = map_index("mapped_index", "input_metadata"),
-        output = build_webgpu_operation(op, output.datatype())("input[mapped_index]"),
+        output_tensor_name = output_wgpu.name(),
+        map_index = map_index("mapped_index", &input_wgpu.name()),
+        output = {
+            let input_data = format!("{}.data[mapped_index]", input_wgpu.name());
+            let output = build_webgpu_operation(op, output.datatype())(&input_data);
+            output
+        }
     )
 }

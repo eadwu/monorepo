@@ -1,6 +1,3 @@
-use ::tensor::primitives::tensorview::{TensorView, TensorViewTracker, ViewType};
-use num::integer::Roots;
-
 pub mod generators;
 
 mod tensor;
@@ -20,7 +17,6 @@ pub struct WebGPUDevice {
 
 #[derive(Debug)]
 pub struct TensorLayout {
-    pub metadata: wgpu::Buffer,
     pub data: wgpu::Buffer,
 }
 
@@ -74,94 +70,34 @@ const {variable_name}: vec3u = vec3u({stride_x}u, {stride_y}u, {stride_z}u);
     }
 }
 
-impl From<&TensorView> for WebGPUWorkGroup {
-    fn from(value: &TensorView) -> Self {
-        let length = value.len();
-        let z = length.cbrt();
-        let y = ((length / z) + 1).sqrt();
-        let x = length / (y * z) + 1;
-        assert!(x as u64 * y as u64 * z as u64 >= length as u64);
-        WebGPUWorkGroup::new(x, y, z)
-    }
-}
-
 #[derive(Debug)]
-pub struct TensorMetadata {
-    pub length: ViewType,
-    pub ndim: ViewType,
-    pub nviews: ViewType,
-    pub view_size: ViewType,
-    pub shape_offset: ViewType,
-    pub stride_offset: ViewType,
-    pub contiguous_stride_offset: ViewType,
-    pub metadata: Vec<ViewType>,
+pub struct WebGPUTensor {
+    pub identifier: String,
+    pub length: u32,
+    pub ndim: u32,
+    pub nviews: u32,
+    pub view_size: u32,
+    pub shape_offset: u32,
+    pub stride_offset: u32,
+    pub contiguous_stride_offset: u32,
+    pub metadata: Vec<u32>,
 }
 
-impl From<&TensorViewTracker> for TensorMetadata {
-    fn from(viewtracker: &TensorViewTracker) -> Self {
-        let length = viewtracker.len();
-        let ndim = viewtracker.ndim();
-
-        let view_history = viewtracker.serialized_history_fifo();
-        let nviews = view_history.len() as ViewType;
-
-        let shape_offset = 0;
-        let stride_offset = shape_offset + ndim;
-        let contiguous_stride_offset = stride_offset + ndim;
-        let view_size = contiguous_stride_offset + ndim; // dimension * 3
-
-        let static_metadata = [
-            length,
-            ndim,
-            nviews,
-            view_size,
-            shape_offset,
-            stride_offset,
-            contiguous_stride_offset,
-        ];
-        let view_metadata = view_history
-            .iter()
-            .flat_map(|view| {
-                view.shape
-                    .iter()
-                    .chain(view.stride.iter())
-                    .chain(view.contiguous_stride.iter())
-            })
-            .map(|&x| x)
-            // If it is a scalar then the metadata is 0 bytes
-            // WebGPU does not like 0-length arrays, so append an extra 0
-            .chain(std::iter::once(0));
-
-        let metadata = static_metadata
-            .into_iter()
-            .chain(view_metadata)
-            .collect::<Vec<_>>();
-
-        TensorMetadata::new(
-            length,
-            ndim,
-            nviews,
-            view_size,
-            shape_offset,
-            stride_offset,
-            contiguous_stride_offset,
-            metadata,
-        )
-    }
-}
-
-impl TensorMetadata {
+impl WebGPUTensor {
     pub fn new(
-        length: ViewType,
-        ndim: ViewType,
-        nviews: ViewType,
-        view_size: ViewType,
-        shape_offset: ViewType,
-        stride_offset: ViewType,
-        contiguous_stride_offset: ViewType,
-        metadata: Vec<ViewType>,
-    ) -> TensorMetadata {
-        TensorMetadata {
+        identifier: &str,
+        length: u32,
+        ndim: u32,
+        nviews: u32,
+        view_size: u32,
+        shape_offset: u32,
+        stride_offset: u32,
+        contiguous_stride_offset: u32,
+        metadata: Vec<u32>,
+    ) -> WebGPUTensor {
+        let identifier = identifier.to_string();
+        WebGPUTensor {
+            identifier,
             length,
             ndim,
             nviews,
@@ -173,10 +109,23 @@ impl TensorMetadata {
         }
     }
 
-    pub fn serialize_definition() -> String {
+    pub fn name(&self) -> String {
+        format!("Tensor_{UniqueId}", UniqueId = self.identifier)
+    }
+
+    fn type_name(&self) -> String {
+        format!("WebGPUTensor_{UniqueId}", UniqueId = self.identifier)
+    }
+
+    pub fn serialize_type(
+        &self,
+        data_wgsl_type: &str,
+        bind_group: &str,
+        permission: &str,
+    ) -> String {
         format!(
             "
-struct TensorMetadata {{
+struct {TensorType} {{
     length: {ViewType},
     ndim: {ViewType},
     nviews: {ViewType},
@@ -184,15 +133,40 @@ struct TensorMetadata {{
     shape_offset: {ViewType},
     stride_offset: {ViewType},
     contiguous_stride_offset: {ViewType},
-    metadata: {Vec}<{ViewType}>,
+    metadata: {Vec}<{ViewType}, {MetadataLength}>,
+    data: {Vec}<{DataType}>,
 }}
+
+@group({BindGroup}) @binding(0) var<storage, {StoragePermission}> {TensorName}: {TensorType};
 ",
+            TensorType = self.type_name(),
             ViewType = "u32",
             Vec = "array",
+            MetadataLength = self.metadata.len(),
+            DataType = data_wgsl_type,
+            BindGroup = bind_group,
+            StoragePermission = permission,
+            TensorName = self.name()
         )
     }
 
-    pub fn bytes(&self) -> &[u8] {
-        bytemuck::cast_slice(&self.metadata)
+    pub fn bytes(&self) -> Vec<u8> {
+        let static_metadata = [
+            self.length,
+            self.ndim,
+            self.nviews,
+            self.view_size,
+            self.shape_offset,
+            self.stride_offset,
+            self.contiguous_stride_offset,
+        ];
+
+        let metadata_all = static_metadata
+            .iter()
+            .chain(self.metadata.iter())
+            .map(|&x| x)
+            .collect::<Vec<_>>();
+
+        bytemuck::cast_slice(&metadata_all[..]).to_vec()
     }
 }
