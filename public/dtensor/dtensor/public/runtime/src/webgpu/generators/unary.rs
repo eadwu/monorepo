@@ -70,7 +70,7 @@ fn {entry_point}(
         entry_point = "main",
         index = compute_index("index", "global_id", "WORKGROUP_STRIDE"),
         output_tensor_name = output_wgpu.name(),
-        map_index = map_index("mapped_index", &input_wgpu.name()),
+        map_index = map_index("mapped_index", input.viewtracker()),
         output = {
             let input_data = format!("{}.data[mapped_index]", input_wgpu.name());
             let output = build_webgpu_operation(op, output.datatype())(&input_data);

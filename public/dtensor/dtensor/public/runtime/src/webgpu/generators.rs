@@ -28,64 +28,50 @@ pub fn compute_index(
     )
 }
 
-pub fn translate_index_as_strided(
-    index_variable: &str,
-    metadata_variable: &str,
-    strided_field: &str,
-    view_offset_variable: &str,
-) -> String {
+pub fn map_index(index_variable: &str, viewtracker: &TensorViewTracker) -> String {
+    let view_history = viewtracker.serialized_history_fifo();
+    let index_transformations = {
+        view_history
+            .iter()
+            .enumerate()
+            .map(|(i, view)| {
+                let last_index = format!("index{}", i);
+                let this_index = format!("index{}", i + 1);
+                if view.ndim() == 0 {
+                    format!("let {} = 0u;", this_index)
+                } else {
+                    let assignment = view
+                        .shape
+                        .iter()
+                        .zip(view.stride.iter().zip(view.contiguous_stride.iter()))
+                        .map(|(&shape, (&stride, &contiguous_stride))| {
+                            format!(
+                                "((({index} / {contiguous_stride}u) % {shape}u) * {stride}u)",
+                                index = last_index,
+                                contiguous_stride = contiguous_stride,
+                                shape = shape,
+                                stride = stride,
+                            )
+                        })
+                        .collect::<Vec<_>>()
+                        .join("+");
+                    format!("let {} = {};", this_index, assignment)
+                }
+            })
+            .collect::<Vec<_>>()
+            .join("\n")
+    };
+
     format!(
         "
 {{
-    var translate_index_as_strided__index = {index_variable};
-    var translate_index_as_strided__mapped = 0u;
-
-    for (var i = 0u; i < {metadata_variable}.ndim; i++) {{
-        let shape_offset = {view_offset_variable} + {metadata_variable}.shape_offset + i;
-        let stride_offset = {view_offset_variable} + {metadata_variable}.{strided_field} + i;
-        let contiguous_stride_offset = {view_offset_variable} + {metadata_variable}.contiguous_stride_offset + i;
-
-        let shape = {metadata_variable}.metadata[shape_offset];
-        let stride = {metadata_variable}.metadata[stride_offset];
-        let contiguous_stride = {metadata_variable}.metadata[contiguous_stride_offset];
-
-        let data_index = translate_index_as_strided__index / contiguous_stride;
-        let mapped_index = data_index % shape;
-
-        translate_index_as_strided__index %= contiguous_stride;
-        translate_index_as_strided__mapped += mapped_index * stride;
-    }}
-
-    {index_variable} = translate_index_as_strided__mapped;
+    let index0 = {index_variable};
+    {index_transformations}
+    {index_variable} = index{view_len};
 }}
 ",
         index_variable = index_variable,
-        metadata_variable = metadata_variable,
-        strided_field = strided_field,
-        view_offset_variable = view_offset_variable,
-    )
-}
-
-pub fn map_index(index_variable: &str, metadata_variable: &str) -> String {
-    format!(
-        "
-{{
-    var map_index__index = {index_variable};
-
-    for (var view = 0u; view < {metadata_variable}.nviews; view++) {{
-        let base_view_offset = view * {metadata_variable}.view_size;
-        {map_as_strided}
-    }}
-
-    {index_variable} = map_index__index;
-}}
-",
-        index_variable = index_variable,
-        map_as_strided = translate_index_as_strided(
-            "map_index__index",
-            metadata_variable,
-            "stride_offset",
-            "base_view_offset"
-        ),
+        index_transformations = index_transformations,
+        view_len = view_history.len(),
     )
 }
