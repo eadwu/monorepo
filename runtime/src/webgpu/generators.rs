@@ -1,19 +1,9 @@
 use tensor::primitives::tensor::TensorType;
-
-use super::TensorMetadata;
+use tensor::primitives::tensorview::TensorViewTracker;
 
 pub mod binary;
 pub mod reduce;
 pub mod unary;
-
-pub fn shader_header() -> String {
-    format!(
-        "
-{TensorMetadata}
-",
-        TensorMetadata = TensorMetadata::serialize_definition(),
-    )
-}
 
 pub fn wgsl_from_tensortype(datatype: TensorType) -> String {
     match datatype {
@@ -23,26 +13,6 @@ pub fn wgsl_from_tensortype(datatype: TensorType) -> String {
         TensorType::U32 => "u32",
     }
     .to_string()
-}
-
-pub fn tensor_interface(
-    group: &str,
-    permission: &str,
-    name: &str,
-    container_type: &str,
-    metadata_name: &str,
-) -> String {
-    format!(
-        "
-@group({group}) @binding(0) var<storage, {permission}> {name}: {container_type};
-@group({group}) @binding(1) var<storage, read> {metadata_name}: TensorMetadata;
-",
-        group = group,
-        permission = permission,
-        name = name,
-        container_type = container_type,
-        metadata_name = metadata_name,
-    )
 }
 
 pub fn compute_index(

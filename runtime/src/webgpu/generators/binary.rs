@@ -1,6 +1,7 @@
 use tensor::primitives::tensor::{BinaryType, Tensor};
 
 use crate::webgpu::generators::*;
+use crate::webgpu::WebGPUTensor;
 use crate::webgpu::WebGPUWorkGroup;
 use crate::webgpu::WORKGROUP_SIZE;
 
@@ -26,29 +27,20 @@ pub fn build_shader(
     output: &Tensor,
     workgroups: &WebGPUWorkGroup,
 ) -> String {
-    let lhs_type = format!(
-        "array<{datatype}>",
-        datatype = wgsl_from_tensortype(lhs.datatype())
-    );
-    let rhs_type = format!(
-        "array<{datatype}>",
-        datatype = wgsl_from_tensortype(rhs.datatype())
-    );
-    let output_element_type = wgsl_from_tensortype(output.datatype());
-    let output_type = format!("array<{datatype}>", datatype = output_element_type);
+    let lhs_wgpu = Into::<WebGPUTensor>::into(lhs);
+    let rhs_wgpu = Into::<WebGPUTensor>::into(rhs);
+    let output_wgpu = Into::<WebGPUTensor>::into(output);
+    let output_datatype = wgsl_from_tensortype(output.datatype());
 
     format!(
         "
-{header}
-
-{workgroup_stride}
-
 {lhs_interface}
 
 {rhs_interface}
 
 {output_interface}
 
+{workgroup_stride}
 @compute {workgroup_size}
 fn {entry_point}(
     @builtin(global_invocation_id) global_id: vec3u
@@ -56,7 +48,7 @@ fn {entry_point}(
     {index}
 
     // Guard against out-of-bounds work group sizes
-    if index >= output_metadata.length {{
+    if index >= {output_tensor_name}.length {{
         return;
     }}
 
@@ -66,24 +58,26 @@ fn {entry_point}(
     var rhs_mapped_index = index;
     {map_rhs_index}
 
-    output[index] = {output};
+    {output_tensor_name}.data[index] = {output};
 }}
 ",
-        header = shader_header(),
         workgroup_stride = workgroups.serialize_strides("WORKGROUP_STRIDE"),
-        lhs_interface = tensor_interface("0", "read", "lhs", &lhs_type, "lhs_metadata"),
-        rhs_interface = tensor_interface("1", "read", "rhs", &rhs_type, "rhs_metadata"),
+        lhs_interface = lhs_wgpu.serialize_type(&wgsl_from_tensortype(lhs.datatype()), "0", "read"),
+        rhs_interface = rhs_wgpu.serialize_type(&wgsl_from_tensortype(rhs.datatype()), "1", "read"),
         output_interface =
-            tensor_interface("2", "read_write", "output", &output_type, "output_metadata"),
+            output_wgpu.serialize_type(&wgsl_from_tensortype(output.datatype()), "2", "read_write"),
         workgroup_size = WORKGROUP_SIZE.serialize_decorator(),
         entry_point = "main",
         index = compute_index("index", "global_id", "WORKGROUP_STRIDE"),
-        map_lhs_index = map_index("lhs_mapped_index", "lhs_metadata"),
-        map_rhs_index = map_index("rhs_mapped_index", "rhs_metadata"),
-        output = build_webgpu_operation(op)(
-            "lhs[lhs_mapped_index]",
-            "rhs[rhs_mapped_index]",
-            &output_element_type
-        ),
+        output_tensor_name = output_wgpu.name(),
+        map_lhs_index = map_index("lhs_mapped_index", &lhs_wgpu.name()),
+        map_rhs_index = map_index("rhs_mapped_index", &rhs_wgpu.name()),
+        output = {
+            let mapped_lhs_data = format!("{}.data[lhs_mapped_index]", lhs_wgpu.name());
+            let mapped_rhs_data = format!("{}.data[rhs_mapped_index]", rhs_wgpu.name());
+            let output =
+                build_webgpu_operation(op)(&mapped_lhs_data, &mapped_rhs_data, &output_datatype);
+            output
+        },
     )
 }

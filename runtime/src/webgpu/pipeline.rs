@@ -3,9 +3,11 @@ use std::{borrow::Cow, collections::HashMap, future::Future};
 use tensor::primitives::tensor::{OperationSpec, Tensor, TensorInput};
 use tensor::topograph::GraphView;
 
-use crate::webgpu::WORKGROUP_SIZE;
-
-use super::{generators, ToWebGPUBindGroup, ToWebGPUTensorLayout, WebGPUDevice, WebGPUWorkGroup};
+use crate::webgpu::generators;
+use crate::webgpu::{
+    ToWebGPUBindGroup, ToWebGPUTensorLayout, WebGPUDevice, WebGPUTensor, WebGPUWorkGroup,
+    WORKGROUP_SIZE,
+};
 
 pub trait WebGPUEvaluation {
     fn evaluate_webgpu(&self, wgpu_device: &WebGPUDevice) -> impl Future<Output = Tensor>;
@@ -149,15 +151,9 @@ pub async fn webgpu_tensor_pipeline<'a>(
         .chain(std::iter::once(output))
         .collect::<Vec<_>>();
 
-    let min_dim_alignment = tensors
-        .iter()
-        .map(|tensor| tensor.viewtracker().max_ndim())
-        .max()
-        .unwrap_or(0);
-
     let tensor_layouts = tensors
         .iter()
-        .map(|tensor| tensor.as_webgpu_tensor(min_dim_alignment, wgpu_device))
+        .map(|tensor| tensor.as_webgpu_tensor(wgpu_device))
         .collect::<Vec<_>>();
 
     let bind_groups = tensor_layouts
@@ -224,9 +220,15 @@ pub async fn webgpu_tensor_pipeline<'a>(
         let data = buffer_slice.get_mapped_range();
 
         // Returns data from buffer
-        let len_bytes = output.len() as usize * output.datatype().byte_size();
-        let output_tensor =
-            Tensor::from_raw_bytes(&data[..len_bytes], output.view().clone(), output.datatype());
+        let output_wgpu = Into::<WebGPUTensor>::into(*output);
+        let metadata_len_bytes = output_wgpu.bytes().len();
+        let data_len_bytes = output.len() as usize * output.datatype().byte_size();
+        let end = data_len_bytes + output_wgpu.bytes().len();
+        let output_tensor = Tensor::from_raw_bytes(
+            &data[metadata_len_bytes..end],
+            output.view().clone(),
+            output.datatype(),
+        );
 
         // With the current interface, we have to make sure all mapped views are
         // dropped before we unmap the buffer.
