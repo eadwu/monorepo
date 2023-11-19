@@ -236,12 +236,9 @@ pub async fn webgpu_tensor_pipeline<'a>(
     let data = buffer_slice.get_mapped_range();
 
     // Returns data from buffer
-    let output_wgpu = Into::<WebGPUTensor>::into(*output);
-    let metadata_len_bytes = output_wgpu.bytes().len();
     let data_len_bytes = output.len() as usize * output.datatype().byte_size();
-    let end = data_len_bytes + output_wgpu.bytes().len();
     let output_tensor = Tensor::from_raw_bytes(
-        &data[metadata_len_bytes..end],
+        &data[..data_len_bytes],
         output.view().clone(),
         output.datatype(),
     );

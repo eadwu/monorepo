@@ -30,14 +30,8 @@ impl ToWebGPUBuffer for Tensor {
     fn as_webgpu_buffer(&self, wgpu_device: &WebGPUDevice) -> wgpu::Buffer {
         let WebGPUDevice { device, queue: _ } = wgpu_device;
 
-        let tensor_metadata = Into::<WebGPUTensor>::into(self);
-        let metadata_bytes = tensor_metadata.bytes();
-        let metadata_len_bytes = metadata_bytes.len();
-
         let data_len_bytes = self.data_len() as usize * self.datatype().byte_size();
-        let total_len_bytes = metadata_len_bytes + data_len_bytes;
-
-        let minimum_size = total_len_bytes.max(WEBGPU_MINIMUM_BUFFER_SIZE);
+        let minimum_size = data_len_bytes.max(WEBGPU_MINIMUM_BUFFER_SIZE);
         let aligned_size =
             minimum_size + (WEBGPU_VEC4_ALIGNMENT - 1) & !(WEBGPU_VEC4_ALIGNMENT - 1);
 
@@ -60,14 +54,9 @@ impl ToWebGPUBuffer for Tensor {
             mapped_at_creation: true,
         });
 
-        {
-            let mut buffer_data = buffer.slice(..).get_mapped_range_mut();
-            buffer_data[..metadata_len_bytes].copy_from_slice(&metadata_bytes[..]);
-            if self.has_data() {
-                let data = self.load();
-                let end = metadata_len_bytes + data.len();
-                buffer_data[metadata_len_bytes..end].copy_from_slice(&data[..]);
-            }
+        if self.has_data() {
+            let data = self.load();
+            buffer.slice(..).get_mapped_range_mut()[..data.len()].copy_from_slice(&data[..]);
         }
 
         buffer.unmap();
@@ -116,34 +105,6 @@ impl ToWebGPUBindGroup for TensorLayout {
 
 impl From<&Tensor> for WebGPUTensor {
     fn from(value: &Tensor) -> Self {
-        let length = value.len();
-        let ndim = value.ndim();
-
-        let shape_offset = 0;
-        let stride_offset = shape_offset + ndim;
-        let contiguous_stride_offset = stride_offset + ndim;
-        let view_size = contiguous_stride_offset + ndim; // dimension * 3
-
-        let view = value.view();
-        let view_metadata = view
-            .shape
-            .iter()
-            .chain(view.stride.iter())
-            .chain(view.contiguous_stride.iter())
-            .map(|&x| x)
-            // If it is a scalar then the metadata is 0 bytes
-            // WebGPU does not like 0-length arrays, so append an extra 0
-            .chain(std::iter::once(0))
-            .collect::<Vec<_>>();
-
-        WebGPUTensor::new(
-            &value.id().to_string(),
-            length,
-            ndim,
-            shape_offset,
-            stride_offset,
-            contiguous_stride_offset,
-            view_metadata,
-        )
+        WebGPUTensor::new(&value.id().to_string())
     }
 }
