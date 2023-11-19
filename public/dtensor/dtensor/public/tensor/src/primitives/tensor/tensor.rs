@@ -133,7 +133,7 @@ impl Tensor {
         if let TensorInput::ExplicitInput(input) = self.data() {
             return match input {
                 InputSpec::Scalar(str) => <&Tensor as ScalarLoader>::load(self, str),
-                InputSpec::Arange(shape) => <&Tensor as ArangeLoader>::load(self, &shape[..]),
+                InputSpec::Arange(n) => <&Tensor as ArangeLoader>::load(self, n.clone()),
                 InputSpec::Internal(spec) => <&Tensor as InternalLoader>::load(self, spec),
                 InputSpec::Safetensor(spec) => <&Tensor as SafetensorLoader>::load(self, spec),
             };
