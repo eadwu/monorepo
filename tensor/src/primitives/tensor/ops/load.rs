@@ -9,7 +9,7 @@ use super::TensorInput;
 #[derive(Clone, Debug)]
 pub enum InputSpec {
     Scalar(String),
-    Arange(Vec<ViewType>),
+    Arange(ViewType),
     Internal(InternalSpec),
     Safetensor(SafetensorSpec),
 }
@@ -31,7 +31,7 @@ impl TensorInput {
     }
 
     pub fn from_arange(shape: &[ViewType]) -> TensorInput {
-        TensorInput::ExplicitInput(InputSpec::Arange(shape.to_vec()))
+        TensorInput::ExplicitInput(InputSpec::Arange(shape.iter().product()))
     }
 
     pub fn from_internal(file: &Path) -> TensorInput {
