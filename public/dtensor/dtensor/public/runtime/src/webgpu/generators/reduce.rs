@@ -22,10 +22,42 @@ pub fn build_shader(
     let input_wgpu = Into::<WebGPUTensor>::into(input);
     let output_wgpu = Into::<WebGPUTensor>::into(output);
 
+    let index_normalization = |index_variable| {
+        let normalized_index = if axis == 0 {
+            // Nothing to normalize
+            "0u".to_string()
+        } else {
+            input.view().shape[..axis as usize]
+                .iter()
+                .zip(output.view().contiguous_stride.iter())
+                .zip(input.view().stride.iter())
+                .map(
+                    |((&output_shape, &output_contiguous_stride), &input_stride)| {
+                        // Strictly speaking, shape isn't needed
+                        format!(
+                            "((({index_variable} / {contiguous_stride}u) % {shape}u) * {stride}u)",
+                            index_variable = index_variable,
+                            contiguous_stride = output_contiguous_stride,
+                            shape = output_shape,
+                            stride = input_stride
+                        )
+                    },
+                )
+                .collect::<Vec<_>>()
+                .join("+")
+        };
+
+        let leftover_index = format!(
+            "({index_variable} % {contiguous_stride_at_axis}u)",
+            index_variable = index_variable,
+            contiguous_stride_at_axis = output.view().contiguous_stride[axis as usize]
+        );
+
+        format!("(({}) + ({}))", normalized_index, leftover_index)
+    };
+
     format!(
         "
-const AXIS: u32 = {axis}u;
-
 {input_interface}
 
 {output_interface}
@@ -42,31 +74,14 @@ fn {entry_point}(
         return;
     }}
 
-    // Essentially map indices without AXIS
-    var mapped_index_temp = index;
-    var mapped_index = 0u;
-    // Coordinates are the same from output to input, except with one dimension flattened
-    // Meaning [..AXIS] strides are different
-    for (var i = 0u; i < AXIS; i++) {{
-        let output_continguous_stride = {output_tensor_name}.metadata[{output_tensor_name}.contiguous_stride_offset + i];
-        let input_continguous_stride = {input_tensor_name}.metadata[{input_tensor_name}.contiguous_stride_offset + i];
-
-        let index_at_dimension = mapped_index_temp / output_continguous_stride;
-        mapped_index_temp %= output_continguous_stride;
-        mapped_index += index_at_dimension * input_continguous_stride;
-    }}
-    // While [AXIS+1..] are the same
-    mapped_index += mapped_index_temp;
-
-    let axis_rank = {input_tensor_name}.metadata[{input_tensor_name}.shape_offset + AXIS];
-    let axis_stride = {input_tensor_name}.metadata[{input_tensor_name}.contiguous_stride_offset + AXIS];
+    let mapped_index = {normalize_index};
 
     var mapped_axis_index = mapped_index;
     {map_axis_index}
 
     var reduction = {input_tensor_name}.data[mapped_index];
-    for (var i = 1u; i < axis_rank; i++) {{
-        mapped_axis_index = mapped_index + i * axis_stride;
+    for (var i = 1u; i < {axis_rank}u; i++) {{
+        mapped_axis_index = mapped_index + i * {axis_stride}u;
         {map_axis_index}
 
         reduction = {operation};
@@ -76,14 +91,19 @@ fn {entry_point}(
 }}
 ",
         workgroup_stride = workgroups.serialize_strides("WORKGROUP_STRIDE"),
-        input_interface = input_wgpu.serialize_type(&wgsl_from_tensortype(input.datatype()), "0", "read"),
-        output_interface = output_wgpu.serialize_type(&wgsl_from_tensortype(output.datatype()), "1", "read_write"),
+        input_interface =
+            input_wgpu.serialize_type(&wgsl_from_tensortype(input.datatype()), "0", "read"),
+        output_interface =
+            output_wgpu.serialize_type(&wgsl_from_tensortype(output.datatype()), "1", "read_write"),
         workgroup_size = WORKGROUP_SIZE.serialize_decorator(),
         entry_point = "main",
         index = compute_index("index", "global_id", "WORKGROUP_STRIDE"),
         output_tensor_name = output_wgpu.name(),
         input_tensor_name = input_wgpu.name(),
+        normalize_index = index_normalization("index"),
         map_axis_index = map_index("mapped_axis_index", input.viewtracker()),
+        axis_rank = input.view().shape[axis as usize],
+        axis_stride = input.view().stride[axis as usize],
         operation = {
             let input_data = format!("{}.data[mapped_axis_index]", input_wgpu.name());
             let output = build_webgpu_operation(op)("reduction", &input_data);
