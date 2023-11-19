@@ -192,13 +192,16 @@ pub async fn webgpu_tensor_pipeline<'a>(
     let output_buffer = &output_layout.data;
     let size = output_buffer.size();
 
+    #[cfg(feature = "wgpu_direct_buffer")]
+    let staging_buffer = output_buffer;
+    #[cfg(not(feature = "wgpu_direct_buffer"))]
     let staging_buffer = device.create_buffer(&wgpu::BufferDescriptor {
         label: None,
         size,
         usage: wgpu::BufferUsages::MAP_READ | wgpu::BufferUsages::COPY_DST,
         mapped_at_creation: false,
     });
-
+    #[cfg(not(feature = "wgpu_direct_buffer"))]
     encoder.copy_buffer_to_buffer(output_buffer, 0, &staging_buffer, 0, size);
 
     queue.submit(std::iter::once(encoder.finish()));

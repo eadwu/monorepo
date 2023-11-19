@@ -41,12 +41,22 @@ impl ToWebGPUBuffer for Tensor {
         let aligned_size =
             minimum_size + (WEBGPU_VEC4_ALIGNMENT - 1) & !(WEBGPU_VEC4_ALIGNMENT - 1);
 
+        #[cfg(feature = "wgpu_direct_buffer")]
         let buffer = device.create_buffer(&wgpu::BufferDescriptor {
             label: None,
             size: aligned_size as u64,
             usage: wgpu::BufferUsages::STORAGE
-                | wgpu::BufferUsages::COPY_SRC
-                | wgpu::BufferUsages::COPY_DST,
+                | wgpu::BufferUsages::MAP_READ
+                | wgpu::BufferUsages::MAP_WRITE,
+            mapped_at_creation: true,
+        });
+        #[cfg(not(feature = "wgpu_direct_buffer"))]
+        let buffer = device.create_buffer(&wgpu::BufferDescriptor {
+            label: None,
+            size: aligned_size as u64,
+            usage: wgpu::BufferUsages::STORAGE
+                | wgpu::BufferUsages::COPY_DST
+                | wgpu::BufferUsages::COPY_SRC,
             mapped_at_creation: true,
         });
 
