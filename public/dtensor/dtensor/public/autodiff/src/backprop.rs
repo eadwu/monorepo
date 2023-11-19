@@ -1,9 +1,9 @@
 use std::collections::HashMap;
 
-use ::tensor::primitives::tensor::Tensor;
+use tensor::primitives::tensor::Tensor;
 
-mod tensor;
-pub use tensor::*;
+mod dtensor;
+pub use dtensor::*;
 
 type Gradients = HashMap<u32, Option<Tensor>>;
 pub struct TensorGradient {

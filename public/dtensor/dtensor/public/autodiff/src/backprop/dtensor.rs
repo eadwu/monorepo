@@ -1,7 +1,9 @@
-use ::tensor::primitives::tensor::*;
-use ::tensor::topograph::GraphView;
+use std::collections::HashMap;
 
-use crate::backprop::*;
+use tensor::primitives::tensor::*;
+use tensor::topograph::GraphView;
+
+use crate::backprop::{BackPropable, BackPropagation, Gradients, TensorGradient};
 
 impl BackPropagation for Tensor {
     fn backward(&self) -> Vec<TensorGradient> {
