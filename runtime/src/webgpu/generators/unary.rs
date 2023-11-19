@@ -51,14 +51,14 @@ fn {entry_point}(
     {index}
 
     // Guard against out-of-bounds work group sizes
-    if index >= {output_tensor_name}.length {{
+    if index >= {output_length}u {{
         return;
     }}
 
     var mapped_index = index;
     {map_index}
 
-    {output_tensor_name}.data[index] = {output};
+    {output_tensor_name}[index] = {output};
 }}
 ",
         workgroup_stride = workgroups.serialize_strides("WORKGROUP_STRIDE"),
@@ -69,10 +69,11 @@ fn {entry_point}(
         workgroup_size = WORKGROUP_SIZE.serialize_decorator(),
         entry_point = "main",
         index = compute_index("index", "global_id", "WORKGROUP_STRIDE"),
+        output_length = output.len(),
         output_tensor_name = output_wgpu.name(),
         map_index = map_index("mapped_index", input.viewtracker()),
         output = {
-            let input_data = format!("{}.data[mapped_index]", input_wgpu.name());
+            let input_data = format!("{}[mapped_index]", input_wgpu.name());
             let output = build_webgpu_operation(op, output.datatype())(&input_data);
             output
         }

@@ -70,7 +70,7 @@ fn {entry_point}(
     {index}
 
     // Guard against out-of-bounds work group sizes
-    if index >= {output_tensor_name}.length {{
+    if index >= {output_length}u {{
         return;
     }}
 
@@ -79,7 +79,7 @@ fn {entry_point}(
     var mapped_axis_index = mapped_index;
     {map_axis_index}
 
-    var reduction = {input_tensor_name}.data[mapped_index];
+    var reduction = {input_tensor_name}[mapped_index];
     for (var i = 1u; i < {axis_rank}u; i++) {{
         mapped_axis_index = mapped_index + i * {axis_stride}u;
         {map_axis_index}
@@ -87,7 +87,7 @@ fn {entry_point}(
         reduction = {operation};
     }}
 
-    {output_tensor_name}.data[index] = reduction;
+    {output_tensor_name}[index] = reduction;
 }}
 ",
         workgroup_stride = workgroups.serialize_strides("WORKGROUP_STRIDE"),
@@ -98,6 +98,7 @@ fn {entry_point}(
         workgroup_size = WORKGROUP_SIZE.serialize_decorator(),
         entry_point = "main",
         index = compute_index("index", "global_id", "WORKGROUP_STRIDE"),
+        output_length = output.len(),
         output_tensor_name = output_wgpu.name(),
         input_tensor_name = input_wgpu.name(),
         normalize_index = index_normalization("index"),
@@ -105,7 +106,7 @@ fn {entry_point}(
         axis_rank = input.view().shape[axis as usize],
         axis_stride = input.view().stride[axis as usize],
         operation = {
-            let input_data = format!("{}.data[mapped_axis_index]", input_wgpu.name());
+            let input_data = format!("{}[mapped_axis_index]", input_wgpu.name());
             let output = build_webgpu_operation(op)("reduction", &input_data);
             output
         },
