@@ -104,7 +104,8 @@ impl WebGPUEvaluation for Tensor {
                     &wgpu_device,
                 )
                 .await;
-                intermediate_results.insert(tensor.id(), result);
+                let _ = tensor.update(&result.data());
+                intermediate_results.insert(tensor.id(), tensor.clone());
 
                 inputs.iter().for_each(|tensor_id| {
                     if let Some(&last_tensor_id) = runtime.dependencies.get(tensor_id) {

@@ -1,4 +1,5 @@
 use std::borrow::BorrowMut;
+use std::cell::RefCell;
 use std::mem::replace;
 use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::Arc;
@@ -19,14 +20,14 @@ pub struct Tensor(Arc<TensorInternals>);
 pub struct TensorInternals {
     id: u32,
     view: TensorViewTracker,
-    data: TensorInput,
+    data: RefCell<TensorInput>,
     datatype: TensorType,
 }
 
 impl TensorInternals {
     pub fn new(
         view: TensorViewTracker,
-        data: TensorInput,
+        data: RefCell<TensorInput>,
         datatype: TensorType,
     ) -> TensorInternals {
         TensorInternals {
@@ -44,7 +45,11 @@ impl Tensor {
         data: TensorInput,
         datatype: TensorType,
     ) -> Tensor {
-        Tensor(Arc::new(TensorInternals::new(view.into(), data, datatype)))
+        Tensor(Arc::new(TensorInternals::new(
+            view.into(),
+            RefCell::new(data),
+            datatype,
+        )))
     }
 
     pub fn scalar<T: TensorDataElement>(data: T) -> Tensor {
@@ -119,8 +124,8 @@ impl Tensor {
         &self.0.view
     }
 
-    pub fn data(&self) -> &TensorInput {
-        &self.0.data
+    pub fn data(&self) -> TensorInput {
+        self.0.data.borrow().clone()
     }
 
     pub fn datatype(&self) -> TensorType {
@@ -130,7 +135,7 @@ impl Tensor {
     pub fn load(&self) -> Vec<u8> {
         assert!(self.has_data(), "Tensor does not contain any data");
 
-        if let TensorInput::ExplicitInput(input) = self.data() {
+        if let TensorInput::ExplicitInput(input) = &self.data() {
             return match input {
                 InputSpec::Scalar(str) => <&Tensor as ScalarLoader>::load(self, str),
                 InputSpec::Arange(n) => <&Tensor as ArangeLoader>::load(self, n.clone()),
@@ -141,13 +146,19 @@ impl Tensor {
 
         unreachable!("Reached unreachable path for Tensor.load()");
     }
+
+    pub fn update(&self, input: &TensorInput) -> TensorInput {
+        self.0.data.replace(input.clone())
+    }
 }
 
 impl Drop for Tensor {
     fn drop(&mut self) {
         fn consume_to(value: &mut Tensor, dest: &mut Vec<Tensor>) {
             if let Some(tensor) = Arc::get_mut(&mut value.0) {
-                if let TensorInput::ExplicitInput(ref mut input) = tensor.data {
+                let tensor_data = tensor.data.get_mut();
+
+                if let TensorInput::ExplicitInput(ref mut input) = tensor_data {
                     if let InputSpec::Internal(ref mut spec) = input {
                         if let Some(path) = Arc::get_mut(spec.path.borrow_mut()) {
                             FILE_MANAGER.lock().unwrap().close(path);
@@ -155,11 +166,11 @@ impl Drop for Tensor {
                     }
                 }
 
-                if let TensorInput::NoOp(ref mut input) = tensor.data {
+                if let TensorInput::NoOp(ref mut input) = tensor_data {
                     dest.push(input.clone());
                 }
 
-                if let TensorInput::OperationResult(ref mut result) = tensor.data {
+                if let TensorInput::OperationResult(ref mut result) = tensor_data {
                     if let OperationSpec::UnaryOp(ref mut op) = result {
                         dest.push(op.input.clone());
                     }
@@ -174,7 +185,7 @@ impl Drop for Tensor {
                     }
                 }
 
-                let _ = replace(&mut tensor.data, TensorInput::Invalidated);
+                let _ = tensor.data.replace(TensorInput::Invalidated);
             }
         }
 
