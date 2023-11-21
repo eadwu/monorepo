@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::primitives::tensor::{OperationSpec, Tensor, TensorInput};
+use crate::primitives::tensor::{GraphDependencies, OperationSpec, Tensor, TensorInput};
 
 pub struct RuntimeGraph {
     pub dependencies: HashMap<u32, u32>,
@@ -35,20 +35,7 @@ impl GraphView for Tensor {
                 continue;
             }
 
-            if let TensorInput::NoOp(input) = current.data() {
-                queue.push(input.clone());
-            }
-
-            if let TensorInput::OperationResult(operation) = current.data() {
-                match operation {
-                    OperationSpec::UnaryOp(op) => queue.push(op.input.clone()),
-                    OperationSpec::BinaryOp(op) => {
-                        queue.push(op.lhs.clone());
-                        queue.push(op.rhs.clone());
-                    }
-                    OperationSpec::ReduceOp(op) => queue.push(op.input.clone()),
-                }
-            }
+            queue.append(&mut current.dependencies());
         }
 
         // Traverse each node until all paths are accounted for
@@ -58,22 +45,7 @@ impl GraphView for Tensor {
             let current = queue.pop().unwrap();
             graph.push(current.clone());
 
-            let mut parents = vec![];
-            if let TensorInput::NoOp(input) = current.data() {
-                parents.push(input.clone());
-            }
-
-            if let TensorInput::OperationResult(operation) = current.data() {
-                match operation {
-                    OperationSpec::UnaryOp(op) => parents.push(op.input.clone()),
-                    OperationSpec::BinaryOp(op) => {
-                        parents.push(op.lhs.clone());
-                        parents.push(op.rhs.clone());
-                    }
-                    OperationSpec::ReduceOp(op) => parents.push(op.input.clone()),
-                }
-            };
-
+            let parents = current.dependencies();
             for parent in parents {
                 let count = node_counts.get(&parent.id()).unwrap().clone();
                 if count == 1 {
@@ -85,28 +57,17 @@ impl GraphView for Tensor {
         }
 
         // Get latest dependency (lifetime) for every Tensor in graph
-        let graph: Vec<Tensor> = graph.into_iter().rev().collect();
-        let mut dependencies = HashMap::new();
-        for tensor in &graph {
-            if let TensorInput::NoOp(input) = tensor.data() {
-                dependencies.insert(input.id(), tensor.id());
-            }
-
-            if let TensorInput::OperationResult(operation) = tensor.data() {
-                match operation {
-                    OperationSpec::UnaryOp(op) => {
-                        dependencies.insert(op.input.id(), tensor.id());
-                    }
-                    OperationSpec::BinaryOp(op) => {
-                        dependencies.insert(op.lhs.id(), tensor.id());
-                        dependencies.insert(op.rhs.id(), tensor.id());
-                    }
-                    OperationSpec::ReduceOp(op) => {
-                        dependencies.insert(op.input.id(), tensor.id());
-                    }
-                }
-            }
-        }
+        let graph = graph.into_iter().rev().collect::<Vec<_>>();
+        let dependencies = graph
+            .iter()
+            .flat_map(|tensor| {
+                tensor
+                    .dependencies()
+                    .iter()
+                    .map(|input| (input.id(), tensor.id()))
+                    .collect::<Vec<_>>()
+            })
+            .collect::<HashMap<_, _>>();
 
         RuntimeGraph::new(dependencies, graph)
     }
