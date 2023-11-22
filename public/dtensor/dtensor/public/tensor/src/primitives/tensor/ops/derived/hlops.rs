@@ -396,7 +396,7 @@ impl Tensor {
             .fold(self.clone(), |acc, (axis, &(offset_pre, offset_post))| {
                 let shape = acc.shape()[axis];
                 let indices = (offset_pre..shape - offset_post).collect::<Vec<_>>();
-                let indices_tensor = Tensor::from_contiguous(&indices[..], &[indices.len() as u32]);
+                let indices_tensor = Tensor::range(&[indices.len() as u32], offset_pre, 1);
                 acc.Gather(axis as u32, &indices_tensor)
             })
     }
@@ -526,7 +526,7 @@ impl Tensor {
                 // Although it is important for Gather for it to be within the bounds
                 let end = end.min(shape_at_axis);
                 let indices = (start..end).step_by(step as usize).collect::<Vec<u32>>();
-                let indices_tensor = Tensor::from_contiguous(&indices[..], &[indices.len() as u32]);
+                let indices_tensor = Tensor::range(&[indices.len() as u32], start, step);
                 // Equivalent to slicing by one dimension each time
                 acc.Gather(axis, &indices_tensor)
             })

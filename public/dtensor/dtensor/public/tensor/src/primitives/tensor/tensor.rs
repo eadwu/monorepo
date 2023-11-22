@@ -62,9 +62,13 @@ impl Tensor {
     }
 
     pub fn arange(shape: &[ViewType]) -> Tensor {
+        Tensor::range(shape, 0, 1)
+    }
+
+    pub fn range(shape: &[ViewType], start: ViewType, step: ViewType) -> Tensor {
         let view = TensorView::from_contiguous_shape(shape);
-        let n = view.len();
-        Tensor::new(view, TensorInput::from_range(0, n, 1), TensorType::I32)
+        let end = start + step * view.len();
+        Tensor::new(view, TensorInput::from_range(start, end, step), TensorType::I32)
     }
 
     pub fn randn(shape: &[ViewType], mean: Option<f32>, std_dev: Option<f32>) -> Tensor {
