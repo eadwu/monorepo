@@ -1,29 +1,37 @@
+use crate::topograph::{GraphDependencies, UniqueIdentifier};
 use crate::primitives::tensor::*;
 
-pub trait GraphDependencies {
-    fn dependencies(&self) -> Vec<Tensor>;
+impl UniqueIdentifier for Tensor {
+    type Id = u32;
+    fn id(&self) -> Self::Id {
+        self.id()
+    }
 }
 
 impl GraphDependencies for UnarySpec {
-    fn dependencies(&self) -> Vec<Tensor> {
+    type Dependency = Tensor;
+    fn dependencies(&self) -> Vec<Self::Dependency> {
         vec![self.input.clone()]
     }
 }
 
 impl GraphDependencies for BinarySpec {
-    fn dependencies(&self) -> Vec<Tensor> {
+    type Dependency = Tensor;
+    fn dependencies(&self) -> Vec<Self::Dependency> {
         vec![self.lhs.clone(), self.rhs.clone()]
     }
 }
 
 impl GraphDependencies for ReduceSpec {
-    fn dependencies(&self) -> Vec<Tensor> {
+    type Dependency = Tensor;
+    fn dependencies(&self) -> Vec<Self::Dependency> {
         vec![self.input.clone()]
     }
 }
 
 impl GraphDependencies for OperationSpec {
-    fn dependencies(&self) -> Vec<Tensor> {
+    type Dependency = Tensor;
+    fn dependencies(&self) -> Vec<Self::Dependency> {
         match self {
             OperationSpec::UnaryOp(spec) => spec.dependencies(),
             OperationSpec::BinaryOp(spec) => spec.dependencies(),
@@ -33,7 +41,8 @@ impl GraphDependencies for OperationSpec {
 }
 
 impl GraphDependencies for Tensor {
-    fn dependencies(&self) -> Vec<Tensor> {
+    type Dependency = Tensor;
+    fn dependencies(&self) -> Vec<Self::Dependency> {
         match &self.data() {
             TensorInput::NoOp(input) => vec![input.clone()],
             TensorInput::ExplicitInput(_) => vec![],

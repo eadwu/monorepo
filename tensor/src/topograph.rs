@@ -1,27 +1,25 @@
 use std::collections::HashMap;
 
-use crate::primitives::tensor::{GraphDependencies, OperationSpec, Tensor, TensorInput};
+pub type RuntimeGraph<T> = Vec<T>;
 
-pub struct RuntimeGraph {
-    pub dependencies: HashMap<u32, u32>,
-    pub graph: Vec<Tensor>,
+pub trait UniqueIdentifier {
+    type Id: std::hash::Hash + std::cmp::Eq + PartialEq;
+    fn id(&self) -> Self::Id;
 }
 
-impl RuntimeGraph {
-    pub fn new(dependencies: HashMap<u32, u32>, graph: Vec<Tensor>) -> RuntimeGraph {
-        RuntimeGraph {
-            dependencies,
-            graph,
-        }
-    }
+pub trait GraphDependencies {
+    type Dependency;
+    fn dependencies(&self) -> Vec<Self::Dependency>;
 }
 
 pub trait GraphView {
-    fn as_runtime_graph(&self) -> RuntimeGraph;
+    type GraphNode;
+    fn linearize(&self) -> RuntimeGraph<Self::GraphNode>;
 }
 
-impl GraphView for Tensor {
-    fn as_runtime_graph(&self) -> RuntimeGraph {
+impl<T: UniqueIdentifier + GraphDependencies<Dependency = T> + Clone> GraphView for T {
+    type GraphNode = T;
+    fn linearize(&self) -> RuntimeGraph<Self::GraphNode> {
         // Count how many paths reach every node
         let mut node_counts = HashMap::new();
         let mut queue = vec![self.clone()];
@@ -56,19 +54,6 @@ impl GraphView for Tensor {
             }
         }
 
-        // Get latest dependency (lifetime) for every Tensor in graph
-        let graph = graph.into_iter().rev().collect::<Vec<_>>();
-        let dependencies = graph
-            .iter()
-            .flat_map(|tensor| {
-                tensor
-                    .dependencies()
-                    .iter()
-                    .map(|input| (input.id(), tensor.id()))
-                    .collect::<Vec<_>>()
-            })
-            .collect::<HashMap<_, _>>();
-
-        RuntimeGraph::new(dependencies, graph)
+        graph.into_iter().rev().collect::<Vec<_>>()
     }
 }
