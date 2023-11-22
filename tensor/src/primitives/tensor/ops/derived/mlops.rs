@@ -204,6 +204,11 @@ impl Tensor {
         self.Relu().Add(&alpha.Multiply(&zero.Minimum(self)))
     }
 
+    pub fn Recip(&self) -> Tensor {
+        let one = Tensor::scalar(1.0);
+        one.Divide(&self)
+    }
+
     pub fn Relu(&self) -> Tensor {
         let zero = Tensor::scalar(0);
         self.Maximum(&zero)

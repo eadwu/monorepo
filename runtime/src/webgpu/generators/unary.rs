@@ -13,7 +13,6 @@ fn build_webgpu_operation<'a>(
         UnaryType::EXP2 => |input| format!("exp2({input})", input = input),
         UnaryType::IDENTITY => |input| format!("{input}", input = input),
         UnaryType::LOG2 => |input| format!("log2({input})", input = input),
-        UnaryType::RECIP => |input| format!("(1 / ({input}))", input = input),
         UnaryType::SIN => |input| format!("sin({input})", input = input),
         UnaryType::SQRT => |input| format!("sqrt({input})", input = input),
         UnaryType::ABS => |input| format!("abs({input})", input = input),

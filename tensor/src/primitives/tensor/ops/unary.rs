@@ -11,7 +11,6 @@ pub enum UnaryType {
     CAST,
     SIN,
     SQRT,
-    RECIP,
     ABS,
     FLOOR,
     CEIL,
@@ -84,10 +83,6 @@ impl Tensor {
 
     pub fn Sqrt(&self) -> Tensor {
         self.upgradable_unary_op(UnaryType::SQRT, TensorType::F32)
-    }
-
-    pub fn Recip(&self) -> Tensor {
-        self.upgradable_unary_op(UnaryType::RECIP, TensorType::F32)
     }
 
     pub fn Abs(&self) -> Tensor {
