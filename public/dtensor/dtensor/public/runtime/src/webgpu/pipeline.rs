@@ -1,7 +1,7 @@
 use std::{borrow::Cow, collections::HashMap, future::Future};
 
 use tensor::primitives::tensor::{OperationSpec, Tensor, TensorInput};
-use tensor::topograph::GraphView;
+use tensor::topograph::{GraphView, GraphDependencies};
 
 use crate::webgpu::generators;
 use crate::webgpu::{
@@ -26,10 +26,20 @@ impl WebGPUEvaluation for Tensor {
         // Ensure output is a contiguous Tensor
         let output = self.Identity();
 
-        let runtime = output.as_runtime_graph();
+        let runtime = output.linearize();
         let mut intermediate_results = HashMap::new();
 
-        for tensor in &runtime.graph {
+        let lifetimes = runtime
+            .iter()
+            .flat_map(|tensor| {
+                tensor.dependencies()
+                    .iter()
+                    .map(|input| (input.id(), tensor.id()))
+                    .collect::<Vec<_>>()
+            })
+            .collect::<HashMap<_, _>>();
+
+        for tensor in &runtime {
             if let TensorInput::NoOp(input) = tensor.data() {
                 let input: &Tensor = intermediate_results.get(&input.id()).unwrap();
                 let clone = Tensor::new(
@@ -108,7 +118,7 @@ impl WebGPUEvaluation for Tensor {
                 intermediate_results.insert(tensor.id(), tensor.clone());
 
                 inputs.iter().for_each(|tensor_id| {
-                    if let Some(&last_tensor_id) = runtime.dependencies.get(tensor_id) {
+                    if let Some(&last_tensor_id) = lifetimes.get(tensor_id) {
                         if tensor.id() == last_tensor_id {
                             intermediate_results.remove(tensor_id);
                         }

@@ -11,10 +11,10 @@ impl BackPropagation for Tensor {
     }
 
     fn backprop(&self, tensors: &[&Tensor]) -> Gradients {
-        let runtime = self.as_runtime_graph();
+        let runtime = self.linearize();
         let mut gradients = HashMap::new();
 
-        runtime.graph.iter().rev().for_each(|tensor| {
+        runtime.iter().rev().for_each(|tensor| {
             tensor.backward().into_iter().for_each(|tensor_gradient| {
                 let target_tensor_id = tensor_gradient.gradient_of().id();
 
