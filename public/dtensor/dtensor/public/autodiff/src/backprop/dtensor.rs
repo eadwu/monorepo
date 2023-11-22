@@ -57,8 +57,6 @@ impl BackPropable for UnarySpec {
                 UnaryType::LOG2 => Tensor::scalar(std::f32::consts::LN_2)
                     .Multiply(&self.input)
                     .Recip(),
-                // -(1/x^2)
-                UnaryType::RECIP => self.input.Pow(&Tensor::scalar(2)).Recip().Neg(),
                 // cos(x)
                 UnaryType::SIN => self.input.Cos(),
                 // 1 / (2sqrt(x))
