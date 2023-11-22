@@ -9,9 +9,16 @@ use super::TensorInput;
 #[derive(Clone, Debug)]
 pub enum InputSpec {
     Scalar(String),
-    Arange(ViewType),
+    Range(RangeSpec),
     Internal(InternalSpec),
     Safetensor(SafetensorSpec),
+}
+
+#[derive(Clone, Debug)]
+pub struct RangeSpec {
+    pub start: ViewType,
+    pub end: ViewType,
+    pub step: ViewType,
 }
 
 #[derive(Clone, Debug)]
@@ -30,8 +37,8 @@ impl TensorInput {
         TensorInput::ExplicitInput(InputSpec::Scalar(value.to_string()))
     }
 
-    pub fn from_arange(shape: &[ViewType]) -> TensorInput {
-        TensorInput::ExplicitInput(InputSpec::Arange(shape.iter().product()))
+    pub fn from_range(start: ViewType, end: ViewType, step: ViewType) -> TensorInput {
+        TensorInput::ExplicitInput(InputSpec::Range(RangeSpec { start, end, step }))
     }
 
     pub fn from_internal(file: &Path) -> TensorInput {

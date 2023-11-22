@@ -63,7 +63,8 @@ impl Tensor {
 
     pub fn arange(shape: &[ViewType]) -> Tensor {
         let view = TensorView::from_contiguous_shape(shape);
-        Tensor::new(view, TensorInput::from_arange(shape), TensorType::I32)
+        let n = view.len();
+        Tensor::new(view, TensorInput::from_range(0, n, 1), TensorType::I32)
     }
 
     pub fn randn(shape: &[ViewType], mean: Option<f32>, std_dev: Option<f32>) -> Tensor {
@@ -138,7 +139,7 @@ impl Tensor {
         if let TensorInput::ExplicitInput(input) = &self.data() {
             return match input {
                 InputSpec::Scalar(str) => <&Tensor as ScalarLoader>::load(self, str),
-                InputSpec::Arange(n) => <&Tensor as ArangeLoader>::load(self, n.clone()),
+                InputSpec::Range(spec) => <&Tensor as RangeLoader>::load(self, spec),
                 InputSpec::Internal(spec) => <&Tensor as InternalLoader>::load(self, spec),
                 InputSpec::Safetensor(spec) => <&Tensor as SafetensorLoader>::load(self, spec),
             };

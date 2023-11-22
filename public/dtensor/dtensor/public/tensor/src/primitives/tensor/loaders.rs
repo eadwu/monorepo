@@ -1,5 +1,5 @@
-mod arange;
-pub use arange::*;
+mod range;
+pub use range::*;
 
 mod internal;
 pub use internal::*;
