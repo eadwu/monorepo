@@ -4,6 +4,7 @@ use std::sync::Mutex;
 use filemanager::FileManager;
 use once_cell::sync::Lazy;
 
+pub mod ir;
 pub mod primitives;
 pub mod topograph;
 
