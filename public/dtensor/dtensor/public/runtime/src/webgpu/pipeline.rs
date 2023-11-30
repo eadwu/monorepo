@@ -75,7 +75,7 @@ impl WebGPUEvaluation for Tensor {
                         (
                             generators::reduce::build_shader(
                                 op.op,
-                                op.axis,
+                                &op.axes[..],
                                 input,
                                 tensor,
                                 &workgroups,
