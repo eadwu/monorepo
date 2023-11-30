@@ -1,5 +1,5 @@
 use tensor::primitives::tensor::{ReduceType, Tensor};
-use tensor::primitives::tensorview::ViewType;
+use tensor::primitives::tensorview::{TensorView, ViewType};
 
 use crate::webgpu::WebGPUWorkGroup;
 use crate::webgpu::WORKGROUP_SIZE;
@@ -23,38 +23,26 @@ pub fn build_shader(
     let output_wgpu = Into::<WebGPUTensor>::into(output);
 
     let index_normalization = |index_variable| {
-        let normalized_index = if axis == 0 {
-            // Nothing to normalize
-            "0u".to_string()
-        } else {
-            input.view().shape[..axis as usize]
-                .iter()
-                .zip(output.view().contiguous_stride.iter())
-                .zip(input.view().stride.iter())
-                .map(
-                    |((&output_shape, &output_contiguous_stride), &input_stride)| {
-                        // Strictly speaking, shape isn't needed
-                        format!(
-                            "((({index_variable} / {contiguous_stride}u) % {shape}u) * {stride}u)",
-                            index_variable = index_variable,
-                            contiguous_stride = output_contiguous_stride,
-                            shape = output_shape,
-                            stride = input_stride
-                        )
-                    },
-                )
-                .collect::<Vec<_>>()
-                .join("+")
-        };
-
-        let leftover_index = format!(
-            "({index_variable} % {contiguous_stride_at_axis}u)",
-            index_variable = index_variable,
-            contiguous_stride_at_axis = output.view().contiguous_stride[axis as usize]
-        );
-
-        format!("(({}) + ({}))", normalized_index, leftover_index)
+        let normalized_mapper = Into::<TensorViewTracker>::into(TensorView::as_defined(
+            false,
+            output.view().shape.clone(),
+            input.view().stride.clone(),
+            output.view().contiguous_stride.clone(),
+        ));
+        map_index(index_variable, &normalized_mapper)
     };
+
+    let reduce_shape = vec![input.view().shape[axis as usize]];
+    let reduce_strides = vec![input.view().stride[axis as usize]];
+    let reduce_contiguous_strides = TensorView::compute_contiguous_stride(&reduce_shape[..]);
+
+    let iteration_mapper = Into::<TensorViewTracker>::into(TensorView::as_defined(
+        false,
+        reduce_shape.into_boxed_slice(),
+        reduce_strides.into_boxed_slice(),
+        reduce_contiguous_strides.into_boxed_slice(),
+    ));
+    let reduce_iterations = iteration_mapper.len();
 
     format!(
         "
@@ -74,14 +62,17 @@ fn {entry_point}(
         return;
     }}
 
-    let mapped_index = {normalize_index};
+    var mapped_index = index;
+    {normalize_index}
 
     var mapped_axis_index = mapped_index;
     {map_axis_index}
 
     var reduction = {input_tensor_name}[mapped_index];
-    for (var i = 1u; i < {axis_rank}u; i++) {{
-        mapped_axis_index = mapped_index + i * {axis_stride}u;
+    for (var i = 1u; i < {reduce_iterations}u; i++) {{
+        var offset_at_index = i;
+        {map_index_to_offset}
+        mapped_axis_index = mapped_index + offset_at_index;
         {map_axis_index}
 
         reduction = {operation};
@@ -101,10 +92,10 @@ fn {entry_point}(
         output_length = output.len(),
         output_tensor_name = output_wgpu.name(),
         input_tensor_name = input_wgpu.name(),
-        normalize_index = index_normalization("index"),
+        normalize_index = index_normalization("mapped_index"),
         map_axis_index = map_index("mapped_axis_index", input.viewtracker()),
-        axis_rank = input.view().shape[axis as usize],
-        axis_stride = input.view().stride[axis as usize],
+        reduce_iterations = reduce_iterations,
+        map_index_to_offset = map_index("offset_at_index", &iteration_mapper),
         operation = {
             let input_data = format!("{}[mapped_axis_index]", input_wgpu.name());
             let output = build_webgpu_operation(op)("reduction", &input_data);
