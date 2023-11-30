@@ -13,47 +13,16 @@ pub enum ReduceType {
 pub struct ReduceSpec {
     pub op: ReduceType,
     pub input: Tensor,
-    pub axis: ViewType,
+    pub axes: Vec<ViewType>,
 }
 
 impl TensorInput {
-    pub fn reduce(op: ReduceType, input: Tensor, axis: ViewType) -> TensorInput {
-        TensorInput::OperationResult(OperationSpec::ReduceOp(ReduceSpec { op, input, axis }))
+    pub fn reduce(op: ReduceType, input: Tensor, axes: Vec<ViewType>) -> TensorInput {
+        TensorInput::OperationResult(OperationSpec::ReduceOp(ReduceSpec { op, input, axes }))
     }
 }
 
 impl Tensor {
-    fn _reduce(&self, op: ReduceType, axis: ViewType, keep_dim: bool) -> Tensor {
-        let output_shape = self
-            .view()
-            .shape
-            .iter()
-            .enumerate()
-            .map(
-                |(idx, &dimension)| {
-                    if idx == axis as usize {
-                        1
-                    } else {
-                        dimension
-                    }
-                },
-            )
-            .collect::<Vec<_>>();
-
-        let output_view = TensorView::from_contiguous_shape(&output_shape[..]);
-        let result = Tensor::new(
-            output_view,
-            TensorInput::reduce(op, self.clone(), axis),
-            self.datatype(),
-        );
-
-        if keep_dim {
-            result
-        } else {
-            result.squeeze(axis)
-        }
-    }
-
     fn reduce_op(&self, op: ReduceType, axes: &[ViewType], keep_dims: bool) -> Tensor {
         // If &[] is given, assume it is a reduction along all axes
         let axes = if axes.len() == 0 {
@@ -84,10 +53,26 @@ impl Tensor {
             )
         });
 
-        // Start from the back so that indices are accurate if keep_dims is false
-        axes.iter().rev().fold(self.clone(), |accumulator, &axis| {
-            accumulator._reduce(op, axis, keep_dims)
-        })
+        let mut output_shape = self.shape().to_vec();
+        for &axis in &axes {
+            output_shape[axis as usize] = 1;
+        }
+        let output_view = TensorView::from_contiguous_shape(&output_shape[..]);
+
+        let result = Tensor::new(
+            output_view,
+            TensorInput::reduce(op, self.clone(), axes.clone()),
+            self.datatype(),
+        );
+
+        if keep_dims {
+            result
+        } else {
+            // Start from the back so that indices are accurate if keep_dims is false
+            axes.iter()
+                .rev()
+                .fold(result, |accumulator, &axis| accumulator.squeeze(axis))
+        }
     }
 
     pub fn Sum(&self, axes: &[ViewType], keep_dims: bool) -> Tensor {

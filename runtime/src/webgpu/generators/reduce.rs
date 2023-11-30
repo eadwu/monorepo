@@ -14,7 +14,7 @@ fn build_webgpu_operation<'a>(op: ReduceType) -> impl Fn(&'a str, &'a str) -> St
 
 pub fn build_shader(
     op: ReduceType,
-    axis: ViewType,
+    axes: &[ViewType],
     input: &Tensor,
     output: &Tensor,
     workgroups: &WebGPUWorkGroup,
@@ -32,8 +32,14 @@ pub fn build_shader(
         map_index(index_variable, &normalized_mapper)
     };
 
-    let reduce_shape = vec![input.view().shape[axis as usize]];
-    let reduce_strides = vec![input.view().stride[axis as usize]];
+    let reduce_shape = axes
+        .iter()
+        .map(|&axis| input.view().shape[axis as usize])
+        .collect::<Vec<_>>();
+    let reduce_strides = axes
+        .iter()
+        .map(|&axis| input.view().stride[axis as usize])
+        .collect::<Vec<_>>();
     let reduce_contiguous_strides = TensorView::compute_contiguous_stride(&reduce_shape[..]);
 
     let iteration_mapper = Into::<TensorViewTracker>::into(TensorView::as_defined(

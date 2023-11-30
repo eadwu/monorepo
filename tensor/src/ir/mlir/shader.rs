@@ -1,5 +1,5 @@
 use crate::primitives::tensor::*;
-use crate::primitives::tensorview::TensorViewTracker;
+use crate::primitives::tensorview::{TensorView, TensorViewTracker};
 
 use crate::ir::mlir::*;
 
@@ -282,125 +282,49 @@ impl UnrollShaderIR for ReduceSpec {
         let index_ir = &index_ir.index;
         let evaltype = Into::<ShaderIREvaluation>::into(self.op);
 
-        let view = self.input.view();
+        let input_view = self.input.view();
+
+        let mut output_shape = input_view.shape.to_vec();
+        for &axis in &self.axes {
+            output_shape[axis as usize] = 1;
+        }
+        let output_view = TensorView::from_contiguous_shape(&output_shape[..]);
 
         // IR to normalize the index to 0 at AXIS
-        let normalized_ir = {
-            let contiguous_stride_factor = view.shape[self.axis as usize];
-            let zero = ShaderIR::new(
-                ShaderIROp::Const,
-                ShaderIRType::I32,
-                &[],
-                Some(ShaderIREvaluation::I32(0)),
-            );
+        let normalized_mapper = Into::<TensorViewTracker>::into(TensorView::as_defined(
+            false,
+            output_view.shape.clone(),
+            input_view.stride.clone(),
+            output_view.contiguous_stride.clone(),
+        ));
 
-            let normalized = view
-                .shape
-                .iter()
-                .zip(view.contiguous_stride.iter().zip(view.stride.iter()))
-                .take(self.axis as usize)
-                .fold(
-                    zero.clone(),
-                    |acc, (&shape, (&input_contiguous_stride, &input_stride))| {
-                        let output_contiguous_stride =
-                            input_contiguous_stride / contiguous_stride_factor;
+        let reduce_shape = self
+            .axes
+            .iter()
+            .map(|&axis| input_view.shape[axis as usize])
+            .collect::<Vec<_>>();
+        let reduce_strides = self
+            .axes
+            .iter()
+            .map(|&axis| input_view.stride[axis as usize])
+            .collect::<Vec<_>>();
+        let reduce_contiguous_strides = TensorView::compute_contiguous_stride(&reduce_shape[..]);
+        let iteration_mapper = Into::<TensorViewTracker>::into(TensorView::as_defined(
+            false,
+            reduce_shape.into_boxed_slice(),
+            reduce_strides.into_boxed_slice(),
+            reduce_contiguous_strides.into_boxed_slice(),
+        ));
+        let reduce_iterations = iteration_mapper.len();
 
-                        let output_contiguous_stride_ir = ShaderIR::new(
-                            ShaderIROp::Const,
-                            ShaderIRType::I32,
-                            &[],
-                            Some(ShaderIREvaluation::I32(output_contiguous_stride as i32)),
-                        );
-                        let shape_ir = ShaderIR::new(
-                            ShaderIROp::Const,
-                            ShaderIRType::I32,
-                            &[],
-                            Some(ShaderIREvaluation::I32(shape as i32)),
-                        );
-                        let input_stride_ir = ShaderIR::new(
-                            ShaderIROp::Const,
-                            ShaderIRType::I32,
-                            &[],
-                            Some(ShaderIREvaluation::I32(input_stride as i32)),
-                        );
-
-                        let x0 = ShaderIR::new(
-                            ShaderIROp::Evaluate,
-                            ShaderIRType::I32,
-                            &[index_ir.clone(), output_contiguous_stride_ir],
-                            Some(ShaderIREvaluation::DIVIDE),
-                        );
-                        // This should not be needed
-                        let x1 = ShaderIR::new(
-                            ShaderIROp::Evaluate,
-                            ShaderIRType::I32,
-                            &[x0, shape_ir],
-                            Some(ShaderIREvaluation::MOD),
-                        );
-                        let x2 = ShaderIR::new(
-                            ShaderIROp::Evaluate,
-                            ShaderIRType::I32,
-                            &[x1, input_stride_ir],
-                            Some(ShaderIREvaluation::MULTIPLY),
-                        );
-
-                        ShaderIR::new(
-                            ShaderIROp::Evaluate,
-                            ShaderIRType::I32,
-                            &[acc, x2],
-                            Some(ShaderIREvaluation::ADD),
-                        )
-                    },
-                );
-
-            let unnormalized = {
-                let contiguous_stride_ir = ShaderIR::new(
-                    ShaderIROp::Const,
-                    ShaderIRType::I32,
-                    &[],
-                    Some(ShaderIREvaluation::I32(
-                        view.contiguous_stride[self.axis as usize] as i32,
-                    )),
-                );
-
-                ShaderIR::new(
-                    ShaderIROp::Evaluate,
-                    ShaderIRType::I32,
-                    &[index_ir.clone(), contiguous_stride_ir],
-                    Some(ShaderIREvaluation::MOD),
-                )
-            };
-
-            ShaderIR::new(
-                ShaderIROp::Evaluate,
-                ShaderIRType::I32,
-                &[normalized, unnormalized],
-                Some(ShaderIREvaluation::ADD),
-            )
-        };
-
-        let reduce_length = view.shape[self.axis as usize];
-        let reduce_stride = view.stride[self.axis as usize];
-
-        let stride_ir = ShaderIR::new(
-            ShaderIROp::Const,
-            ShaderIRType::I32,
-            &[],
-            Some(ShaderIREvaluation::I32(reduce_stride as i32)),
-        );
-
+        let normalized_ir = normalized_mapper.shader_ir(index_ir);
         let reduce_begin = ShaderIR::new(
             ShaderIROp::ReduceBegin,
             ir_type,
             &[normalized_ir.clone()], // ballmark of reduce region
-            Some(ShaderIREvaluation::I32(reduce_length as i32)),
+            Some(ShaderIREvaluation::I32(reduce_iterations as i32)),
         );
-        let adjusted_stride_ir = ShaderIR::new(
-            ShaderIROp::Evaluate,
-            ShaderIRType::I32,
-            &[reduce_begin.clone(), stride_ir],
-            Some(ShaderIREvaluation::MULTIPLY),
-        );
+        let adjusted_stride_ir = iteration_mapper.shader_ir(&reduce_begin);
         let loop_index_ir = ShaderIR::new(
             ShaderIROp::Evaluate,
             ShaderIRType::I32,

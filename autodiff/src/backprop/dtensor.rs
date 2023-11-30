@@ -113,7 +113,7 @@ impl BackPropable for ReduceSpec {
                 ReduceType::MAX => {
                     let output = if output.ndim() != self.input.ndim() {
                         // Squeezed so unsqueeze
-                        output.unsqueeze(self.axis)
+                        self.axes.iter().fold(output.clone(), |acc, &axis| acc.unsqueeze(axis))
                     } else {
                         output.clone()
                     };
