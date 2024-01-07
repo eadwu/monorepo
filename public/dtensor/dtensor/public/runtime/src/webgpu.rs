@@ -1,3 +1,5 @@
+pub mod benchmark;
+
 pub mod generators;
 
 mod tensor;

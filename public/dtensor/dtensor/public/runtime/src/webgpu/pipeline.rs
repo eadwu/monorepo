@@ -3,6 +3,7 @@ use std::{borrow::Cow, collections::HashMap, future::Future};
 use tensor::primitives::tensor::{OperationSpec, Tensor, TensorInput};
 use tensor::topograph::{GraphView, GraphDependencies};
 
+use crate::webgpu::benchmark;
 use crate::webgpu::generators;
 use crate::webgpu::{
     ToWebGPUBindGroup, ToWebGPUTensorLayout, WebGPUDevice, WebGPUTensor, WebGPUWorkGroup,
@@ -172,13 +173,42 @@ pub async fn webgpu_tensor_pipeline<'a>(
         })
         .collect::<Vec<_>>();
 
+    #[cfg(feature = "wgpu_benchmark")]
+    let encoder_timestamps =
+        benchmark::WebGPUTimestamps::new(benchmark::WebGPUEncoderTimestamps::size(), wgpu_device);
+    #[cfg(feature = "wgpu_benchmark")]
+    let compute_timestamps = benchmark::WebGPUTimestamps::new(
+        benchmark::WebGPUComputePassTimestamps::size(),
+        wgpu_device,
+    );
+
     let mut encoder =
         device.create_command_encoder(&wgpu::CommandEncoderDescriptor { label: None });
+
+    #[cfg(feature = "wgpu_benchmark")]
+    encoder.write_timestamp(
+        &encoder_timestamps.query_set,
+        benchmark::WebGPUEncoderTimestamps::Start as _,
+    );
+
     {
+        #[cfg(not(feature = "wgpu_benchmark"))]
         let mut workload = encoder.begin_compute_pass(&wgpu::ComputePassDescriptor {
             label: None,
             timestamp_writes: None,
         });
+        #[cfg(feature = "wgpu_benchmark")]
+        let mut workload = encoder.begin_compute_pass(&wgpu::ComputePassDescriptor {
+            label: None,
+            timestamp_writes: Some(wgpu::ComputePassTimestampWrites {
+                query_set: &compute_timestamps.query_set,
+                beginning_of_pass_write_index: Some(
+                    benchmark::WebGPUComputePassTimestamps::Start as _,
+                ),
+                end_of_pass_write_index: Some(benchmark::WebGPUComputePassTimestamps::End as _),
+            }),
+        });
+
         workload.set_pipeline(&pipeline);
 
         bind_groups
@@ -188,12 +218,30 @@ pub async fn webgpu_tensor_pipeline<'a>(
                 workload.set_bind_group(index as u32, &bind_group, &[])
             });
 
+        #[cfg(feature = "wgpu_benchmark")]
+        workload.write_timestamp(
+            &encoder_timestamps.query_set,
+            benchmark::WebGPUEncoderTimestamps::ComputePassConfigured as _,
+        );
+
         workload.dispatch_workgroups(
             dispatch_workgroups.x / WORKGROUP_SIZE.x + 1,
             dispatch_workgroups.y / WORKGROUP_SIZE.y + 1,
             dispatch_workgroups.z / WORKGROUP_SIZE.z + 1,
         );
     }
+
+    #[cfg(feature = "wgpu_benchmark")]
+    encoder.write_timestamp(
+        &encoder_timestamps.query_set,
+        benchmark::WebGPUEncoderTimestamps::ComputePassFinished as _,
+    );
+
+    #[cfg(feature = "wgpu_benchmark")]
+    encoder.write_timestamp(
+        &encoder_timestamps.query_set,
+        benchmark::WebGPUEncoderTimestamps::OutputCopyToCpuStart as _,
+    );
 
     let output_layout = tensor_layouts.last().unwrap();
     let output_buffer = &output_layout.data;
@@ -210,6 +258,25 @@ pub async fn webgpu_tensor_pipeline<'a>(
     });
     #[cfg(not(feature = "wgpu_direct_buffer"))]
     encoder.copy_buffer_to_buffer(output_buffer, 0, &staging_buffer, 0, size);
+
+    #[cfg(feature = "wgpu_benchmark")]
+    encoder.write_timestamp(
+        &encoder_timestamps.query_set,
+        benchmark::WebGPUEncoderTimestamps::OutputCopyToCpuEnd as _,
+    );
+
+    #[cfg(feature = "wgpu_benchmark")]
+    encoder.write_timestamp(
+        &encoder_timestamps.query_set,
+        benchmark::WebGPUEncoderTimestamps::End as _,
+    );
+
+    #[cfg(feature = "wgpu_benchmark")]
+    let resolved_encoder_timestamps =
+        encoder_timestamps.resolve_query_set(&mut encoder, wgpu_device);
+    #[cfg(feature = "wgpu_benchmark")]
+    let resolved_compute_timestamps =
+        compute_timestamps.resolve_query_set(&mut encoder, wgpu_device);
 
     queue.submit(std::iter::once(encoder.finish()));
 
@@ -237,6 +304,29 @@ pub async fn webgpu_tensor_pipeline<'a>(
     {
         buffer_slice.map_async(wgpu::MapMode::Read, |_| {});
         device.poll(wgpu::Maintain::Wait);
+    }
+
+    #[cfg(feature = "wgpu_benchmark")]
+    {
+        let period = queue.get_timestamp_period();
+        let elapsed_us = |start, end: u64| end.wrapping_sub(start) as f64 * period as f64 / 1000.0;
+
+        let encoder_timestamps =
+            encoder_timestamps.read_results(&resolved_encoder_timestamps, wgpu_device);
+        let compute_timestamps =
+            compute_timestamps.read_results(&resolved_compute_timestamps, wgpu_device);
+
+        let encoder_timeline = &encoder_timestamps[1..]
+            .iter()
+            .map(|&end| elapsed_us(encoder_timestamps[0], end))
+            .map(|us| format!("{:.2}", us))
+            .collect::<Vec<_>>();
+
+        println!("PIPELINE: {}", encoder_timeline.join(" | ") + " μs");
+        println!(
+            "COMPUTE: {:.2} μs",
+            elapsed_us(compute_timestamps[0], compute_timestamps[1])
+        );
     }
 
     // Gets contents of buffer

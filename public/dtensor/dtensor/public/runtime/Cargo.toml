@@ -14,3 +14,4 @@ wgpu = "0.18.0"
 
 [features]
 wgpu_direct_buffer = []
+wgpu_benchmark = []
