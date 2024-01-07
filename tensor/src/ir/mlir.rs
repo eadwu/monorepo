@@ -119,12 +119,20 @@ impl ShaderIR {
         self.0.id
     }
 
+    pub fn op(&self) -> ShaderIROp {
+        self.0.op
+    }
+
     pub fn datatype(&self) -> ShaderIRType {
         self.0.datatype
     }
 
     pub fn inputs(&self) -> &[ShaderIR] {
         &self.0.inputs[..]
+    }
+
+    pub fn evaltype(&self) -> Option<ShaderIREvaluation> {
+        self.0.evaltype
     }
 }
 

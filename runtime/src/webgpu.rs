@@ -84,7 +84,7 @@ impl WebGPUTensor {
     }
 
     pub fn name(&self) -> String {
-        format!("Tensor_{UniqueId}", UniqueId = self.identifier)
+        format!("tensor_{UniqueId}", UniqueId = self.identifier)
     }
 
     pub fn serialize_type(
