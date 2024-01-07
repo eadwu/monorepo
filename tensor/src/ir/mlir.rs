@@ -7,6 +7,9 @@ use crate::topograph::{GraphDependencies, GraphView, UniqueIdentifier};
 mod shader;
 pub use shader::*;
 
+mod generators;
+pub use generators::*;
+
 static ID_GENERATOR: AtomicU64 = AtomicU64::new(0);
 
 pub type ShaderIRID = u64;

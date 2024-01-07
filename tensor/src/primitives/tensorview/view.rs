@@ -13,14 +13,28 @@ pub struct TensorView {
 }
 
 impl TensorView {
+    pub fn as_defined(
+        contiguous: bool,
+        shape: Box<[ViewType]>,
+        stride: Box<[ViewType]>,
+        contiguous_stride: Box<[ViewType]>,
+    ) -> TensorView {
+        TensorView {
+            contiguous,
+            shape,
+            stride,
+            contiguous_stride,
+        }
+    }
+
     pub fn new(contiguous: bool, shape: Box<[ViewType]>, stride: Box<[ViewType]>) -> TensorView {
         let contiguous_stride = TensorView::compute_contiguous_stride(&shape);
-        TensorView {
-            contiguous: contiguous,
-            shape: shape,
-            stride: stride,
-            contiguous_stride: contiguous_stride.into_boxed_slice(),
-        }
+        TensorView::as_defined(
+            contiguous,
+            shape,
+            stride,
+            contiguous_stride.into_boxed_slice(),
+        )
     }
 
     pub fn from_contiguous_shape(shape: &[ViewType]) -> TensorView {
@@ -32,7 +46,7 @@ impl TensorView {
         )
     }
 
-    fn compute_contiguous_stride(contiguous_shape: &[ViewType]) -> Vec<ViewType> {
+    pub fn compute_contiguous_stride(contiguous_shape: &[ViewType]) -> Vec<ViewType> {
         // When it is stored contiguously, the stride is the product of the size
         // of the dimension before it
         contiguous_shape
