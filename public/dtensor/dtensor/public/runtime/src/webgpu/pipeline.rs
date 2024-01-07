@@ -16,7 +16,7 @@ pub trait WebGPUEvaluation {
 
 #[derive(Debug)]
 pub struct WebGPUPipeline<'a> {
-    pub shader: &'a str,
+    pub shader: &'a wgpu::ShaderModule,
     pub inputs: &'a [&'a Tensor],
     pub output: &'a Tensor,
     pub dispatch_workgroups: &'a WebGPUWorkGroup,
@@ -24,6 +24,7 @@ pub struct WebGPUPipeline<'a> {
 
 impl WebGPUEvaluation for Tensor {
     async fn evaluate_webgpu(&self, wgpu_device: &WebGPUDevice) -> Tensor {
+        let WebGPUDevice { device, queue: _ } = wgpu_device;
         // Ensure output is a contiguous Tensor
         let output = self.Identity();
 
@@ -101,9 +102,14 @@ impl WebGPUEvaluation for Tensor {
                     })
                     .collect::<Vec<_>>();
 
+                let compute_shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
+                    label: None,
+                    source: wgpu::ShaderSource::Wgsl(Cow::Borrowed(&shader)),
+                });
+
                 let result = webgpu_tensor_pipeline(
                     &WebGPUPipeline {
-                        shader: &shader,
+                        shader: &compute_shader,
                         inputs: &dependencies,
                         output,
                         dispatch_workgroups: &workgroups,
@@ -142,15 +148,10 @@ pub async fn webgpu_tensor_pipeline<'a>(
         dispatch_workgroups,
     } = pipeline;
 
-    let compiled_shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
-        label: None,
-        source: wgpu::ShaderSource::Wgsl(Cow::Borrowed(shader)),
-    });
-
     let pipeline = device.create_compute_pipeline(&wgpu::ComputePipelineDescriptor {
         label: None,
         layout: None,
-        module: &compiled_shader,
+        module: &shader,
         entry_point: "main",
     });
 
