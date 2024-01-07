@@ -1,10 +1,13 @@
-use std::{borrow::Cow, collections::HashMap, future::Future};
+use std::borrow::Cow;
+use std::collections::{HashMap, HashSet};
+use std::future::Future;
 
+use tensor::ir::mlir::{ShaderIRBuilder, ShaderIREvaluation, ShaderIROp};
 use tensor::primitives::tensor::{OperationSpec, Tensor, TensorInput};
-use tensor::topograph::{GraphView, GraphDependencies};
+use tensor::topograph::{GraphDependencies, GraphView};
 
 use crate::webgpu::benchmark;
-use crate::webgpu::generators;
+use crate::webgpu::generators::{self, compute_index, wgsl_from_tensortype};
 use crate::webgpu::{
     ToWebGPUBindGroup, ToWebGPUTensorLayout, WebGPUDevice, WebGPUTensor, WebGPUWorkGroup,
     WORKGROUP_SIZE,
@@ -31,10 +34,16 @@ impl WebGPUEvaluation for Tensor {
         let runtime = output.linearize();
         let mut intermediate_results = HashMap::new();
 
+        let lookup = runtime
+            .iter()
+            .map(|tensor| (tensor.id(), tensor.clone()))
+            .collect::<HashMap<_, _>>();
+
         let lifetimes = runtime
             .iter()
             .flat_map(|tensor| {
-                tensor.dependencies()
+                tensor
+                    .dependencies()
                     .iter()
                     .map(|input| (input.id(), tensor.id()))
                     .collect::<Vec<_>>()
@@ -51,56 +60,145 @@ impl WebGPUEvaluation for Tensor {
             } else if let TensorInput::OperationResult(operation) = tensor.data() {
                 let workgroups = Into::<WebGPUWorkGroup>::into(tensor.view());
 
-                let (shader, inputs, output) = match operation {
-                    OperationSpec::UnaryOp(op) => {
-                        let input = intermediate_results.get(&op.input.id()).unwrap();
+                #[cfg(feature = "dtensor_shader_stitch")]
+                let (shader, dependencies) = {
+                    let (shader, inputs) = match operation {
+                        OperationSpec::UnaryOp(op) => {
+                            let input = intermediate_results.get(&op.input.id()).unwrap();
 
-                        (
-                            generators::unary::build_shader(op.op, input, tensor, &workgroups),
-                            vec![op.input.id()],
-                            tensor,
-                        )
-                    }
-                    OperationSpec::BinaryOp(op) => {
-                        let lhs = intermediate_results.get(&op.lhs.id()).unwrap();
-                        let rhs = intermediate_results.get(&op.rhs.id()).unwrap();
+                            (
+                                generators::unary::build_shader(op.op, input, tensor, &workgroups),
+                                vec![op.input.id()],
+                            )
+                        }
+                        OperationSpec::BinaryOp(op) => {
+                            let lhs = intermediate_results.get(&op.lhs.id()).unwrap();
+                            let rhs = intermediate_results.get(&op.rhs.id()).unwrap();
 
-                        (
-                            generators::binary::build_shader(op.op, lhs, rhs, tensor, &workgroups),
-                            vec![op.lhs.id(), op.rhs.id()],
-                            tensor,
-                        )
-                    }
-                    OperationSpec::ReduceOp(op) => {
-                        let input = intermediate_results.get(&op.input.id()).unwrap();
+                            (
+                                generators::binary::build_shader(
+                                    op.op,
+                                    lhs,
+                                    rhs,
+                                    tensor,
+                                    &workgroups,
+                                ),
+                                vec![op.lhs.id(), op.rhs.id()],
+                            )
+                        }
+                        OperationSpec::ReduceOp(op) => {
+                            let input = intermediate_results.get(&op.input.id()).unwrap();
 
-                        (
-                            generators::reduce::build_shader(
-                                op.op,
-                                &op.axes[..],
-                                input,
-                                tensor,
-                                &workgroups,
-                            ),
-                            vec![op.input.id()],
-                            tensor,
-                        )
-                    }
+                            (
+                                generators::reduce::build_shader(
+                                    op.op,
+                                    &op.axes[..],
+                                    input,
+                                    tensor,
+                                    &workgroups,
+                                ),
+                                vec![op.input.id()],
+                            )
+                        }
+                    };
+
+                    let dependencies = inputs
+                        .iter()
+                        .map(|tensor_id| {
+                            assert!(
+                                lookup.contains_key(tensor_id),
+                                "Expected Tensor {} to be computed by Tensor {}",
+                                tensor_id,
+                                tensor.id()
+                            );
+
+                            lookup.get(tensor_id).unwrap()
+                        })
+                        .collect::<Vec<_>>();
+
+                    (shader, dependencies)
                 };
 
-                let dependencies = inputs
-                    .iter()
-                    .map(|tensor_id| {
-                        assert!(
-                            intermediate_results.contains_key(tensor_id),
-                            "Expected Tensor {} to be computed by Tensor {}",
-                            tensor_id,
-                            tensor.id()
-                        );
+                #[cfg(not(feature = "dtensor_shader_stitch"))]
+                let (shader, dependencies) = {
+                    let shader_ir = tensor.build_shader_ir();
+                    let mut dependencies = shader_ir
+                        .linearize()
+                        .iter()
+                        .filter(|ir| match ir.op() {
+                            ShaderIROp::Load => true,
+                            _ => false,
+                        })
+                        .map(|ir| match ir.evaltype() {
+                            Some(ShaderIREvaluation::I32(tensor_id)) => tensor_id as u32,
+                            _ => panic!(),
+                        })
+                        .collect::<HashSet<_>>()
+                        .into_iter()
+                        .map(|tensor_id| lookup.get(&tensor_id).unwrap())
+                        .collect::<Vec<_>>();
 
-                        intermediate_results.get(tensor_id).unwrap()
-                    })
-                    .collect::<Vec<_>>();
+                    let shader = format!(
+                    "
+                    {input_interface}
+
+                    {output_interface}
+
+                    {workgroup_stride}
+                    @compute {workgroup_size}
+                    fn main(
+                        @builtin(global_invocation_id) global_id: vec3u
+                    ) {{
+                        {index}
+
+                        // Guard against out-of-bounds work group sizes
+                        if index >= {output_length}u {{
+                            return;
+                        }}
+
+                        // Bypass checks
+                        {check_bypass}
+
+                        {shader_body}
+                    }}",
+                    input_interface = dependencies
+                        .iter()
+                        .enumerate()
+                        .map(
+                            |(index, input)| Into::<WebGPUTensor>::into(*input).serialize_type(
+                                &wgsl_from_tensortype(input.datatype()),
+                                &index.to_string(),
+                                "read"
+                            )
+                        )
+                        .collect::<Vec<_>>()
+                        .join("\n"),
+                    output_interface = Into::<WebGPUTensor>::into(tensor).serialize_type(
+                        &wgsl_from_tensortype(tensor.datatype()),
+                        &dependencies.len().to_string(),
+                        "read_write"
+                    ),
+                    workgroup_stride = workgroups.serialize_strides("WORKGROUP_STRIDE"),
+                    workgroup_size = WORKGROUP_SIZE.serialize_decorator(),
+                    index = compute_index("index", "global_id", "WORKGROUP_STRIDE"),
+                    output_length = tensor.len(),
+                    check_bypass = dependencies
+                        .iter()
+                        .chain(std::iter::once(&tensor))
+                        .map(|tensor| tensor.id())
+                        .map(|tensor_id| format!(
+                            "let _{id} = tensor_{id}[0]; {output_tensor}[index] = {datatype}(_{id});",
+                            id = tensor_id,
+                            datatype = wgsl_from_tensortype(tensor.datatype()),
+                            output_tensor = Into::<WebGPUTensor>::into(tensor).name()
+                        ))
+                        .collect::<Vec<_>>()
+                        .join("\n"),
+                    shader_body = shader_ir.gen_wgsl(),
+                );
+
+                    (shader, dependencies)
+                };
 
                 let compute_shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
                     label: None,
@@ -111,7 +209,7 @@ impl WebGPUEvaluation for Tensor {
                     &WebGPUPipeline {
                         shader: &compute_shader,
                         inputs: &dependencies,
-                        output,
+                        output: tensor,
                         dispatch_workgroups: &workgroups,
                     },
                     &wgpu_device,
@@ -120,13 +218,16 @@ impl WebGPUEvaluation for Tensor {
                 let _ = tensor.update(&result.data());
                 intermediate_results.insert(tensor.id(), tensor.clone());
 
-                inputs.iter().for_each(|tensor_id| {
-                    if let Some(&last_tensor_id) = lifetimes.get(tensor_id) {
-                        if tensor.id() == last_tensor_id {
-                            intermediate_results.remove(tensor_id);
+                dependencies
+                    .iter()
+                    .map(|tensor| tensor.id())
+                    .for_each(|tensor_id| {
+                        if let Some(&last_tensor_id) = lifetimes.get(&tensor_id) {
+                            if tensor.id() == last_tensor_id {
+                                intermediate_results.remove(&tensor_id);
+                            }
                         }
-                    }
-                });
+                    });
             } else {
                 panic!("Found {:?}, which should be impossible", tensor.data());
             }
