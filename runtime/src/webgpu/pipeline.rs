@@ -148,9 +148,49 @@ pub async fn webgpu_tensor_pipeline<'a>(
         dispatch_workgroups,
     } = pipeline;
 
+    let bind_group_layouts_entries = inputs
+        .iter()
+        .map(|tensor| wgpu::BindGroupLayoutEntry {
+            binding: 0,
+            visibility: wgpu::ShaderStages::COMPUTE,
+            ty: wgpu::BindingType::Buffer {
+                ty: wgpu::BufferBindingType::Storage { read_only: true },
+                has_dynamic_offset: false,
+                min_binding_size: None,
+            },
+            count: None,
+        })
+        .chain(std::iter::once(wgpu::BindGroupLayoutEntry {
+            binding: 0,
+            visibility: wgpu::ShaderStages::COMPUTE,
+            ty: wgpu::BindingType::Buffer {
+                ty: wgpu::BufferBindingType::Storage { read_only: false },
+                has_dynamic_offset: false,
+                min_binding_size: None,
+            },
+            count: None,
+        }))
+        .collect::<Vec<_>>();
+
+    let bind_group_layouts = bind_group_layouts_entries
+        .into_iter()
+        .map(|entry| {
+            device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
+                label: None,
+                entries: &[entry],
+            })
+        })
+        .collect::<Vec<_>>();
+
     let pipeline = device.create_compute_pipeline(&wgpu::ComputePipelineDescriptor {
         label: None,
-        layout: None,
+        layout: Some(
+            &device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
+                label: None,
+                bind_group_layouts: &bind_group_layouts.iter().collect::<Vec<_>>()[..],
+                push_constant_ranges: &[],
+            }),
+        ),
         module: &shader,
         entry_point: "main",
     });
