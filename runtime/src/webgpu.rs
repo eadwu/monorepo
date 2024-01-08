@@ -2,6 +2,8 @@ pub mod benchmark;
 
 pub mod generators;
 
+pub(crate) mod utils;
+
 mod tensor;
 pub use tensor::*;
 
