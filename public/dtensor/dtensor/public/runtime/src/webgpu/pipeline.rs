@@ -2,6 +2,9 @@ use std::borrow::Cow;
 use std::collections::{HashMap, HashSet};
 use std::future::Future;
 
+use spirv_tools::assembler::Assembler;
+use spirv_tools::opt::Optimizer;
+use spirv_tools::val::Validator;
 use tensor::ir::mlir::{ShaderIRBuilder, ShaderIREvaluation, ShaderIROp};
 use tensor::primitives::tensor::{OperationSpec, Tensor, TensorInput};
 use tensor::topograph::{GraphDependencies, GraphView};
@@ -200,6 +203,89 @@ impl WebGPUEvaluation for Tensor {
                     (shader, dependencies)
                 };
 
+                #[cfg(feature = "dtensor_spirv_passthrough")]
+                let compute_shader = {
+                    let mut wgsl_module = naga::front::wgsl::parse_str(&shader).unwrap();
+                    naga::compact::compact(&mut wgsl_module);
+
+                    let info = naga::valid::Validator::new(
+                        naga::valid::ValidationFlags::all(),
+                        naga::valid::Capabilities::all(),
+                    )
+                    .validate(&wgsl_module)
+                    .unwrap();
+
+                    let spirv_module = naga::back::spv::write_vec(
+                        &wgsl_module,
+                        &info,
+                        &naga::back::spv::Options::default(),
+                        Some(&naga::back::spv::PipelineOptions {
+                            shader_stage: naga::ShaderStage::Compute,
+                            entry_point: "main".to_string(),
+                        }),
+                    )
+                    .unwrap();
+
+                    let mut opt =
+                        spirv_tools::opt::create(Some(spirv_tools::TargetEnv::Vulkan_1_2));
+                    opt.register_pass(spirv_tools::opt::Passes::UnifyConstant);
+                    opt.register_pass(spirv_tools::opt::Passes::InlineExhaustive);
+                    opt.register_pass(spirv_tools::opt::Passes::LoopPeeling);
+                    opt.register_pass(spirv_tools::opt::Passes::LoopUnswitch);
+                    opt.register_pass(spirv_tools::opt::Passes::EliminateDeadFunctions);
+                    opt.register_pass(spirv_tools::opt::Passes::EliminateDeadConstant);
+                    opt.register_pass(spirv_tools::opt::Passes::CodeSinking);
+                    opt.register_pass(spirv_tools::opt::Passes::DeadVariableElimination);
+                    opt.register_pass(spirv_tools::opt::Passes::AggressiveDCE);
+                    opt.register_pass(spirv_tools::opt::Passes::FoldSpecConstantOpAndComposite);
+                    opt.register_pass(spirv_tools::opt::Passes::Simplification);
+                    opt.register_pass(spirv_tools::opt::Passes::StrengthReduction);
+                    opt.register_performance_passes();
+                    opt.register_pass(spirv_tools::opt::Passes::LocalRedundancyElimination);
+                    opt.register_pass(spirv_tools::opt::Passes::RedundancyElimination);
+                    opt.register_pass(spirv_tools::opt::Passes::RedundantLineInfoElim);
+                    opt.register_pass(spirv_tools::opt::Passes::RemoveDuplicates);
+                    #[cfg(feature = "dtensor_spirv_passthrough_f16")]
+                    opt.register_pass(spirv_tools::opt::Passes::RelaxFloatOps);
+                    #[cfg(feature = "dtensor_spirv_passthrough_f16")]
+                    opt.register_pass(spirv_tools::opt::Passes::ConvertRelaxedToHalf);
+                    opt.register_size_passes();
+
+                    let spirv_opt = opt
+                        .optimize(
+                            spirv_module.clone(),
+                            &mut crate::webgpu::utils::spirv::Callback {},
+                            None,
+                        )
+                        .unwrap();
+
+                    let validator = spirv_tools::val::create(None);
+                    validator
+                        .validate(
+                            spirv_opt.as_words(),
+                            Some(spirv_tools::val::ValidatorOptions::default()),
+                        )
+                        .unwrap();
+
+                    let assembler = spirv_tools::assembler::create(None);
+                    let spirv_text = assembler
+                        .disassemble(
+                            spirv_opt.as_words(),
+                            spirv_tools::assembler::DisassembleOptions::default(),
+                        )
+                        .unwrap()
+                        .unwrap();
+
+                    let bytes: &[u8] = bytemuck::cast_slice(&spirv_module[..]);
+                    unsafe {
+                        device.create_shader_module_spirv(&wgpu::ShaderModuleDescriptorSpirV {
+                            label: None,
+                            source: Cow::Borrowed(spirv_opt.as_words()),
+                        })
+                    }
+                };
+
+                #[cfg(not(feature = "dtensor_spirv_passthrough"))]
                 let compute_shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
                     label: None,
                     source: wgpu::ShaderSource::Wgsl(Cow::Borrowed(&shader)),
