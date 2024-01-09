@@ -134,6 +134,14 @@ impl ShaderIR {
     pub fn evaltype(&self) -> Option<ShaderIREvaluation> {
         self.0.evaltype
     }
+
+    pub fn literal(&self) -> String {
+        self.linearize()
+            .into_iter()
+            .map(|ir| format!("{}", ir))
+            .collect::<Vec<_>>()
+            .join("\n")
+    }
 }
 
 impl GraphDependencies for ShaderIR {
@@ -150,5 +158,52 @@ impl UniqueIdentifier for ShaderIR {
     type Id = u64;
     fn id(&self) -> Self::Id {
         self.id()
+    }
+}
+
+impl Display for ShaderIR {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let inputs = format!(
+            "[{}]",
+            self.inputs()
+                .iter()
+                .map(|ir| ir.id().to_string())
+                .collect::<Vec<_>>()
+                .join(",")
+        );
+
+        let evaltype = self
+            .0
+            .evaltype
+            .map(|op| op.to_string())
+            .unwrap_or("".to_string());
+
+        write!(
+            f,
+            "{:<8} {:<16} {:<4} {:<16} {:<}",
+            self.id(),
+            self.0.op.to_string(),
+            self.datatype().to_string(),
+            inputs,
+            evaltype
+        )
+    }
+}
+
+impl Display for ShaderIROp {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
+impl Display for ShaderIRType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
+impl Display for ShaderIREvaluation {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self)
     }
 }
