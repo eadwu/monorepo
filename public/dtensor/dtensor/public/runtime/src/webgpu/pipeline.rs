@@ -521,7 +521,7 @@ pub async fn webgpu_tensor_pipeline<'a>(
         // Poll the device in a blocking manner so that our future resolves.
         // In an actual application, `device.poll(...)` should
         // be called in an event loop 1or on another thread.
-        device.poll(wgpu::Maintain::Wait);
+        device.poll(wgpu::Maintain::wait()).panic_on_timeout();
 
         // Awaits until `buffer_future` can be read from
         if receiver.receive().await.is_none() {
@@ -531,7 +531,7 @@ pub async fn webgpu_tensor_pipeline<'a>(
     #[cfg(not(target_arch = "wasm32"))]
     {
         buffer_slice.map_async(wgpu::MapMode::Read, |_| {});
-        device.poll(wgpu::Maintain::Wait);
+        device.poll(wgpu::Maintain::wait()).panic_on_timeout();
     }
 
     #[cfg(feature = "wgpu_benchmark")]
