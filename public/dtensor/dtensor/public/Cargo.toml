@@ -7,4 +7,5 @@ members = [
     "nn",
     "tensor",
     "runtime",
+    "scheduler/mercenary",
 ]
