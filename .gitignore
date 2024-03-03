@@ -1,8 +1,1 @@
-# Executable outputs
-nats-server
-receptionist
-mercenary
-
-# Keep files
 !go.mod
-!scheduler/mercenary/
