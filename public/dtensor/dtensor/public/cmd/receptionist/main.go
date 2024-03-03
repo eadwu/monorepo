@@ -2,6 +2,7 @@ package main
 
 import (
 	"dtensor/scheduler/logger"
+	"dtensor/scheduler/receptionist"
 	"flag"
 	"os"
 
@@ -31,4 +32,10 @@ func main() {
 	}
 	defer nc.Close()
 	log.Info().Msgf("Connected to NATS server located at `%s`", NATS_URL)
+
+	r, err := receptionist.New()
+	if err != nil {
+		log.Fatal().Msg("Failed to generate unique identifier")
+	}
+	r.Routine()
 }
