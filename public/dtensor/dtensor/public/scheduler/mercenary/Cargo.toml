@@ -6,4 +6,5 @@ edition = "2021"
 [dependencies]
 async-nats = "0.33.0"
 tokio = "1.36.0"
+tracing = "0.1.40"
 uuid = { version = "1.7.0", features = ["v4"] }
