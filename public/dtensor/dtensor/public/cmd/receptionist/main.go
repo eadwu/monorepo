@@ -10,7 +10,16 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+const (
+	LOCALHOST = "127.0.0.1"
+	GRPC_PORT = 9090
+	HTTP_PORT = 8081
+)
+
 func main() {
+	address := flag.String("address", LOCALHOST, "Address to listen on")
+	grpcPort := flag.Uint64("grpc", GRPC_PORT, "Port to listen for gRPC requests")
+	httpPort := flag.Uint64("http", HTTP_PORT, "Port to listen for HTTP requests")
 	flag.BoolVar(&logger.PrettyLogging, "pretty", false, "Prettify output of logs")
 	flag.Parse()
 
@@ -37,5 +46,5 @@ func main() {
 	if err != nil {
 		log.Fatal().Msg("Failed to generate unique identifier")
 	}
-	r.Routine()
+	r.Routine(*address, *grpcPort, *httpPort)
 }
