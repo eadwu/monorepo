@@ -48,6 +48,10 @@ func Init() {
 		function := ""
 		if f := runtime.FuncForPC(pc); f != nil {
 			name := f.Name()
+			if lastSlashIndex := strings.LastIndex(name, "/"); lastSlashIndex != -1 {
+				name = name[lastSlashIndex+1:]
+			}
+
 			function = name + "()"
 		}
 
