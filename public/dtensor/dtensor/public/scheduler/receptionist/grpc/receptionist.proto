@@ -1,7 +1,7 @@
 syntax = "proto3";
 
-package receptionist;
-option go_package = "dtensor/scheduler/grpc;receptionist";
+package grpc;
+option go_package = "dtensor/scheduler/receptionist;grpc";
 
 import "google/api/annotations.proto";
 

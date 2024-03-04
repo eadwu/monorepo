@@ -4,7 +4,7 @@
 // - protoc             v3.20.3
 // source: receptionist.proto
 
-package receptionist
+package grpc
 
 import (
 	context "context"
@@ -19,8 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Receptionist_Active_FullMethodName  = "/receptionist.Receptionist/Active"
-	Receptionist_Request_FullMethodName = "/receptionist.Receptionist/Request"
+	Receptionist_Active_FullMethodName  = "/grpc.Receptionist/Active"
+	Receptionist_Request_FullMethodName = "/grpc.Receptionist/Request"
 )
 
 // ReceptionistClient is the client API for Receptionist service.
@@ -159,7 +159,7 @@ func (x *receptionistRequestServer) Recv() (*RequestDetails, error) {
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Receptionist_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "receptionist.Receptionist",
+	ServiceName: "grpc.Receptionist",
 	HandlerType: (*ReceptionistServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

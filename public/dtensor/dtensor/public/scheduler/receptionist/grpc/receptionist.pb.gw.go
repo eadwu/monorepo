@@ -2,11 +2,11 @@
 // source: receptionist.proto
 
 /*
-Package receptionist is a reverse proxy.
+Package grpc is a reverse proxy.
 
 It translates gRPC into RESTful JSON APIs.
 */
-package receptionist
+package grpc
 
 import (
 	"context"
@@ -106,7 +106,7 @@ func RegisterReceptionistHandlerServer(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/receptionist.Receptionist/Active", runtime.WithHTTPPathPattern("/status"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/grpc.Receptionist/Active", runtime.WithHTTPPathPattern("/status"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -177,7 +177,7 @@ func RegisterReceptionistHandlerClient(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/receptionist.Receptionist/Active", runtime.WithHTTPPathPattern("/status"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/grpc.Receptionist/Active", runtime.WithHTTPPathPattern("/status"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -199,7 +199,7 @@ func RegisterReceptionistHandlerClient(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/receptionist.Receptionist/Request", runtime.WithHTTPPathPattern("/request"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/grpc.Receptionist/Request", runtime.WithHTTPPathPattern("/request"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
