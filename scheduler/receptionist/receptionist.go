@@ -3,6 +3,7 @@ package receptionist
 import (
 	"context"
 	"fmt"
+	"io"
 	"net"
 	"net/http"
 
@@ -82,4 +83,30 @@ type ReceptionistInterface struct {
 
 func (r *ReceptionistInterface) Active(ctx context.Context, _param *pb.Empty) (*pb.Acknowledgement, error) {
 	return &pb.Acknowledgement{Ok: true}, nil
+}
+
+func (r *ReceptionistInterface) Request(stream pb.Receptionist_RequestServer) error {
+	for {
+		request, err := stream.Recv()
+		if err == io.EOF {
+			return nil
+		}
+		if err != nil {
+			return err
+		}
+		log.Debug().Msgf("Got request specified as %v", request)
+
+		id, err := uuid.NewRandom()
+		if err != nil {
+			log.Error().Msgf("Failed to generate identifier for request: %v", err)
+			stream.Send(&pb.RequestAcknowledgement{Success: false})
+			continue
+		}
+
+		log.Debug().Msgf("Request `%s` is now circulating within the guild", id)
+		stream.Send(&pb.RequestAcknowledgement{
+			Success:    true,
+			Identifier: id.String(),
+		})
+	}
 }

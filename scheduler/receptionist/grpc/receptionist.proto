@@ -43,10 +43,24 @@ service Receptionist {
 	rpc Active (Empty) returns (Acknowledgement) {
 		option (google.api.http) = { get: "/status" };
 	};
+
+	rpc Request (stream RequestDetails) returns (stream RequestAcknowledgement) {
+		option (google.api.http) = {
+			post: "/request"
+			body: "*"
+		};
+	}
 }
 
 message Empty {}
 
 message Acknowledgement {
 	bool ok = 1;
+}
+
+message RequestDetails {}
+
+message RequestAcknowledgement {
+	bool success = 1;
+	string identifier = 2;
 }
