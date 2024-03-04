@@ -1,7 +1,7 @@
 syntax = "proto3";
 
-package guild;
-option go_package = "dtensor/scheduler/proto;guild";
+package receptionist;
+option go_package = "dtensor/scheduler/grpc;receptionist";
 
 import "google/api/annotations.proto";
 
@@ -39,14 +39,14 @@ messages in each stream is preserved.
 	rpc BidiHello(stream HelloRequest) returns (stream HelloResponse);
  */
 
-service Guild {
-  rpc Active (Empty) returns (GuildAcknowledgement) {
+service Receptionist {
+	rpc Active (Empty) returns (Acknowledgement) {
 		option (google.api.http) = { get: "/status" };
 	};
 }
 
 message Empty {}
 
-message GuildAcknowledgement {
+message Acknowledgement {
 	bool ok = 1;
 }
