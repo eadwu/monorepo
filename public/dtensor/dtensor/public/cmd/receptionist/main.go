@@ -39,10 +39,11 @@ func main() {
 	if err != nil {
 		log.Fatal().Msgf("Failed to connect to NATS server located at `%s`", NATS_URL)
 	}
+	defer nc.Drain()
 	defer nc.Close()
 	log.Info().Msgf("Connected to NATS server located at `%s`", NATS_URL)
 
-	r, err := receptionist.New()
+	r, err := receptionist.New(nc)
 	if err != nil {
 		log.Fatal().Msg("Failed to generate unique identifier")
 	}
