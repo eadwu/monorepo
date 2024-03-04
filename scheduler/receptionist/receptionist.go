@@ -8,6 +8,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/nats-io/nats.go"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -17,18 +18,21 @@ import (
 
 type Receptionist struct {
 	identifier uuid.UUID
+	nc         *nats.Conn
 }
 
-func New() (Receptionist, error) {
+func New(nc *nats.Conn) (Receptionist, error) {
 	id, err := uuid.NewRandom()
 	if err != nil {
 		return Receptionist{
 			identifier: uuid.New(),
+			nc:         nc,
 		}, err
 	}
 
 	instance := Receptionist{
 		identifier: id,
+		nc:         nc,
 	}
 	return instance, nil
 }
