@@ -19,7 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Receptionist_Active_FullMethodName = "/receptionist.Receptionist/Active"
+	Receptionist_Active_FullMethodName  = "/receptionist.Receptionist/Active"
+	Receptionist_Request_FullMethodName = "/receptionist.Receptionist/Request"
 )
 
 // ReceptionistClient is the client API for Receptionist service.
@@ -27,6 +28,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ReceptionistClient interface {
 	Active(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Acknowledgement, error)
+	Request(ctx context.Context, opts ...grpc.CallOption) (Receptionist_RequestClient, error)
 }
 
 type receptionistClient struct {
@@ -46,11 +48,43 @@ func (c *receptionistClient) Active(ctx context.Context, in *Empty, opts ...grpc
 	return out, nil
 }
 
+func (c *receptionistClient) Request(ctx context.Context, opts ...grpc.CallOption) (Receptionist_RequestClient, error) {
+	stream, err := c.cc.NewStream(ctx, &Receptionist_ServiceDesc.Streams[0], Receptionist_Request_FullMethodName, opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &receptionistRequestClient{stream}
+	return x, nil
+}
+
+type Receptionist_RequestClient interface {
+	Send(*RequestDetails) error
+	Recv() (*RequestAcknowledgement, error)
+	grpc.ClientStream
+}
+
+type receptionistRequestClient struct {
+	grpc.ClientStream
+}
+
+func (x *receptionistRequestClient) Send(m *RequestDetails) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *receptionistRequestClient) Recv() (*RequestAcknowledgement, error) {
+	m := new(RequestAcknowledgement)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // ReceptionistServer is the server API for Receptionist service.
 // All implementations must embed UnimplementedReceptionistServer
 // for forward compatibility
 type ReceptionistServer interface {
 	Active(context.Context, *Empty) (*Acknowledgement, error)
+	Request(Receptionist_RequestServer) error
 	mustEmbedUnimplementedReceptionistServer()
 }
 
@@ -60,6 +94,9 @@ type UnimplementedReceptionistServer struct {
 
 func (UnimplementedReceptionistServer) Active(context.Context, *Empty) (*Acknowledgement, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Active not implemented")
+}
+func (UnimplementedReceptionistServer) Request(Receptionist_RequestServer) error {
+	return status.Errorf(codes.Unimplemented, "method Request not implemented")
 }
 func (UnimplementedReceptionistServer) mustEmbedUnimplementedReceptionistServer() {}
 
@@ -92,6 +129,32 @@ func _Receptionist_Active_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Receptionist_Request_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(ReceptionistServer).Request(&receptionistRequestServer{stream})
+}
+
+type Receptionist_RequestServer interface {
+	Send(*RequestAcknowledgement) error
+	Recv() (*RequestDetails, error)
+	grpc.ServerStream
+}
+
+type receptionistRequestServer struct {
+	grpc.ServerStream
+}
+
+func (x *receptionistRequestServer) Send(m *RequestAcknowledgement) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *receptionistRequestServer) Recv() (*RequestDetails, error) {
+	m := new(RequestDetails)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // Receptionist_ServiceDesc is the grpc.ServiceDesc for Receptionist service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -104,6 +167,13 @@ var Receptionist_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Receptionist_Active_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "Request",
+			Handler:       _Receptionist_Request_Handler,
+			ServerStreams: true,
+			ClientStreams: true,
+		},
+	},
 	Metadata: "receptionist.proto",
 }
