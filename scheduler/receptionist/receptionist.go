@@ -13,7 +13,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	pb "dtensor/scheduler/proto"
+	pb "dtensor/scheduler/receptionist/grpc"
 )
 
 type Receptionist struct {
@@ -52,7 +52,7 @@ func (r Receptionist) Routine(addr string, grpcPort uint64, httpPort uint64) {
 
 		var opts []grpc.ServerOption
 		grpcServer := grpc.NewServer(opts...)
-		pb.RegisterGuildServer(grpcServer, &ReceptionistInterface{})
+		pb.RegisterReceptionistServer(grpcServer, &ReceptionistInterface{})
 		go grpcServer.Serve(conn)
 	}
 
@@ -64,7 +64,7 @@ func (r Receptionist) Routine(addr string, grpcPort uint64, httpPort uint64) {
 
 		mux := runtime.NewServeMux()
 		opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
-		if err := pb.RegisterGuildHandlerFromEndpoint(ctx, mux, grpcEndpoint, opts); err != nil {
+		if err := pb.RegisterReceptionistHandlerFromEndpoint(ctx, mux, grpcEndpoint, opts); err != nil {
 			log.Fatal().Msgf("Failed to register grpc interface: %v", err)
 		}
 
@@ -77,9 +77,9 @@ func (r Receptionist) Routine(addr string, grpcPort uint64, httpPort uint64) {
 }
 
 type ReceptionistInterface struct {
-	pb.UnimplementedGuildServer
+	pb.UnimplementedReceptionistServer
 }
 
-func (r *ReceptionistInterface) Active(ctx context.Context, _param *pb.Empty) (*pb.GuildAcknowledgement, error) {
-	return &pb.GuildAcknowledgement{Ok: true}, nil
+func (r *ReceptionistInterface) Active(ctx context.Context, _param *pb.Empty) (*pb.Acknowledgement, error) {
+	return &pb.Acknowledgement{Ok: true}, nil
 }
