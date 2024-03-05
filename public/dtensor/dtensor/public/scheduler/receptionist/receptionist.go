@@ -2,6 +2,7 @@ package receptionist
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net"
@@ -14,6 +15,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
+	"dtensor/scheduler/guild"
 	pb "dtensor/scheduler/receptionist/grpc"
 )
 
@@ -38,7 +40,7 @@ func New(nc *nats.Conn) (Receptionist, error) {
 	return instance, nil
 }
 
-func (r Receptionist) Routine(addr string, grpcPort uint64, httpPort uint64) {
+func (r *Receptionist) Routine(addr string, grpcPort uint64, httpPort uint64) {
 	grpcEndpoint := fmt.Sprintf("%s:%d", addr, grpcPort)
 	httpEndpoint := fmt.Sprintf("%s:%d", addr, httpPort)
 	log.Trace().Msgf("`%s`: gRPC: `%s` HTTP: `%s`", r.identifier, grpcEndpoint, httpEndpoint)
@@ -53,7 +55,7 @@ func (r Receptionist) Routine(addr string, grpcPort uint64, httpPort uint64) {
 
 		var opts []grpc.ServerOption
 		grpcServer := grpc.NewServer(opts...)
-		pb.RegisterReceptionistServer(grpcServer, &ReceptionistInterface{})
+		pb.RegisterReceptionistServer(grpcServer, &ReceptionistInterface{receptionist: r})
 		go grpcServer.Serve(conn)
 	}
 
@@ -79,6 +81,11 @@ func (r Receptionist) Routine(addr string, grpcPort uint64, httpPort uint64) {
 
 type ReceptionistInterface struct {
 	pb.UnimplementedReceptionistServer
+	receptionist *Receptionist
+}
+
+func (r ReceptionistInterface) NatsClient() *nats.Conn {
+	return r.receptionist.nc
 }
 
 func (r *ReceptionistInterface) Active(ctx context.Context, _param *pb.Empty) (*pb.Acknowledgement, error) {
@@ -96,17 +103,29 @@ func (r *ReceptionistInterface) Request(stream pb.Receptionist_RequestServer) er
 		}
 		log.Debug().Msgf("Got request specified as %v", request)
 
-		id, err := uuid.NewRandom()
+		questId, err := uuid.NewRandom()
 		if err != nil {
 			log.Error().Msgf("Failed to generate identifier for request: %v", err)
 			stream.Send(&pb.RequestAcknowledgement{Success: false})
 			continue
 		}
 
-		log.Debug().Msgf("Request `%s` is now circulating within the guild", id)
+		quest, err := json.Marshal(guild.GuildQuest{Identifier: questId.String()})
+		if err != nil {
+			log.Error().Msgf("Failed to construct quest details for request: %v", err)
+			stream.Send(&pb.RequestAcknowledgement{Success: false})
+			continue
+		}
+
+		if _, err := r.NatsClient().Request(guild.GUILD_QUEST_BOARD_TOPIC, quest, guild.GUILD_QUEST_TIMEOUT); err != nil {
+			log.Error().Msgf("Request `%s` failed to be accepted by anyone within the guild: %v", questId, err)
+			continue
+		}
+
+		log.Info().Msgf("Request `%s` has been accepted", questId)
 		stream.Send(&pb.RequestAcknowledgement{
 			Success:    true,
-			Identifier: id.String(),
+			Identifier: questId.String(),
 		})
 	}
 }
