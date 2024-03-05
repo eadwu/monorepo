@@ -6,7 +6,9 @@ edition = "2021"
 [dependencies]
 async-nats = "0.33.0"
 clap = { version = "4.5.1", features = ["derive"] }
-tokio = "1.36.0"
+futures-util = "0.3.30"
+guild = { version = "0.1.0", path = "../guild" }
+tokio = { version = "1.36.0", features = ["rt-multi-thread"] }
 tracing = "0.1.40"
 tracing-subscriber = { version = "0.3.18", features = ["time", "fmt", "ansi", "json"] }
 uuid = { version = "1.7.0", features = ["v4"] }
