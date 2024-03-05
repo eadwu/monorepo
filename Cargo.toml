@@ -7,5 +7,6 @@ members = [
     "nn",
     "tensor",
     "runtime",
+    "scheduler/guild",
     "scheduler/mercenary",
 ]
