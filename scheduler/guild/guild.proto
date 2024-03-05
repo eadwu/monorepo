@@ -6,3 +6,9 @@ option go_package = "dtensor/scheduler;guild";
 message GuildQuest {
 	string identifier = 1;
 }
+
+message GuildQuestAcknowledgement {
+	bool accepted = 1;
+	string quest = 2;
+	string mercenary = 3;
+}

@@ -118,14 +118,29 @@ func (r *ReceptionistInterface) Request(stream pb.Receptionist_RequestServer) er
 			continue
 		}
 
-		if _, err := r.NatsClient().Request(
+		reply, err := r.NatsClient().Request(
 			guild.GUILD_QUEST_BOARD_TOPIC, quest, time.Duration(guild.GUILD_QUEST_TIMEOUT)*time.Millisecond,
-		); err != nil {
-			log.Error().Msgf("Request `%s` failed to be accepted by anyone within the guild: %v", questId, err)
+		)
+		if err != nil {
+			log.Error().Msgf("No reply received for request `%s`: %v", questId, err)
+			stream.Send(&pb.RequestAcknowledgement{Success: false})
 			continue
 		}
 
-		log.Info().Msgf("Request `%s` has been accepted", questId)
+		var acknowledgement guild.GuildQuestAcknowledgement
+		if err := json.Unmarshal(reply.Data, &acknowledgement); err != nil {
+			log.Error().Msgf("Failed to determine status of request `%s`: %v", questId, err)
+			stream.Send(&pb.RequestAcknowledgement{Success: false})
+			continue
+		}
+
+		if !acknowledgement.Accepted {
+			log.Info().Msgf("Request `%s` was not accepted within the guild", questId)
+			stream.Send(&pb.RequestAcknowledgement{Success: false})
+			continue
+		}
+
+		log.Info().Msgf("Request `%s` has been accepted by Mercenary `%s`", questId, acknowledgement.Mercenary)
 		stream.Send(&pb.RequestAcknowledgement{
 			Success:    true,
 			Identifier: questId.String(),

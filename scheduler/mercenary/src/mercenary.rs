@@ -1,5 +1,6 @@
 use futures_util::StreamExt;
 
+#[derive(Clone)]
 pub struct Mercenary {
     identifier: uuid::Uuid,
     client: async_nats::Client,
@@ -17,6 +18,10 @@ impl Mercenary {
             identifier: id,
             client: nc,
         }
+    }
+
+    fn identifier(&self) -> String {
+        self.identifier.to_string()
     }
 
     fn nats_client(&self) -> &async_nats::Client {
@@ -40,7 +45,7 @@ impl Mercenary {
                 guild::GUILD_ALL_MERCENARY_QUEUE_GROUP,
             ),
             // Direct Communication (unicast)
-            MercenaryChannel::new(self.topic(), self.identifier.to_string()),
+            MercenaryChannel::new(self.topic(), self.identifier()),
         ];
 
         let mut handles = Vec::with_capacity(communication_channels.len());
@@ -51,11 +56,9 @@ impl Mercenary {
                 &channel.topic,
                 &channel.queue_group
             );
-            handles.push(tokio::spawn(Mercenary::handler(
-                self.nats_client().clone(),
-                channel.topic,
-                channel.queue_group,
-            )))
+            handles.push(tokio::spawn(
+                self.clone().handler(channel.topic, channel.queue_group),
+            ))
         }
         for handle in handles {
             handle.await??
@@ -64,16 +67,32 @@ impl Mercenary {
     }
 
     async fn handler<T: Into<String>>(
-        nats_client: async_nats::Client,
+        self,
         topic: T,
         queue_group: T,
     ) -> Result<(), async_nats::Error> {
+        let nats_client = self.nats_client();
         let mut subscription = nats_client
             .queue_subscribe(topic.into(), queue_group.into())
             .await?;
 
         while let Some(quest_msg) = subscription.next().await {
-            println!("{:?}", quest_msg);
+            let quest = serde_json::from_slice::<guild::GuildQuest>(&quest_msg.payload)?;
+            let quest_identifier = quest.identifier;
+            tracing::info!(
+                "Mercenary `{}` accepted quest `{}`",
+                &self.identifier,
+                &quest_identifier
+            );
+
+            if let Some(reply_subject) = quest_msg.reply {
+                tracing::debug!("Relaying status update of `{}` to `{}`", &quest_identifier, &reply_subject);
+
+                let response =
+                    guild::GuildQuestAcknowledgement::accept(quest_identifier, self.identifier());
+                let payload = serde_json::to_string(&response)?;
+                nats_client.publish(reply_subject, payload.into()).await?;
+            }
         }
         Ok(())
     }
