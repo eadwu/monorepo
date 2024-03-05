@@ -29,7 +29,5 @@ async fn main() -> Result<(), async_nats::Error> {
 
     let nc = async_nats::connect(&args.nats_address).await?;
     tracing::info!("Connection established with guild `{}`", &args.nats_address);
-
-    Mercenary::new().routine().await?;
-    Ok(())
+    Mercenary::new(nc).routine().await
 }

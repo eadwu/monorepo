@@ -7,6 +7,7 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
@@ -117,7 +118,9 @@ func (r *ReceptionistInterface) Request(stream pb.Receptionist_RequestServer) er
 			continue
 		}
 
-		if _, err := r.NatsClient().Request(guild.GUILD_QUEST_BOARD_TOPIC, quest, guild.GUILD_QUEST_TIMEOUT); err != nil {
+		if _, err := r.NatsClient().Request(
+			guild.GUILD_QUEST_BOARD_TOPIC, quest, time.Duration(guild.GUILD_QUEST_TIMEOUT)*time.Millisecond,
+		); err != nil {
 			log.Error().Msgf("Request `%s` failed to be accepted by anyone within the guild: %v", questId, err)
 			continue
 		}
