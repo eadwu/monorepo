@@ -9,5 +9,5 @@ const (
 	GUILD_ALL_MERCENARY_QUEUE_GROUP = "mercenary"
 
 	MS_TO_SEC           uint64 = 1000
-	GUILD_QUEST_TIMEOUT        = 5 * MS_TO_SEC
+	GUILD_QUEST_TIMEOUT        = 1 * MS_TO_SEC
 )
