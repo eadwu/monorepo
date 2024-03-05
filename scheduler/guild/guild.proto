@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+package guild;
+option go_package = "dtensor/scheduler;guild";
+
+message GuildQuest {
+	string identifier = 1;
+}
