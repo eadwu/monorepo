@@ -46,31 +46,28 @@ impl Mercenary {
             ),
             // Direct Communication (unicast)
             MercenaryChannel::new(self.topic(), self.identifier()),
-        ];
+        ]
+        .into_iter()
+        .map(|channel| self.handler(channel.topic, channel.queue_group))
+        .collect::<Vec<_>>();
 
-        let mut handles = Vec::with_capacity(communication_channels.len());
-        for channel in communication_channels {
-            tracing::debug!(
-                "Mercenary `{}` is listening on topic `{}` (group `{}`)",
-                &self.identifier,
-                &channel.topic,
-                &channel.queue_group
-            );
-            handles.push(tokio::spawn(
-                self.clone().handler(channel.topic, channel.queue_group),
-            ))
-        }
-        for handle in handles {
-            handle.await??
-        }
+        // Ignore Result handling here, instead make sure the async task never fails
+        futures_util::future::join_all(communication_channels).await;
         Ok(())
     }
 
     async fn handler<T: Into<String>>(
-        self,
+        &self,
         topic: T,
         queue_group: T,
     ) -> Result<(), async_nats::Error> {
+        tracing::debug!(
+            "Mercenary `{}` is listening on topic `{}` (group `{}`)",
+            &self.identifier,
+            &channel.topic,
+            &channel.queue_group
+        );
+
         let nats_client = self.nats_client();
         let mut subscription = nats_client
             .queue_subscribe(topic.into(), queue_group.into())
@@ -86,7 +83,11 @@ impl Mercenary {
             );
 
             if let Some(reply_subject) = quest_msg.reply {
-                tracing::debug!("Relaying status update of `{}` to `{}`", &quest_identifier, &reply_subject);
+                tracing::debug!(
+                    "Relaying status update of `{}` to `{}`",
+                    &quest_identifier,
+                    &reply_subject
+                );
 
                 let response =
                     guild::GuildQuestAcknowledgement::accept(quest_identifier, self.identifier());
@@ -94,6 +95,13 @@ impl Mercenary {
                 nats_client.publish(reply_subject, payload.into()).await?;
             }
         }
+
+        tracing::debug!(
+            "Mercenary `{}` dropped topic `{}` (group `{}`)",
+            &self.identifier,
+            &channel.topic,
+            &channel.queue_group
+        );
         Ok(())
     }
 }
