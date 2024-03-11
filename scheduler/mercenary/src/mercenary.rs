@@ -61,16 +61,19 @@ impl Mercenary {
         topic: T,
         queue_group: T,
     ) -> Result<(), async_nats::Error> {
+        let topic = topic.into();
+        let queue_group = queue_group.into();
+
         tracing::debug!(
             "Mercenary `{}` is listening on topic `{}` (group `{}`)",
             &self.identifier,
-            &channel.topic,
-            &channel.queue_group
+            &topic,
+            &queue_group,
         );
 
         let nats_client = self.nats_client();
         let mut subscription = nats_client
-            .queue_subscribe(topic.into(), queue_group.into())
+            .queue_subscribe(topic.clone(), queue_group.clone())
             .await?;
 
         while let Some(quest_msg) = subscription.next().await {
@@ -99,8 +102,8 @@ impl Mercenary {
         tracing::debug!(
             "Mercenary `{}` dropped topic `{}` (group `{}`)",
             &self.identifier,
-            &channel.topic,
-            &channel.queue_group
+            &topic,
+            &queue_group
         );
         Ok(())
     }
