@@ -107,14 +107,14 @@ func (r *ReceptionistInterface) Request(stream pb.Receptionist_RequestServer) er
 		questId, err := uuid.NewRandom()
 		if err != nil {
 			log.Error().Msgf("Failed to generate identifier for request: %v", err)
-			stream.Send(&pb.RequestAcknowledgement{Success: false})
+			r.AcknowledgeFail(stream)
 			continue
 		}
 
 		quest, err := json.Marshal(guild.GuildQuest{Identifier: questId.String()})
 		if err != nil {
 			log.Error().Msgf("Failed to construct quest details for request: %v", err)
-			stream.Send(&pb.RequestAcknowledgement{Success: false})
+			r.AcknowledgeFail(stream)
 			continue
 		}
 
@@ -123,20 +123,20 @@ func (r *ReceptionistInterface) Request(stream pb.Receptionist_RequestServer) er
 		)
 		if err != nil {
 			log.Error().Msgf("No reply received for request `%s`: %v", questId, err)
-			stream.Send(&pb.RequestAcknowledgement{Success: false})
+			r.AcknowledgeFail(stream)
 			continue
 		}
 
 		var acknowledgement guild.GuildQuestAcknowledgement
 		if err := json.Unmarshal(reply.Data, &acknowledgement); err != nil {
 			log.Error().Msgf("Failed to determine status of request `%s`: %v", questId, err)
-			stream.Send(&pb.RequestAcknowledgement{Success: false})
+			r.AcknowledgeFail(stream)
 			continue
 		}
 
 		if !acknowledgement.Accepted {
 			log.Info().Msgf("Request `%s` was not accepted within the guild", questId)
-			stream.Send(&pb.RequestAcknowledgement{Success: false})
+			r.AcknowledgeFail(stream)
 			continue
 		}
 
@@ -146,4 +146,8 @@ func (r *ReceptionistInterface) Request(stream pb.Receptionist_RequestServer) er
 			Identifier: questId.String(),
 		})
 	}
+}
+
+func (r *ReceptionistInterface) AcknowledgeFail(stream pb.Receptionist_RequestServer) {
+	stream.Send(&pb.RequestAcknowledgement{Success: false})
 }
