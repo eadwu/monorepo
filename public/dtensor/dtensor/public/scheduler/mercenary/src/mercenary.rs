@@ -66,7 +66,7 @@ impl Mercenary {
         let queue_group = queue_group.into();
 
         tracing::debug!(
-            "Mercenary `{}` is listening on topic `{}` (group `{}`)",
+            "Mercenary `{}` is listening on board `{}` as part of party `{}`",
             &self.identifier,
             &topic,
             &queue_group,
@@ -101,7 +101,7 @@ impl Mercenary {
         }
 
         tracing::debug!(
-            "Mercenary `{}` dropped topic `{}` (group `{}`)",
+            "Mercenary `{}` is no longer actively looking at quest board `{}` as part of party `{}`",
             &self.identifier,
             &topic,
             &queue_group
