@@ -1,10 +1,12 @@
 use futures_util::StreamExt;
+use guild::Requirement;
 use prost::Message;
 
 #[derive(Clone)]
 pub struct Mercenary {
     identifier: uuid::Uuid,
     client: async_nats::Client,
+    capabilities: guild::Resources,
 }
 
 struct MercenaryChannel {
@@ -18,6 +20,7 @@ impl Mercenary {
         Mercenary {
             identifier: id,
             client: nc,
+            capabilities: guild::Resources::default(),
         }
     }
 
@@ -41,10 +44,7 @@ impl Mercenary {
 
         let communication_channels = [
             // Quest Board (broadcast)
-            MercenaryChannel::new(
-                guild::GUILD_QUEST_BOARD_TOPIC,
-                guild::GUILD_ALL_MERCENARY_QUEUE_GROUP,
-            ),
+            MercenaryChannel::new(guild::GUILD_QUEST_BOARD_TOPIC, guild::GUILD_DEFAULT_PARTY),
             // Direct Communication (unicast)
             MercenaryChannel::new(self.topic(), self.identifier()),
         ]
@@ -80,11 +80,28 @@ impl Mercenary {
         while let Some(quest_msg) = subscription.next().await {
             let quest = guild::GuildQuest::decode(quest_msg.payload)?;
             let quest_identifier = quest.identifier;
-            tracing::info!(
-                "Mercenary `{}` accepted quest `{}`",
-                &self.identifier,
-                &quest_identifier
-            );
+
+            let satisfied_requirements = quest.requirements.map_or(true, |quest_requirements| {
+                tracing::debug!(
+                    "Quest `{}` requirements: {:?}",
+                    &quest_identifier,
+                    quest_requirements
+                );
+                self.capabilities.satisfies(&quest_requirements)
+            });
+            if satisfied_requirements {
+                tracing::info!(
+                    "Mercenary `{}` accepted quest `{}`",
+                    &self.identifier,
+                    &quest_identifier
+                );
+            } else {
+                tracing::info!(
+                    "Mercenary `{}` does not satisfy quest `{}` requirements",
+                    &self.identifier,
+                    &quest_identifier
+                );
+            }
 
             if let Some(reply_subject) = quest_msg.reply {
                 tracing::debug!(
@@ -93,8 +110,11 @@ impl Mercenary {
                     &reply_subject
                 );
 
-                let response =
-                    guild::GuildQuestAcknowledgement::accept(quest_identifier, self.identifier());
+                let response = if satisfied_requirements {
+                    guild::GuildQuestAcknowledgement::accept(quest_identifier, self.identifier())
+                } else {
+                    guild::GuildQuestAcknowledgement::deny(quest_identifier)
+                };
                 let payload = response.encode_to_vec();
                 nats_client.publish(reply_subject, payload.into()).await?;
             }
