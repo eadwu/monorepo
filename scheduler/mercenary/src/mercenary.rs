@@ -1,4 +1,5 @@
 use futures_util::StreamExt;
+use prost::Message;
 
 #[derive(Clone)]
 pub struct Mercenary {
@@ -77,7 +78,7 @@ impl Mercenary {
             .await?;
 
         while let Some(quest_msg) = subscription.next().await {
-            let quest = serde_json::from_slice::<guild::GuildQuest>(&quest_msg.payload)?;
+            let quest = guild::GuildQuest::decode(quest_msg.payload)?;
             let quest_identifier = quest.identifier;
             tracing::info!(
                 "Mercenary `{}` accepted quest `{}`",
@@ -94,7 +95,7 @@ impl Mercenary {
 
                 let response =
                     guild::GuildQuestAcknowledgement::accept(quest_identifier, self.identifier());
-                let payload = serde_json::to_string(&response)?;
+                let payload = response.encode_to_vec();
                 nats_client.publish(reply_subject, payload.into()).await?;
             }
         }

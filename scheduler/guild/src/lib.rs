@@ -8,17 +8,7 @@ pub const GUILD_ALL_MERCENARY_QUEUE_GROUP: &str = "mercenary";
 pub const MS_TO_SEC: u64 = 1000;
 pub const GUILD_QUEST_TIMEOUT: u64 = 1 * MS_TO_SEC;
 
-#[derive(Debug, Clone, serde::Deserialize)]
-pub struct GuildQuest {
-    pub identifier: String,
-}
-
-#[derive(Debug, Clone, serde::Serialize)]
-pub struct GuildQuestAcknowledgement {
-    pub accepted: bool,
-    pub quest: String,
-    pub mercenary: String,
-}
+include!(concat!(env!("OUT_DIR"), "/guild.rs"));
 
 impl GuildQuestAcknowledgement {
     pub fn denied(quest: String) -> GuildQuestAcknowledgement {
