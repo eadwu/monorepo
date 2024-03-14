@@ -85,7 +85,7 @@ type ReceptionistInterface struct {
 	receptionist *Receptionist
 }
 
-func (r ReceptionistInterface) NatsClient() *nats.Conn {
+func (r *ReceptionistInterface) NatsClient() *nats.Conn {
 	return r.receptionist.nc
 }
 
@@ -119,9 +119,10 @@ func (r *ReceptionistInterface) Request(stream pb.Receptionist_RequestServer) er
 			continue
 		}
 
-		reply, err := r.NatsClient().Request(
-			guild.GUILD_QUEST_BOARD_TOPIC, quest, time.Duration(guild.GUILD_QUEST_TIMEOUT)*time.Millisecond,
-		)
+		topic := guild.GUILD_QUEST_BOARD_TOPIC
+		timeout := time.Duration(guild.GUILD_QUEST_TIMEOUT) * time.Millisecond
+		log.Info().Msgf("Sending quest `%s` through board `%s`", questId, topic)
+		reply, err := r.NatsClient().Request(topic, payload, timeout)
 		if err != nil {
 			log.Error().Msgf("No reply received for request `%s`: %v", questId, err)
 			r.AcknowledgeFail(stream)
