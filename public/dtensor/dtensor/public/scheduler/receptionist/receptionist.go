@@ -2,7 +2,6 @@ package receptionist
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"net"
@@ -15,6 +14,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/protobuf/proto"
 
 	"dtensor/scheduler/guild"
 	pb "dtensor/scheduler/receptionist/grpc"
@@ -111,7 +111,8 @@ func (r *ReceptionistInterface) Request(stream pb.Receptionist_RequestServer) er
 			continue
 		}
 
-		quest, err := json.Marshal(guild.GuildQuest{Identifier: questId.String()})
+		quest := guild.GuildQuest{Identifier: questId.String()}
+		payload, err := proto.Marshal(&quest)
 		if err != nil {
 			log.Error().Msgf("Failed to construct quest details for request: %v", err)
 			r.AcknowledgeFail(stream)
@@ -128,7 +129,7 @@ func (r *ReceptionistInterface) Request(stream pb.Receptionist_RequestServer) er
 		}
 
 		var acknowledgement guild.GuildQuestAcknowledgement
-		if err := json.Unmarshal(reply.Data, &acknowledgement); err != nil {
+		if err := proto.Unmarshal(reply.Data, &acknowledgement); err != nil {
 			log.Error().Msgf("Failed to determine status of request `%s`: %v", questId, err)
 			r.AcknowledgeFail(stream)
 			continue
