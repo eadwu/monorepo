@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-bytemuck = "1.14.3"
+bytemuck = "1.15.0"
 filemanager = { version = "0.1.0", path = "../filemanager" }
 half = "2.4.0"
 itertools = "0.12.1"
