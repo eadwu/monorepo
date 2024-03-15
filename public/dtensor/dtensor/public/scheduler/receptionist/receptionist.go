@@ -111,7 +111,10 @@ func (r *ReceptionistInterface) Request(stream pb.Receptionist_RequestServer) er
 			continue
 		}
 
-		quest := guild.GuildQuest{Identifier: questId.String()}
+		quest := guild.GuildQuest{
+			Identifier:   questId.String(),
+			Requirements: request.Requirements,
+		}
 		payload, err := proto.Marshal(&quest)
 		if err != nil {
 			log.Error().Msgf("Failed to construct quest details for request: %v", err)
