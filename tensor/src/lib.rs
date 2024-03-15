@@ -1,4 +1,3 @@
-#![feature(trait_alias)]
 use std::sync::Mutex;
 
 use filemanager::FileManager;
