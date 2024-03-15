@@ -2,7 +2,7 @@ use std::slice::Iter;
 
 use itertools::{EitherOrBoth::*, Itertools};
 
-pub type ViewType = u32;
+pub type ViewType = i32;
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct TensorView {

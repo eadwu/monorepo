@@ -18,7 +18,7 @@ impl From<&TensorView> for WebGPUWorkGroup {
         let y = ((length / z) + 1).sqrt();
         let x = length / (y * z) + 1;
         assert!(x as u64 * y as u64 * z as u64 >= length as u64);
-        WebGPUWorkGroup::new(x, y, z)
+        WebGPUWorkGroup::new(x as u32, y as u32, z as u32)
     }
 }
 

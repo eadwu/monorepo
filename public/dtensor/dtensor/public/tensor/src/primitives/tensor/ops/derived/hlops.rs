@@ -237,7 +237,7 @@ impl Tensor {
             .iter()
             .enumerate()
             .skip(2)
-            .map(|(axis, _)| axis as u32)
+            .map(|(axis, _)| axis as i32)
             .collect::<Vec<_>>();
         self.Normalization(&feature_axes[..], epsilon)
     }
@@ -396,8 +396,8 @@ impl Tensor {
             .fold(self.clone(), |acc, (axis, &(offset_pre, offset_post))| {
                 let shape = acc.shape()[axis];
                 let indices = (offset_pre..shape - offset_post).collect::<Vec<_>>();
-                let indices_tensor = Tensor::range(&[indices.len() as u32], offset_pre, 1);
-                acc.Gather(axis as u32, &indices_tensor)
+                let indices_tensor = Tensor::range(&[indices.len() as i32], offset_pre, 1);
+                acc.Gather(axis as i32, &indices_tensor)
             })
     }
 
@@ -411,7 +411,7 @@ impl Tensor {
         padding.iter().enumerate().fold(
             self.clone(),
             |updates, (axis, &(padding_pre, padding_post))| {
-                let axis = axis as u32;
+                let axis = axis as i32;
                 let piecewise_padding = (0..updates.ndim())
                     .map(|i| {
                         if i == axis {
@@ -525,8 +525,8 @@ impl Tensor {
                 // `end` may exceed the shape of the axis, but does nothing special
                 // Although it is important for Gather for it to be within the bounds
                 let end = end.min(shape_at_axis);
-                let indices = (start..end).step_by(step as usize).collect::<Vec<u32>>();
-                let indices_tensor = Tensor::range(&[indices.len() as u32], start, step);
+                let indices = (start..end).step_by(step as usize).collect::<Vec<i32>>();
+                let indices_tensor = Tensor::range(&[indices.len() as i32], start, step);
                 // Equivalent to slicing by one dimension each time
                 acc.Gather(axis, &indices_tensor)
             })
