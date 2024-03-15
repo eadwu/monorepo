@@ -4,6 +4,7 @@ package grpc;
 option go_package = "dtensor/scheduler/receptionist;grpc";
 
 import "google/api/annotations.proto";
+import "scheduler/guild/guild.proto";
 
 /*
 gRPC lets you define four kinds of service method:
@@ -58,7 +59,9 @@ message Acknowledgement {
 	bool ok = 1;
 }
 
-message RequestDetails {}
+message RequestDetails {
+	guild.Resources requirements = 1;
+}
 
 message RequestAcknowledgement {
 	bool success = 1;
