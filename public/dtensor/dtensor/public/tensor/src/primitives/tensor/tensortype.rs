@@ -1,4 +1,5 @@
-pub trait TensorDataElement = Into<TensorType> + bytemuck::Pod + Copy + ToString;
+pub trait TensorDataElement: Into<TensorType> + bytemuck::Pod + Copy + ToString {}
+impl<T> TensorDataElement for T where T: Into<TensorType> + bytemuck::Pod + Copy + ToString {}
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub enum TensorType {
