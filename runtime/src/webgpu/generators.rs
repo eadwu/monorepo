@@ -39,7 +39,7 @@ pub fn map_index(index_variable: &str, viewtracker: &TensorViewTracker) -> Strin
                 } else {
                     view.shape
                         .iter()
-                        .zip(view.stride.iter().zip(view.contiguous_stride.iter()))
+                        .zip(view.stride.iter().zip(view.contiguous_stride().iter()))
                         .map(|(&shape, (&stride, &contiguous_stride))| {
                             format!(
                                 "((({previous_index} / {contiguous_stride}u) % {shape}u) * {stride}u)",

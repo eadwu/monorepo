@@ -27,7 +27,6 @@ pub fn build_shader(
             false,
             output.view().shape.clone(),
             input.view().stride.clone(),
-            output.view().contiguous_stride.clone(),
         ));
         map_index(index_variable, &normalized_mapper)
     };
@@ -40,13 +39,10 @@ pub fn build_shader(
         .iter()
         .map(|&axis| input.view().stride[axis as usize])
         .collect::<Vec<_>>();
-    let reduce_contiguous_strides = TensorView::compute_contiguous_stride(&reduce_shape[..]);
-
     let iteration_mapper = Into::<TensorViewTracker>::into(TensorView::as_defined(
         false,
         reduce_shape.into_boxed_slice(),
         reduce_strides.into_boxed_slice(),
-        reduce_contiguous_strides.into_boxed_slice(),
     ));
     let reduce_iterations = iteration_mapper.len();
 

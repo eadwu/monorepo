@@ -9,7 +9,6 @@ pub struct TensorView {
     pub contiguous: bool,
     pub shape: Box<[ViewType]>,
     pub stride: Box<[ViewType]>,
-    pub contiguous_stride: Box<[ViewType]>,
 }
 
 impl TensorView {
@@ -17,23 +16,19 @@ impl TensorView {
         contiguous: bool,
         shape: Box<[ViewType]>,
         stride: Box<[ViewType]>,
-        contiguous_stride: Box<[ViewType]>,
     ) -> TensorView {
         TensorView {
             contiguous,
             shape,
             stride,
-            contiguous_stride,
         }
     }
 
     pub fn new(contiguous: bool, shape: Box<[ViewType]>, stride: Box<[ViewType]>) -> TensorView {
-        let contiguous_stride = TensorView::compute_contiguous_stride(&shape);
         TensorView::as_defined(
             contiguous,
             shape,
             stride,
-            contiguous_stride.into_boxed_slice(),
         )
     }
 
@@ -71,6 +66,10 @@ impl TensorView {
 
     pub fn ndim(&self) -> ViewType {
         self.shape.len() as ViewType
+    }
+
+    pub fn contiguous_stride(&self) -> Vec<ViewType> {
+        TensorView::compute_contiguous_stride(&self.shape[..])
     }
 
     pub fn pad(&self, padding: &[(ViewType, ViewType)]) -> TensorView {
