@@ -295,7 +295,6 @@ impl UnrollShaderIR for ReduceSpec {
             false,
             output_view.shape.clone(),
             input_view.stride.clone(),
-            output_view.contiguous_stride.clone(),
         ));
 
         let reduce_shape = self
@@ -308,12 +307,10 @@ impl UnrollShaderIR for ReduceSpec {
             .iter()
             .map(|&axis| input_view.stride[axis as usize])
             .collect::<Vec<_>>();
-        let reduce_contiguous_strides = TensorView::compute_contiguous_stride(&reduce_shape[..]);
         let iteration_mapper = Into::<TensorViewTracker>::into(TensorView::as_defined(
             false,
             reduce_shape.into_boxed_slice(),
             reduce_strides.into_boxed_slice(),
-            reduce_contiguous_strides.into_boxed_slice(),
         ));
         let reduce_iterations = iteration_mapper.len();
 
@@ -356,7 +353,7 @@ impl SerializeShaderIR for TensorViewTracker {
             .fold(index_ir.clone(), |previous_index_ir, view| {
                 view.shape
                     .iter()
-                    .zip(view.stride.iter().zip(view.contiguous_stride.iter()))
+                    .zip(view.stride.iter().zip(view.contiguous_stride().iter()))
                     .fold(
                         zero.clone(),
                         |partial_index, (&shape, (&stride, &contiguous_stride))| {
