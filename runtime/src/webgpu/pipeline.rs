@@ -2,8 +2,11 @@ use std::borrow::Cow;
 use std::collections::{HashMap, HashSet};
 use std::future::Future;
 
+#[cfg(feature = "dtensor_spirv_passthrough")]
 use spirv_tools::assembler::Assembler;
+#[cfg(feature = "dtensor_spirv_passthrough")]
 use spirv_tools::opt::Optimizer;
+#[cfg(feature = "dtensor_spirv_passthrough")]
 use spirv_tools::val::Validator;
 use tensor::ir::mlir::{ShaderIRBuilder, ShaderIREvaluation, ShaderIROp};
 use tensor::primitives::tensor::{OperationSpec, Tensor, TensorInput};
