@@ -1,6 +1,5 @@
 use std::borrow::Cow;
 use std::collections::{HashMap, HashSet};
-use std::future::Future;
 
 #[cfg(feature = "dtensor_spirv_passthrough")]
 use spirv_tools::assembler::Assembler;
@@ -20,7 +19,7 @@ use crate::webgpu::{
 };
 
 pub trait WebGPUEvaluation {
-    fn evaluate_webgpu(&self, wgpu_device: &WebGPUDevice) -> impl Future<Output = Tensor>;
+    fn evaluate_webgpu(&self, wgpu_device: &WebGPUDevice) -> Tensor;
 }
 
 #[derive(Debug)]
@@ -32,7 +31,7 @@ pub struct WebGPUPipeline<'a> {
 }
 
 impl WebGPUEvaluation for Tensor {
-    async fn evaluate_webgpu(&self, wgpu_device: &WebGPUDevice) -> Tensor {
+    fn evaluate_webgpu(&self, wgpu_device: &WebGPUDevice) -> Tensor {
         let WebGPUDevice { device, queue: _ } = wgpu_device;
         // Ensure output is a contiguous Tensor
         let output = self.Identity();
@@ -302,8 +301,7 @@ impl WebGPUEvaluation for Tensor {
                         dispatch_workgroups: &workgroups,
                     },
                     &wgpu_device,
-                )
-                .await;
+                );
                 let _ = tensor.update(&result.data());
                 intermediate_results.insert(tensor.id(), tensor.clone());
 
@@ -326,7 +324,7 @@ impl WebGPUEvaluation for Tensor {
     }
 }
 
-pub async fn webgpu_tensor_pipeline<'a>(
+pub fn webgpu_tensor_pipeline<'a>(
     pipeline: &WebGPUPipeline<'a>,
     wgpu_device: &WebGPUDevice,
 ) -> Tensor {
@@ -511,31 +509,9 @@ pub async fn webgpu_tensor_pipeline<'a>(
 
     queue.submit(std::iter::once(encoder.finish()));
 
-    // Note that we're not calling `.await` here.
     let buffer_slice = staging_buffer.slice(..);
-
-    #[cfg(target_arch = "wasm32")]
-    {
-        // Sets the buffer up for mapping, sending over the result of the mapping back to us when it is finished.
-        // buffer_slice.map_async(wgpu::MapMode::Read, |_| {});
-        let (sender, receiver) = futures_intrusive::channel::shared::oneshot_channel();
-        buffer_slice.map_async(wgpu::MapMode::Read, move |v| sender.send(v).unwrap());
-
-        // Poll the device in a blocking manner so that our future resolves.
-        // In an actual application, `device.poll(...)` should
-        // be called in an event loop 1or on another thread.
-        device.poll(wgpu::Maintain::wait()).panic_on_timeout();
-
-        // Awaits until `buffer_future` can be read from
-        if receiver.receive().await.is_none() {
-            panic!("failed to run compute on gpu!")
-        }
-    }
-    #[cfg(not(target_arch = "wasm32"))]
-    {
-        buffer_slice.map_async(wgpu::MapMode::Read, |_| {});
-        device.poll(wgpu::Maintain::wait()).panic_on_timeout();
-    }
+    buffer_slice.map_async(wgpu::MapMode::Read, |_| {});
+    device.poll(wgpu::Maintain::wait()).panic_on_timeout();
 
     #[cfg(feature = "wgpu_benchmark")]
     {
