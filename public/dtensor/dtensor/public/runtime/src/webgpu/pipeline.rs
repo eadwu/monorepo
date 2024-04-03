@@ -55,7 +55,9 @@ impl WebGPUEvaluation for Tensor {
             })
             .collect::<HashMap<_, _>>();
 
-        for tensor in &runtime {
+        #[cfg(feature = "dtensor_shader_collapse")]
+        let runtime = &runtime[runtime.len() - 1..];
+        for tensor in &runtime[..] {
             if let TensorInput::NoOp(input) = tensor.data() {
                 let precomputed: &Tensor = intermediate_results.get(&input.id()).unwrap();
                 let _ = tensor.update(&precomputed.data());
