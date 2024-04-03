@@ -18,6 +18,7 @@ wgpu = { version = "0.19.3", features = ["spirv"] }
 wgpu_direct_buffer = []
 wgpu_benchmark = []
 dtensor_shader_stitch = []
+dtensor_shader_collapse = []
 dtensor_spirv_passthrough = ["dep:spirv-tools"]
 dtensor_spirv_passthrough_f16 = ["dtensor_spirv_passthrough"]
 
