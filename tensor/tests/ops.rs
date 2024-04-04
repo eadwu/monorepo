@@ -16,7 +16,7 @@ async fn multiply() {
 
     let result = a.Multiply(&b).evaluate_webgpu(&wgpu_device);
     let output = result.load();
-    assert_eq!(bytemuck::cast_slice::<u8, i32>(&output), &[6, 12, 18, 24]);
+    assert_eq!(bytemuck::cast_slice::<u8, i32>(&output[..]), &[6, 12, 18, 24]);
 }
 
 #[tokio::test]
@@ -31,7 +31,7 @@ async fn broadcast() {
         .evaluate_webgpu(&wgpu_device);
     let output = result.load();
     assert_eq!(
-        bytemuck::cast_slice::<u8, i32>(&output),
+        bytemuck::cast_slice::<u8, i32>(&output[..]),
         &[
             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
             24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 0, 1, 2, 3, 4, 5, 6, 7,
@@ -45,7 +45,7 @@ async fn broadcast() {
     let result = input.broadcast_to(&view).evaluate_webgpu(&wgpu_device);
     let output = result.load();
     assert_eq!(
-        bytemuck::cast_slice::<u8, f32>(&output),
+        bytemuck::cast_slice::<u8, f32>(&output[..]),
         &[
             1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1,
             1.1, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0,
@@ -64,13 +64,13 @@ async fn slice() {
         .Slice(&[1, 0], &[2, 3], &[0, 1], &[1, 2])
         .evaluate_webgpu(&wgpu_device);
     let output = result.load();
-    assert_eq!(bytemuck::cast_slice::<u8, f32>(&output), &[5.0, 7.0]);
+    assert_eq!(bytemuck::cast_slice::<u8, f32>(&output[..]), &[5.0, 7.0]);
 
     let result = input
         .Slice(&[0, 1], &[1, 1000], &[0, 1], &[1, 1])
         .evaluate_webgpu(&wgpu_device);
     let output = result.load();
-    assert_eq!(bytemuck::cast_slice::<u8, f32>(&output), &[2.0, 3.0, 4.0]);
+    assert_eq!(bytemuck::cast_slice::<u8, f32>(&output[..]), &[2.0, 3.0, 4.0]);
 }
 
 #[tokio::test]
@@ -80,13 +80,13 @@ async fn argmax() {
     let input = Tensor::from_contiguous(&[1, 2, 3, 3], &[2, 2]);
     let result = input.ArgMax(1, false, false).evaluate_webgpu(&wgpu_device);
     let output = result.load();
-    assert_eq!(bytemuck::cast_slice::<u8, i32>(&output), &[1, 0]);
+    assert_eq!(bytemuck::cast_slice::<u8, i32>(&output[..]), &[1, 0]);
 
     let input = Tensor::arange(&[4, 2, 3, 5]);
     let result = input.ArgMax(1, false, false).evaluate_webgpu(&wgpu_device);
     let output = result.load();
     assert_eq!(
-        bytemuck::cast_slice::<u8, i32>(&output),
+        bytemuck::cast_slice::<u8, i32>(&output[..]),
         &[
             1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
             1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -97,14 +97,14 @@ async fn argmax() {
     let result = input.ArgMax(3, true, false).evaluate_webgpu(&wgpu_device);
     let output = result.load();
     assert_eq!(
-        bytemuck::cast_slice::<u8, i32>(&output),
+        bytemuck::cast_slice::<u8, i32>(&output[..]),
         &[4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]
     );
 
     let result = input.ArgMin(3, true, false).evaluate_webgpu(&wgpu_device);
     let output = result.load();
     assert_eq!(
-        bytemuck::cast_slice::<u8, i32>(&output),
+        bytemuck::cast_slice::<u8, i32>(&output[..]),
         &[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     );
 }
@@ -119,7 +119,7 @@ async fn offset() {
         .evaluate_webgpu(&wgpu_device);
     let output = result.load();
     assert_eq!(
-        bytemuck::cast_slice::<u8, i32>(&output),
+        bytemuck::cast_slice::<u8, i32>(&output[..]),
         &[42, 43, 44, 50, 51, 52]
     );
 }
@@ -132,7 +132,7 @@ async fn pad() {
     let result = input.Pad(&[(1, 1), (1, 0)]).evaluate_webgpu(&wgpu_device);
     let output = result.load();
     assert_eq!(
-        bytemuck::cast_slice::<u8, i32>(&output),
+        bytemuck::cast_slice::<u8, i32>(&output[..]),
         &[0, 0, 0, 0, 4, 2, 0, 3, 1, 0, 0, 0]
     );
 
@@ -140,7 +140,7 @@ async fn pad() {
     let result = input.Pad(&[(1, 2)]).evaluate_webgpu(&wgpu_device);
     let output = result.load();
     assert_eq!(
-        bytemuck::cast_slice::<u8, f32>(&output),
+        bytemuck::cast_slice::<u8, f32>(&output[..]),
         &[0.0, 1.0, 0.0, 0.0]
     );
 }
@@ -158,7 +158,7 @@ async fn conv() {
         .evaluate_webgpu(&wgpu_device);
     let output = result.load();
     assert_eq!(
-        bytemuck::cast_slice::<u8, i32>(&output),
+        bytemuck::cast_slice::<u8, i32>(&output[..]),
         &[24, 30, 36, 48, 54, 60, 72, 78, 84]
     );
 
@@ -170,7 +170,7 @@ async fn conv() {
         .evaluate_webgpu(&wgpu_device);
     let output = result.load();
     assert_eq!(
-        bytemuck::cast_slice::<u8, i32>(&output),
+        bytemuck::cast_slice::<u8, i32>(&output[..]),
         &[24, 30, 36, 14, 48, 54, 60, 22, 72, 78, 84, 30, 13, 14, 15, 0]
     );
 }
@@ -184,7 +184,7 @@ async fn matmul() {
     let result = a.MatMul(&b).evaluate_webgpu(&wgpu_device);
     let output = result.load();
     assert_eq!(
-        bytemuck::cast_slice::<u8, f32>(&output),
+        bytemuck::cast_slice::<u8, f32>(&output[..]),
         &[33.0, 36.0, 39.0, 75.0, 82.0, 89.0, 117.0, 128.0, 139.0, 159.0, 174.0, 189.0]
     );
 }
@@ -197,7 +197,7 @@ async fn softmax() {
     let result = x.Softmax(1).evaluate_webgpu(&wgpu_device);
     let output = result.load();
     assert_eq!(
-        bytemuck::cast_slice::<u8, f32>(&output),
+        bytemuck::cast_slice::<u8, f32>(&output[..]),
         &[0.09003057, 0.24472847, 0.66524096]
     );
 }
@@ -221,7 +221,7 @@ async fn scatter() {
         .evaluate_webgpu(&wgpu_device);
     output = result.load();
     assert_eq!(
-        bytemuck::cast_slice::<u8, f32>(&output),
+        bytemuck::cast_slice::<u8, f32>(&output[..]),
         &[2.0, 1.1, 0.0, 1.0, 0.0, 2.2, 0.0, 2.1, 1.2]
     );
 
@@ -233,7 +233,7 @@ async fn scatter() {
         .evaluate_webgpu(&wgpu_device);
     output = result.load();
     assert_eq!(
-        bytemuck::cast_slice::<u8, f32>(&output),
+        bytemuck::cast_slice::<u8, f32>(&output[..]),
         &[1.0, 1.1, 3.0, 2.1, 5.0]
     );
 }
@@ -250,52 +250,52 @@ async fn reduce() {
     b = a.Sum(&[], true);
     result = b.evaluate_webgpu(&wgpu_device);
     output = result.load();
-    assert_eq!(bytemuck::cast_slice::<u8, f32>(&output), &[10.0]);
+    assert_eq!(bytemuck::cast_slice::<u8, f32>(&output[..]), &[10.0]);
 
     b = a.Sum(&[], false);
     result = b.evaluate_webgpu(&wgpu_device);
     output = result.load();
-    assert_eq!(bytemuck::cast_slice::<u8, f32>(&output), &[10.0]);
+    assert_eq!(bytemuck::cast_slice::<u8, f32>(&output[..]), &[10.0]);
 
     b = a.Sum(&[1], true);
     result = b.evaluate_webgpu(&wgpu_device);
     output = result.load();
-    assert_eq!(bytemuck::cast_slice::<u8, f32>(&output), &[3.0, 7.0]);
+    assert_eq!(bytemuck::cast_slice::<u8, f32>(&output[..]), &[3.0, 7.0]);
 
     b = a.Sum(&[1], false);
     result = b.evaluate_webgpu(&wgpu_device);
     output = result.load();
-    assert_eq!(bytemuck::cast_slice::<u8, f32>(&output), &[3.0, 7.0]);
+    assert_eq!(bytemuck::cast_slice::<u8, f32>(&output[..]), &[3.0, 7.0]);
 
     b = a.Sum(&[0], true);
     result = b.evaluate_webgpu(&wgpu_device);
     output = result.load();
-    assert_eq!(bytemuck::cast_slice::<u8, f32>(&output), &[4.0, 6.0]);
+    assert_eq!(bytemuck::cast_slice::<u8, f32>(&output[..]), &[4.0, 6.0]);
 
     b = a.Sum(&[0], false);
     result = b.evaluate_webgpu(&wgpu_device);
     output = result.load();
-    assert_eq!(bytemuck::cast_slice::<u8, f32>(&output), &[4.0, 6.0]);
+    assert_eq!(bytemuck::cast_slice::<u8, f32>(&output[..]), &[4.0, 6.0]);
 
     b = a.Sum(&[0, 1], true);
     result = b.evaluate_webgpu(&wgpu_device);
     output = result.load();
-    assert_eq!(bytemuck::cast_slice::<u8, f32>(&output), &[10.0]);
+    assert_eq!(bytemuck::cast_slice::<u8, f32>(&output[..]), &[10.0]);
 
     b = a.Sum(&[0, 1], false);
     result = b.evaluate_webgpu(&wgpu_device);
     output = result.load();
-    assert_eq!(bytemuck::cast_slice::<u8, f32>(&output), &[10.0]);
+    assert_eq!(bytemuck::cast_slice::<u8, f32>(&output[..]), &[10.0]);
 
     b = Tensor::scalar(6128.0).Sum(&[], false);
     result = b.evaluate_webgpu(&wgpu_device);
     output = result.load();
-    assert_eq!(bytemuck::cast_slice::<u8, f32>(&output), &[6128.0]);
+    assert_eq!(bytemuck::cast_slice::<u8, f32>(&output[..]), &[6128.0]);
 
     b = Tensor::scalar(6128.0).Sum(&[], true);
     result = b.evaluate_webgpu(&wgpu_device);
     output = result.load();
-    assert_eq!(bytemuck::cast_slice::<u8, f32>(&output), &[6128.0]);
+    assert_eq!(bytemuck::cast_slice::<u8, f32>(&output[..]), &[6128.0]);
 }
 
 #[tokio::test]
@@ -314,7 +314,7 @@ async fn gather() {
         .evaluate_webgpu(&wgpu_device);
     output = result.load();
     assert_eq!(
-        bytemuck::cast_slice::<u8, f32>(&output),
+        bytemuck::cast_slice::<u8, f32>(&output[..]),
         &[1.0, 1.2, 2.3, 3.4, 2.3, 3.4, 4.5, 5.7]
     );
 
@@ -325,7 +325,7 @@ async fn gather() {
         .evaluate_webgpu(&wgpu_device);
     output = result.load();
     assert_eq!(
-        bytemuck::cast_slice::<u8, f32>(&output),
+        bytemuck::cast_slice::<u8, f32>(&output[..]),
         &[1.0, 1.9, 2.3, 3.9, 4.5, 5.9]
     );
 
@@ -336,7 +336,7 @@ async fn gather() {
         .evaluate_webgpu(&wgpu_device);
     output = result.load();
     assert_eq!(
-        bytemuck::cast_slice::<u8, f32>(&output),
+        bytemuck::cast_slice::<u8, f32>(&output[..]),
         &[1.0, 1.0, 4.0, 3.0]
     );
 
@@ -347,7 +347,7 @@ async fn gather() {
         .evaluate_webgpu(&wgpu_device);
     output = result.load();
     assert_eq!(
-        bytemuck::cast_slice::<u8, f32>(&output),
+        bytemuck::cast_slice::<u8, f32>(&output[..]),
         &[4.0, 8.0, 3.0, 7.0, 2.0, 3.0]
     );
 }
@@ -364,7 +364,7 @@ async fn erf() {
     result = data.Erf().evaluate_webgpu(&wgpu_device);
     output = result.load();
     assert_eq!(
-        bytemuck::cast_slice::<u8, f32>(&output),
+        bytemuck::cast_slice::<u8, f32>(&output[..]),
         &[0.15729931, 0.11979495, 0.08968594, 0.06599197]
     );
 
@@ -372,7 +372,7 @@ async fn erf() {
     result = data.Erf().evaluate_webgpu(&wgpu_device);
     output = result.load();
     assert_eq!(
-        bytemuck::cast_slice::<u8, f32>(&output),
+        bytemuck::cast_slice::<u8, f32>(&output[..]),
         &[-0.15729931, -0.11979495, -0.08968594, -0.06599197]
     );
 }
