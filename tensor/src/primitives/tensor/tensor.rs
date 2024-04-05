@@ -137,15 +137,15 @@ impl Tensor {
         self.0.datatype
     }
 
-    pub fn load(&self) -> Vec<u8> {
+    pub fn load<T: bytemuck::Pod>(&self) -> Vec<T> {
         assert!(self.has_data(), "Tensor does not contain any data");
 
         if let TensorInput::ExplicitInput(input) = &self.data() {
             return match input {
-                InputSpec::Scalar(str) => <&Tensor as ScalarLoader>::load(self, str),
-                InputSpec::Range(spec) => <&Tensor as RangeLoader>::load(self, spec),
-                InputSpec::Internal(spec) => <&Tensor as InternalLoader>::load(self, spec),
-                InputSpec::Safetensor(spec) => <&Tensor as SafetensorLoader>::load(self, spec),
+                InputSpec::Scalar(str) => <&Tensor as ScalarLoader>::load::<T>(self, str),
+                InputSpec::Range(spec) => <&Tensor as RangeLoader>::load::<T>(self, spec),
+                InputSpec::Internal(spec) => <&Tensor as InternalLoader>::load::<T>(self, spec),
+                InputSpec::Safetensor(spec) => <&Tensor as SafetensorLoader>::load::<T>(self, spec),
             };
         }
 
