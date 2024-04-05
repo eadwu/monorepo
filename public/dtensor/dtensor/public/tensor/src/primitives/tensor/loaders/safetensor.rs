@@ -4,11 +4,11 @@ use crate::primitives::tensor::{SafetensorSpec, Tensor};
 use crate::FILE_MANAGER;
 
 pub trait SafetensorLoader {
-    fn load(self, spec: &SafetensorSpec) -> Vec<u8>;
+    fn load<T: bytemuck::Pod>(self, spec: &SafetensorSpec) -> Vec<T>;
 }
 
 impl SafetensorLoader for &Tensor {
-    fn load(self, spec: &SafetensorSpec) -> Vec<u8> {
+    fn load<T: bytemuck::Pod>(self, spec: &SafetensorSpec) -> Vec<T> {
         let buffer = FILE_MANAGER.lock().unwrap().open(&spec.file, 0).unwrap();
         let safetensors = SafeTensors::deserialize(&buffer).unwrap();
         let tensor = safetensors.tensor(&spec.tensor).unwrap();
