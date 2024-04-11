@@ -10,8 +10,10 @@ bytemuck = "1.15.0"
 filemanager = { version = "0.1.0", path = "../filemanager" }
 half = "2.4.0"
 hex = "0.4.3"
+log = "0.4.21"
 prost = "0.12.3"
 sha1 = "0.10.6"
+tensor = { version = "0.1.0", path = "../tensor" }
 
 [build-dependencies]
 prost-build = "0.12.3"
