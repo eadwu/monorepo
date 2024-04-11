@@ -7,6 +7,9 @@ pub(crate) use bytes_parser::*;
 mod data_type;
 pub(crate) use data_type::*;
 
+mod runtime;
+pub use runtime::*;
+
 mod internal {
     include!(concat!(env!("OUT_DIR"), "/onnx.rs"));
 }
