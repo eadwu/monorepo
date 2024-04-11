@@ -45,12 +45,13 @@ impl Tensor {
 
         // Make sure axes are within 0 <= axis < rank
         axes.iter().for_each(|&dimension| {
+            assert!(dimension >= 0, "Unexpected axis {} < 0", dimension);
             assert!(
                 dimension < self.ndim(),
                 "Unexpected axis {} >= {}",
                 dimension,
                 self.ndim()
-            )
+            );
         });
 
         let mut output_shape = self.shape().to_vec();
