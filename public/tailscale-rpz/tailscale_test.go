@@ -1,4 +1,4 @@
-package tailscale
+package main
 
 import (
 	"net/netip"
