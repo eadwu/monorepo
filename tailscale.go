@@ -1,29 +1,24 @@
-package tailscale
+package main
 
 import (
 	"context"
 	"fmt"
+	"log"
 	"strings"
 	"sync"
 	"time"
 
-	"github.com/coredns/coredns/plugin"
-	"github.com/coredns/coredns/plugin/pkg/fall"
 	"tailscale.com/client/tailscale"
 	"tailscale.com/ipn"
 	"tailscale.com/tailcfg"
-	"tailscale.com/tsnet"
 	"tailscale.com/types/netmap"
 )
 
 type Tailscale struct {
-	next plugin.Handler
-	zone string
-	fall fall.F
+	signal chan bool
 
-	authkey string
-	srv     *tsnet.Server
-	lc      *tailscale.LocalClient
+	zone string
+	lc   *tailscale.LocalClient
 
 	mu      sync.RWMutex
 	entries map[string]map[string][]string
@@ -34,30 +29,9 @@ func (t *Tailscale) Name() string { return "tailscale" }
 
 // start connects the Tailscale plugin to a tailscale daemon and populates DNS entries for nodes in the tailnet.
 // DNS entries are automatically kept up to date with any node changes.
-//
-// If t.authkey is non-empty, this function uses that key to connect to the Tailnet using a tsnet server
-// instead of connecting to the local tailscaled instance.
 func (t *Tailscale) start() error {
-	if t.authkey != "" {
-		// authkey was provided, so startup a local tsnet server
-		t.srv = &tsnet.Server{
-			Hostname:     "coredns",
-			AuthKey:      t.authkey,
-			Logf:         log.Debugf,
-			RunWebClient: true,
-		}
-		err := t.srv.Start()
-		if err != nil {
-			return err
-		}
-		t.lc, err = t.srv.LocalClient()
-		if err != nil {
-			return err
-		}
-	} else {
-		// zero value LocalClient will connect to local tailscaled
-		t.lc = &tailscale.LocalClient{}
-	}
+	// zero value LocalClient will connect to local tailscaled
+	t.lc = &tailscale.LocalClient{}
 
 	go t.watchIPNBus()
 	return nil
@@ -69,7 +43,7 @@ func (t *Tailscale) watchIPNBus() {
 	for {
 		watcher, err := t.lc.WatchIPNBus(context.Background(), ipn.NotifyInitialNetMap)
 		if err != nil {
-			log.Info("unable to read from Tailscale event bus, retrying in 1 minute")
+			log.Print("unable to read from Tailscale event bus, retrying in 1 minute")
 			time.Sleep(1 * time.Minute)
 			continue
 		}
@@ -83,6 +57,9 @@ func (t *Tailscale) watchIPNBus() {
 				break
 			}
 			t.processNetMap(n.NetMap)
+
+			// Signal update
+			t.signal <- true
 		}
 	}
 }
@@ -92,7 +69,7 @@ func (t *Tailscale) processNetMap(nm *netmap.NetworkMap) {
 		return
 	}
 
-	log.Debugf("Self tags: %+v", nm.SelfNode.Tags().AsSlice())
+	log.Printf("Self tags: %+v", nm.SelfNode.Tags().AsSlice())
 	nodes := []tailcfg.NodeView{nm.SelfNode}
 	nodes = append(nodes, nm.Peers...)
 
@@ -143,5 +120,5 @@ func (t *Tailscale) processNetMap(nm *netmap.NetworkMap) {
 	t.mu.Lock()
 	t.entries = entries
 	t.mu.Unlock()
-	log.Debugf("updated %d Tailscale entries", len(entries))
+	log.Printf("updated %d Tailscale entries", len(entries))
 }
