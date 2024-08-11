@@ -9,6 +9,13 @@ import (
 	"tailscale.com/atomicfile"
 )
 
+const SOA_RECORD string = `
+$TTL 300
+@ SOA localhost. root.localhost. 1721221718 43200 3600 259200 300
+  NS  localhost.
+
+`
+
 func main() {
 	zone := os.Args[1]
 	output := os.Args[2]
@@ -30,6 +37,10 @@ func main() {
 
 func (t *Tailscale) generateRPZ() string {
 	var builder strings.Builder
+
+	if _, err := builder.WriteString(SOA_RECORD); err != nil {
+		log.Println(err)
+	}
 
 	for host, dns := range t.entries {
 		for record, values := range dns {
