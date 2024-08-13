@@ -1,9 +1,9 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
-	"os"
 	"regexp"
 	"strings"
 
@@ -24,9 +24,17 @@ $TTL 300
 
 `
 
+var central = flag.Bool("central", false, "Provide records to a central alias")
+
 func main() {
-	zone := os.Args[1]
-	output := os.Args[2]
+	flag.Parse()
+	if len(flag.Args()) < 2 {
+		log.Printf("tailscale-rpz [--central] <zone> <rpz-output-file>\n")
+		return
+	}
+
+	zone := flag.Arg(0)
+	output := flag.Arg(1)
 
 	ts := &Tailscale{}
 	ts.zone = zone
@@ -53,7 +61,7 @@ func (t *Tailscale) generateRPZ() string {
 	for host, dns := range t.entries {
 		for record, values := range dns {
 			for _, v := range values {
-				if EPHERMAL_REGEX.MatchString(host) {
+				if *central && EPHERMAL_REGEX.MatchString(host) {
 					splits := strings.Split(host, "-")
 					centralAlias := splits[0]
 
