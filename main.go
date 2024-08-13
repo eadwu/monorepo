@@ -12,10 +12,10 @@ import (
 
 // Tailscale suffixes ephemeral with -N
 // Match everything behind (.*)-N for the central domain for the rest to load balance
-// To make it easier, matching is relaxed to any number of `-` so the name can be
-// "nodename-" and ephemeral instances would be "nodename--1", "nodenname--2"
-// and the central instance is "nodename"
-var EPHERMAL_REGEX *regexp.Regexp = regexp.MustCompile(`([^-]+)-*-[0-9]+`)
+// To make it easier, matching is relaxed to only detect the existence of a `-`
+// so the name can be "node-name" and ephemeral instances would be
+// "node-name-1", "node-name-2" and the central instance is "node-name"
+var EPHERMAL_REGEX *regexp.Regexp = regexp.MustCompile(`^([^-]+.*)-[0-9]+$`)
 
 const SOA_RECORD string = `
 $TTL 300
@@ -61,9 +61,8 @@ func (t *Tailscale) generateRPZ() string {
 	for host, dns := range t.entries {
 		for record, values := range dns {
 			for _, v := range values {
-				if *central && EPHERMAL_REGEX.MatchString(host) {
-					splits := strings.Split(host, "-")
-					centralAlias := splits[0]
+				if splits := EPHERMAL_REGEX.FindStringSubmatch(host); *central && splits != nil {
+					centralAlias := splits[1]
 
 					rpz := fmt.Sprintf("%s.%s	%s	%s\n", centralAlias, t.zone, record, v)
 					if _, err := builder.WriteString(rpz); err != nil {
