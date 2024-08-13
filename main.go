@@ -11,11 +11,11 @@ import (
 )
 
 // Tailscale suffixes ephemeral with -N
-// Match everything behind (.*)-N for the central domain for the rest to load balance
-// To make it easier, matching is relaxed to only detect the existence of a `-`
-// so the name can be "node-name" and ephemeral instances would be
-// "node-name-1", "node-name-2" and the central instance is "node-name"
-var EPHERMAL_REGEX *regexp.Regexp = regexp.MustCompile(`^([^-]+.*)-[0-9]+$`)
+// Central names are suffixed with -central such that the node and any other
+// ephermal node names derived from it are centralized to the prefix
+// For example node-central, node-central-1, and node-central-2 will be aliased
+// records to node
+var EPHERMAL_REGEX *regexp.Regexp = regexp.MustCompile("^([^-]+.*)-central(?:-[0-9]+){0,1}$")
 
 const SOA_RECORD string = `
 $TTL 300
