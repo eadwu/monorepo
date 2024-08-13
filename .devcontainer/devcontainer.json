@@ -1,0 +1,13 @@
+{
+  "name": "Go",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "forwardPorts": [],
+  "runArgs": [
+    "--userns=keep-id"
+  ],
+  "containerEnv": {
+    "HOME": "/home/vscode"
+  }
+}
