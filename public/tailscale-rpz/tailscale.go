@@ -17,8 +17,9 @@ import (
 type Tailscale struct {
 	signal chan bool
 
-	zone string
-	lc   *tailscale.LocalClient
+	zone   string
+	lc     *tailscale.LocalClient
+	domain string
 
 	mu      sync.RWMutex
 	entries map[string]map[string][]string
@@ -75,6 +76,10 @@ func (t *Tailscale) processNetMap(nm *netmap.NetworkMap) {
 
 	entries := map[string]map[string][]string{}
 	for _, node := range nodes {
+		if node != nm.SelfNode && (node.Online() == nil || !*node.Online()) {
+			// No connection from perspective of Tailscale considered offline
+			continue
+		}
 		if node.IsWireGuardOnly() {
 			// IsWireGuardOnly identifies a node as a Mullvad exit node.
 			continue
@@ -119,6 +124,7 @@ func (t *Tailscale) processNetMap(nm *netmap.NetworkMap) {
 
 	t.mu.Lock()
 	t.entries = entries
+	t.domain = nm.MagicDNSSuffix()
 	t.mu.Unlock()
 	log.Printf("updated %d Tailscale entries", len(entries))
 }
