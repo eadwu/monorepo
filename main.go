@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"math/rand"
 	"regexp"
 	"strings"
 
@@ -25,11 +26,12 @@ $TTL 300
 `
 
 var central = flag.Bool("central", false, "Provide records to a central alias")
+var shuffle = flag.Bool("shuffle", false, "Shuffle order of hosts every update")
 
 func main() {
 	flag.Parse()
 	if len(flag.Args()) < 2 {
-		log.Printf("tailscale-rpz [--central] <zone> <rpz-output-file>\n")
+		log.Printf("tailscale-rpz [--central] [--shuffle] <zone> <rpz-output-file>\n")
 		return
 	}
 
@@ -58,7 +60,19 @@ func (t *Tailscale) generateRPZ() string {
 		log.Println(err)
 	}
 
-	for host, dns := range t.entries {
+	// Shuffle the keys randomly
+	hosts := make([]string, 0, len(t.entries))
+	for host := range t.entries {
+		hosts = append(hosts, host)
+	}
+	if *shuffle {
+		rand.Shuffle(len(hosts), func(i, j int) {
+			hosts[i], hosts[j] = hosts[j], hosts[i]
+		})
+	}
+
+	for _, host := range hosts {
+		dns := t.entries[host]
 		for record, values := range dns {
 			for _, v := range values {
 				if splits := EPHERMAL_REGEX.FindStringSubmatch(host); *central && splits != nil {
