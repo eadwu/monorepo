@@ -6,161 +6,147 @@ let
       name = "better-comments";
       publisher = "aaron-bond";
       version = "3.0.2";
-      sha256 = "15w1ixvp6vn9ng6mmcmv9ch0ngx8m85i1yabxdfn6zx3ypq802c5";
+      hash = "sha256-hQmA8PWjf2Nd60v5EAuqqD8LIEu7slrNs8luc3ePgZc=";
     }
 
     {
       name = "bookmarks";
       publisher = "alefragnani";
       version = "13.5.0";
-      sha256 = "06pmlmd3wahplhv5r8jdk19xlv2rmhiggmmw6s30pnys2bj5va50";
+      hash = "sha256-oKhd5BLa2wuGNrzW9yKsWWzaU5hNolw2pBcqPlql9Ro=";
     }
 
     {
       name = "path-intellisense";
       publisher = "christian-kohler";
       version = "2.10.0";
-      sha256 = "06x9ksl4bghfpxh4n65d1d7dr11spl140p9ch4mc01nrdibgckbc";
+      hash = "sha256-bE32VmzZBsAqgSxdQAK9OoTcTgutGEtgvw6+RaieqRs=";
     }
 
     {
       name = "githistory";
       publisher = "donjayamanne";
       version = "0.6.20";
-      sha256 = "0x9q7sh5l1frpvfss32ypxk03d73v9npnqxif4fjwcfwvx5mhiww";
+      hash = "sha256-nEdYS9/cMS4dcbFje23a47QBZr9eDK3dvtkFWqA+OHU=";
     }
 
     {
       name = "gitlens";
       publisher = "eamodio";
-      version = "2025.2.804";
-      sha256 = "04kf98qy5vsh16nn4ydrl8nb47hbwafpjcfj2qrl7xvf9jshw2bb";
-    }
-
-    {
-      name = "vsc-material-theme";
-      publisher = "equinusocio";
-      version = "34.7.9";
-      sha256 = "0a2hjd552b2fbfkm3wcvf5rh6dl4wb9kdrmdji4yx9jvqh2di60z";
-    }
-
-    {
-      name = "vsc-material-theme-icons";
-      publisher = "equinusocio";
-      version = "3.8.12";
-      sha256 = "0srj5d5mkfpcz4sissk5gbs4ijjlr7hqfjwmqa6rxslrgjihdb5g";
+      version = "2025.3.204";
+      hash = "sha256-4L30w8Ht/zSf2yuF1V0go6IanlNGaKW6+HEvakSwy1M=";
     }
 
     {
       name = "copilot";
       publisher = "github";
-      version = "1.266.1364";
-      sha256 = "0xqjjjvq0fp6dxf2sx97bn1sfr8xwfpms4jidgvxhd2fbnygqf5g";
+      version = "1.276.1405";
+      hash = "sha256-DAtSxsllj4hsYPoyDLgSe6I4vJhyGSUCcWKCgtQeAMU=";
     }
 
     {
       name = "vscode-pull-request-github";
       publisher = "github";
-      version = "0.105.2025021004";
-      sha256 = "13aa54aiyvlgg41b004jqb7akwi00gzmzjzdcac33x3hbkkhz06p";
+      version = "0.105.2025022704";
+      hash = "sha256-SgNuPiLtWOAk0w9YJOS0vwk1ruvBkZwnDRgbmXJFhDU=";
     }
 
     {
       name = "todo-tree";
       publisher = "gruntfuggly";
       version = "0.0.226";
-      sha256 = "0yrc9qbdk7zznd823bqs1g6n2i5xrda0f9a7349kknj9wp1mqgqn";
+      hash = "sha256-Fj9cw+VJ2jkTGUclB1TLvURhzQsaryFQs/+f2RZOLHs=";
     }
 
     {
       name = "nix-ide";
       publisher = "jnoortheen";
       version = "0.4.12";
-      sha256 = "0rdq9wnqfrj8k1g5fcaam5iahzd16bdpi3sa0n2gi0rh02kg55fy";
+      hash = "sha256-3pXypgAwg/iEBUqPeNsyoX2oYqlKMVdemEhmhy1PuGU=";
     }
 
     {
       name = "magit";
       publisher = "kahole";
-      version = "0.6.64";
-      sha256 = "1d69j6nqmdlm6dihvq1fa207r1ycqz5225l6b3bz5wfzmb50zfri";
+      version = "0.6.66";
+      hash = "sha256-RLSb5OKWmSZB2sgi+YRkaOEaypI5hV6PGItqRw+ihts=";
     }
 
     {
       name = "noctis";
       publisher = "liviuschera";
       version = "10.43.3";
-      sha256 = "0lkkrrcp97pcq2k8brb4bw1gi58bngjxpzk8c2mdhm3pa9dixij4";
+      hash = "sha256-RMYeW1J3VNiqYGj+2+WzC5X4Al9k5YWmwOyedFnOc1I=";
     }
 
     {
       name = "git-graph";
       publisher = "mhutchie";
       version = "1.30.0";
-      sha256 = "000zhgzijf3h6abhv4p3cz99ykj6489wfn81j0s691prr8q9lxxh";
+      hash = "sha256-sHeaMMr5hmQ0kAFZxxMiRk6f0mfjkg2XMnA4Gf+DHwA=";
     }
 
     {
       name = "vscode-filesize";
       publisher = "mkxml";
       version = "3.2.2";
-      sha256 = "060rcckwkwrxvs5z3ikx20a4ahx286si3yz2l5wmwqzkvw560n25";
+      hash = "sha256-RVhgCt/zY155oeL7EbVBokNFFBB9xvGL3j3zySdjGRg=";
     }
 
     {
       name = "remote-containers";
       publisher = "ms-vscode-remote";
-      version = "0.398.0";
-      sha256 = "06z9rwljxqf0hpj1qbila49ixymichvgpjxnc49fgi35pbbq936m";
+      version = "0.400.0";
+      hash = "sha256-UXgyFzzM19Elpdtza6zwXxSGg69ddBwVIe+m0anc9AE=";
     }
 
     {
       name = "remote-ssh";
       publisher = "ms-vscode-remote";
-      version = "0.118.2025020720";
-      sha256 = "1misizc4hjg7agryrh0wy28q5wv99nrz43b98bvdhl9vv0p3bbvz";
+      version = "0.118.2025022515";
+      hash = "sha256-bhutaqCmyJTw+biiNxWQ6cdbIRRSeIcNxh2NferCr9g=";
     }
 
     {
       name = "hexeditor";
       publisher = "ms-vscode";
       version = "1.11.1";
-      sha256 = "1dm3l23pwxr2bslwy6aik6lxfz101zna95vcrh2g7dglklx5h7j4";
+      hash = "sha256-RB5YOp30tfMEzGyXpOwPIHzXqZlRGc+pXiJ3foego7Y=";
     }
 
     {
       name = "vs-keybindings";
       publisher = "ms-vscode";
       version = "0.2.1";
-      sha256 = "1h7dihd6f39jcp27haiwbjdsymyi5p2v4f101lxdi5fafz3y6win";
+      hash = "sha256-NnLjx3fKldg6DSA4ssUt0Vevm1w8KnjEZTINZxqM7cA=";
     }
 
     {
       name = "vsliveshare";
       publisher = "ms-vsliveshare";
       version = "1.0.5948";
-      sha256 = "0rhwjar2c6bih1c5w4w8gdgpc6f18669gzycag5w9s35bv6bvsr8";
+      hash = "sha256-KOu9zF5l6MTLU8z/l4xBwRl2X3uIE15YgHEZJrKSHGY=";
     }
 
     {
       name = "gremlins";
       publisher = "nhoizey";
       version = "0.26.0";
-      sha256 = "1sfs98nxm5ylcjrmylr5y68ddml8cfg1q1wdm7wvhfhjqx4kig9h";
+      hash = "sha256-ML04SccSOrj5qY0HHJ5jiNbWkPElU1+zZNSX2i1K2uk=";
     }
 
     {
       name = "explorer-exclude";
       publisher = "peterschmalfeldt";
       version = "1.3.2";
-      sha256 = "1khvs655dl0gn69azx1hzv9czli1kc7w18dfwirqkdibf1zxvg07";
+      hash = "sha256-B7zdf3Artolz5K6hwA+bIdLP0v4w9K+SsQ/QVorRG84=";
     }
 
     {
       name = "errorlens";
       publisher = "usernamehw";
       version = "3.23.0";
-      sha256 = "100fp73c7pvnlmvc6bxxi7almbl2p58p2291zp6ajgxzix9wjgcv";
+      hash = "sha256-mz3JU4+/P6nM/SEJcVG5gq5K1Ym9L8N2pXbfw8a5DoA=";
     }
   ];
 in
