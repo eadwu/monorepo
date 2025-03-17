@@ -5,15 +5,15 @@ let
     {
       name = "copilot";
       publisher = "github";
-      version = "1.280.1421";
-      hash = "sha256-DfIyCod0IVIhjwBYwqtctDA9V116T974O6wa3tPOrmo=";
+      version = "1.286.1440";
+      hash = "sha256-5nnAubrqY0e1UDoPTpxSgUjgxK+tb1xwrvUZK3MP720=";
     }
     
     {
       name = "vscode-pull-request-github";
       publisher = "github";
-      version = "0.107.2025030604";
-      hash = "sha256-3gXu6powUBYNBhBHA+8zvPQLdBFrwC1LML+NXPEVdIY=";
+      version = "0.107.2025031704";
+      hash = "sha256-xElXOw3VsJoPBa01o4MJUZkozuI9JXNebDyHHRRCo9o=";
     }
     
     {
@@ -33,8 +33,8 @@ let
     {
       name = "remote-containers";
       publisher = "ms-vscode-remote";
-      version = "0.403.0";
-      hash = "sha256-3y/YNajhA65SQQp38DVYUHnpWFb0z6ZtPMDU+RdLzEM=";
+      version = "0.405.0";
+      hash = "sha256-9I/nMWADXKmIaPjdhfqVx+Xn34mx7ZY85XPm47ZX87g=";
     }
     
     {
