@@ -5,22 +5,22 @@ let
     {
       name = "copilot";
       publisher = "github";
-      version = "1.286.1440";
-      hash = "sha256-5nnAubrqY0e1UDoPTpxSgUjgxK+tb1xwrvUZK3MP720=";
+      version = "1.290.1456";
+      hash = "sha256-3vltaYqFfAVuzmezDjgLSjsP9UKNUUKkN36hYJh2+C8=";
     }
     
     {
       name = "vscode-pull-request-github";
       publisher = "github";
-      version = "0.107.2025031704";
-      hash = "sha256-xElXOw3VsJoPBa01o4MJUZkozuI9JXNebDyHHRRCo9o=";
+      version = "0.107.2025032404";
+      hash = "sha256-oK3NehAHaQWrbmm92KkoUWp76de3wYIBKy4KsMjauVI=";
     }
     
     {
       name = "nix-ide";
       publisher = "jnoortheen";
-      version = "0.4.12";
-      hash = "sha256-3pXypgAwg/iEBUqPeNsyoX2oYqlKMVdemEhmhy1PuGU=";
+      version = "0.4.16";
+      hash = "sha256-MdFDOg9uTUzYtRW2Kk4L8V3T/87MRDy1HyXY9ikqDFY=";
     }
     
     {
@@ -33,15 +33,15 @@ let
     {
       name = "remote-containers";
       publisher = "ms-vscode-remote";
-      version = "0.405.0";
-      hash = "sha256-9I/nMWADXKmIaPjdhfqVx+Xn34mx7ZY85XPm47ZX87g=";
+      version = "0.407.0";
+      hash = "sha256-WJo8dXGgziLd2hSr6YgkAqhe8S3VyH0A/o0m4WopaC4=";
     }
     
     {
       name = "remote-ssh";
       publisher = "ms-vscode-remote";
-      version = "0.119.2025030615";
-      hash = "sha256-zEnkL3uFLW7fWpT1RhMFvD0jUhE2OsxtV4GGj9dJDMs=";
+      version = "0.119.2025031815";
+      hash = "sha256-8hyMfRxXGDJ3W4z+Um6wUj1Jjz7vhCBMCHELANfORVU=";
     }
     
     {
